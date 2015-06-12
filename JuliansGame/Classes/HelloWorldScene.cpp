@@ -104,20 +104,91 @@ bool HelloWorld::init()
     contactListener->onContactBegin = CC_CALLBACK_1( HelloWorld::onContactBegin, this) ;
     this->getEventDispatcher()->addEventListenerWithSceneGraphPriority( contactListener, this );
 
-	//touch listener
+	////touch listener
+	//auto event_listener = EventListenerTouchAllAtOnce::create();
+	////event_listener ->onTouchesBegan = someFunc();
+	//event_listener -> onTouchesEnded = [=](const std::vector<Touch*>& pTouches, Event* event){
+	//	auto touch = *pTouches.begin();
+	//	auto openGl_location = touch-> getLocation();
+	//
+	//	auto move_action = MoveTo::create(1.f, openGl_location);
+	//	mySprite-> runAction(move_action);
+	//	CCLOG("%.1f %.1f", mySprite-> getPositionX(), mySprite-> getPositionY());
+	//	};
+	//
+	//this-> getEventDispatcher()-> addEventListenerWithSceneGraphPriority(event_listener, mySprite);
+
+		//touch listener
 	auto event_listener = EventListenerTouchAllAtOnce::create();
-        event_listener -> onTouchesEnded = [=](const std::vector<Touch*>& pTouches, Event* event){
-                auto touch = *pTouches.begin();
-                auto openGl_location = touch-> getLocation();
- 
-                auto move_action = MoveTo::create(1.f, openGl_location);
-                mySprite-> runAction(move_action);
-                CCLOG("%.1f %.1f", mySprite-> getPositionX(), mySprite-> getPositionY());
-        };
- 
-        this-> getEventDispatcher()-> addEventListenerWithSceneGraphPriority(event_listener, mySprite);
+	//event_listener ->onTouchesBegan = someFunc();
+	event_listener -> onTouchesEnded = [=](const std::vector<Touch*>& pTouches, Event* event){
+		auto touch = *pTouches.begin();
+		auto openGl_location = touch-> getLocation();
+	
+		auto move_action = MoveTo::create(1.f, openGl_location);
+		
+
+		auto bullet = Sprite::create( "player_blue.png" );
+		bullet->setPosition( mySprite->getPosition() );
+		auto bulletBody = PhysicsBody::createBox( bullet->getContentSize(), PhysicsMaterial( 0, 1, 0 ) );
+	
+		bulletBody->setDynamic(false);
+		bulletBody->setCollisionBitmask( 2 );
+		bulletBody->setContactTestBitmask( true );
+	
+		bullet->setPhysicsBody( bulletBody );
+
+		this->addChild( bullet );
+		auto callback = CallFunc::create( [this,bullet]() {
+			this->actionFinished(bullet);
+		});
+		auto sequence = Sequence::create(move_action, callback, NULL);
+		bullet-> runAction(sequence);
+		
+		CCLOG("%.1f %.1f", bullet-> getPositionX(), bullet-> getPositionY());
+		};
+	
+	this-> getEventDispatcher()-> addEventListenerWithSceneGraphPriority(event_listener, mySprite);
+
+
+
+	//keyboard listener
+	auto eventListener = EventListenerKeyboard::create();
+
+	eventListener->onKeyPressed = [](EventKeyboard::KeyCode keyCode, Event* event){
+
+		Vec2 loc = event->getCurrentTarget()->getPosition();
+		switch(keyCode){
+			case EventKeyboard::KeyCode::KEY_LEFT_ARROW:
+			case EventKeyboard::KeyCode::KEY_A:
+				event->getCurrentTarget()->setPosition(loc.x-10,loc.y);
+				break;
+			case EventKeyboard::KeyCode::KEY_RIGHT_ARROW:
+			case EventKeyboard::KeyCode::KEY_D:
+				event->getCurrentTarget()->setPosition(loc.x+10,loc.y);
+				break;
+			case EventKeyboard::KeyCode::KEY_UP_ARROW:
+			case EventKeyboard::KeyCode::KEY_W:
+				event->getCurrentTarget()->setPosition(loc.x,loc.y+10);
+				break;
+			case EventKeyboard::KeyCode::KEY_DOWN_ARROW:
+			case EventKeyboard::KeyCode::KEY_S:
+				event->getCurrentTarget()->setPosition(loc.x,loc.y-10);
+				break;
+		}
+
+	};
+    this->_eventDispatcher->addEventListenerWithSceneGraphPriority(eventListener, mySprite);
+
 
     return true;
+}
+
+// do something on complete
+void HelloWorld::actionFinished(cocos2d::Sprite *bullet) 
+{
+	this->removeChild(bullet, true);
+	CCLOG("action completed!");
 }
 
 

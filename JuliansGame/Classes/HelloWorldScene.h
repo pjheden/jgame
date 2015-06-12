@@ -24,7 +24,9 @@ private:
 
 	//sprite
 	cocos2d::Sprite *mySprite;
+	//cocos2d::Sprite *bullet;
 
+	void actionFinished(cocos2d::Sprite *bullet);
 };
 
 #endif // __HELLOWORLD_SCENE_H__
