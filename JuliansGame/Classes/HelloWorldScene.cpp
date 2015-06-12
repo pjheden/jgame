@@ -49,6 +49,8 @@ bool HelloWorld::init()
 	auto spriteBody = PhysicsBody::createBox( sprite->getContentSize(), PhysicsMaterial( 0, 1, 0 ) );
 	
 	spriteBody->setDynamic(false);
+	spriteBody->setCollisionBitmask( 2 );
+	spriteBody->setContactTestBitmask( true );
 	
 	sprite->setPhysicsBody( spriteBody );
 
@@ -75,20 +77,49 @@ bool HelloWorld::init()
 
 	auto spriteBody = PhysicsBody::createBox( sprite->getContentSize(), PhysicsMaterial( 0, 1, 0 ) );
 	
-	spriteBody->setCollisionBitmask( 2 );
+	spriteBody->setCollisionBitmask( 1 );
 	spriteBody->setContactTestBitmask( true );
 	
 	sprite->setPhysicsBody( spriteBody );
 
 	this->addChild( sprite );
 	}
+	{
+	//create a sprite declared in header
+	mySprite = Sprite::create( "player_blue.png" );
+	mySprite->setPosition( Point( visibleSize.width / 2 + origin.x, mySprite->getContentSize().height + origin.y ) );
+	auto spriteBody = PhysicsBody::createBox( mySprite->getContentSize(), PhysicsMaterial( 0, 1, 0 ) );
+	
+	spriteBody->setDynamic(false);
+	spriteBody->setCollisionBitmask( 2 );
+	spriteBody->setContactTestBitmask( true );
+	
+	mySprite->setPhysicsBody( spriteBody );
 
+	this->addChild( mySprite );
+	}
+
+	// listen for contact between objects
 	auto contactListener = EventListenerPhysicsContact::create();
     contactListener->onContactBegin = CC_CALLBACK_1( HelloWorld::onContactBegin, this) ;
     this->getEventDispatcher()->addEventListenerWithSceneGraphPriority( contactListener, this );
 
+	//touch listener
+	auto event_listener = EventListenerTouchAllAtOnce::create();
+        event_listener -> onTouchesEnded = [=](const std::vector<Touch*>& pTouches, Event* event){
+                auto touch = *pTouches.begin();
+                auto openGl_location = touch-> getLocation();
+ 
+                auto move_action = MoveTo::create(1.f, openGl_location);
+                mySprite-> runAction(move_action);
+                CCLOG("%.1f %.1f", mySprite-> getPositionX(), mySprite-> getPositionY());
+        };
+ 
+        this-> getEventDispatcher()-> addEventListenerWithSceneGraphPriority(event_listener, mySprite);
+
     return true;
 }
+
 
 bool HelloWorld::onContactBegin(cocos2d::PhysicsContact &contact)
 {

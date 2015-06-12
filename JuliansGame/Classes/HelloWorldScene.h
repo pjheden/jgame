@@ -21,6 +21,10 @@ private:
 	void setPhyschisWorld( cocos2d::PhysicsWorld *world ) { sceneWorld = world; }
 
 	bool onContactBegin ( cocos2d::PhysicsContact &contact );
+
+	//sprite
+	cocos2d::Sprite *mySprite;
+
 };
 
 #endif // __HELLOWORLD_SCENE_H__
