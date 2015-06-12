@@ -89,7 +89,7 @@ bool HelloWorld::init()
 	mySprite = Sprite::create( "player_blue.png" );
 	mySprite->setPosition( Point( visibleSize.width / 2 + origin.x, mySprite->getContentSize().height + origin.y ) );
 	auto spriteBody = PhysicsBody::createBox( mySprite->getContentSize(), PhysicsMaterial( 0, 1, 0 ) );
-	
+
 	spriteBody->setDynamic(false);
 	spriteBody->setCollisionBitmask( 2 );
 	spriteBody->setContactTestBitmask( true );
@@ -128,9 +128,9 @@ bool HelloWorld::init()
 		auto move_action = MoveTo::create(1.f, openGl_location);
 		
 
-		auto bullet = Sprite::create( "player_blue.png" );
+		auto bullet = Sprite::create( "bullet.png" );
 		bullet->setPosition( mySprite->getPosition() );
-		auto bulletBody = PhysicsBody::createBox( bullet->getContentSize(), PhysicsMaterial( 0, 1, 0 ) );
+		auto bulletBody = PhysicsBody::createCircle( bullet->getContentSize().width, PhysicsMaterial( 0, 1, 0 ) );
 	
 		bulletBody->setDynamic(false);
 		bulletBody->setCollisionBitmask( 2 );
@@ -167,13 +167,20 @@ bool HelloWorld::init()
 			case EventKeyboard::KeyCode::KEY_D:
 				event->getCurrentTarget()->setPosition(loc.x+10,loc.y);
 				break;
+
 			case EventKeyboard::KeyCode::KEY_UP_ARROW:
 			case EventKeyboard::KeyCode::KEY_W:
 				event->getCurrentTarget()->setPosition(loc.x,loc.y+10);
 				break;
+
 			case EventKeyboard::KeyCode::KEY_DOWN_ARROW:
 			case EventKeyboard::KeyCode::KEY_S:
 				event->getCurrentTarget()->setPosition(loc.x,loc.y-10);
+				break;
+
+			case EventKeyboard::KeyCode::KEY_SPACE:
+				CCJumpTo* jumpTo = CCJumpTo::create(1,event->getCurrentTarget()->getPosition()+Vec2(0,100),1.2f,1);
+				 event->getCurrentTarget()->runAction(jumpTo);
 				break;
 		}
 

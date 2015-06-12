@@ -27,6 +27,8 @@ private:
 	//cocos2d::Sprite *bullet;
 
 	void actionFinished(cocos2d::Sprite *bullet);
+
+	void spriteJump(cocos2d::Sprite *aSprite);
 };
 
 #endif // __HELLOWORLD_SCENE_H__
