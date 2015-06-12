@@ -28,7 +28,7 @@ private:
 
 	void actionFinished(cocos2d::Sprite *bullet);
 
-	void spriteJump(cocos2d::Sprite *aSprite);
+	cocos2d::Sprite* createDynamicSprite(std::string filename, cocos2d::Vec2 startPosition);
 };
 
 #endif // __HELLOWORLD_SCENE_H__

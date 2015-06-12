@@ -56,41 +56,17 @@ bool HelloWorld::init()
 
 	this->addChild( sprite );
 
-	{
-	//create a sprite
-	auto sprite = Sprite::create( "player_red.png" );
-	sprite->setPosition( Point( visibleSize.width / 2 + origin.x, visibleSize.height / 2 + origin.y ) );
+	//create enemy-sprites
+	auto sprite1 = HelloWorld::createDynamicSprite( "player_red.png", Vec2(visibleSize.width / 2 + origin.x, visibleSize.height / 2 + origin.y));
+	auto sprite2 = HelloWorld::createDynamicSprite( "player_red.png", Vec2(visibleSize.width / 2 + origin.x, visibleSize.height / 2 + origin.y + 200));
 
-	auto spriteBody = PhysicsBody::createBox( sprite->getContentSize(), PhysicsMaterial( 0, 1, 0 ) );
-	
-	spriteBody->setCollisionBitmask( 1 );
-	spriteBody->setContactTestBitmask( true );
-	
-	sprite->setPhysicsBody( spriteBody );
-
-	this->addChild( sprite );
-	}
-	{
-	//create a sprite 2 (above)
-	auto sprite = Sprite::create( "player_red.png" );
-	sprite->setPosition( Point( visibleSize.width / 2 + origin.x, visibleSize.height / 2 + origin.y + 200) );
-
-	auto spriteBody = PhysicsBody::createBox( sprite->getContentSize(), PhysicsMaterial( 0, 1, 0 ) );
-	
-	spriteBody->setCollisionBitmask( 1 );
-	spriteBody->setContactTestBitmask( true );
-	
-	sprite->setPhysicsBody( spriteBody );
-
-	this->addChild( sprite );
-	}
 	{
 	//create a sprite declared in header
 	mySprite = Sprite::create( "player_blue.png" );
 	mySprite->setPosition( Point( visibleSize.width / 2 + origin.x, mySprite->getContentSize().height + origin.y ) );
 	auto spriteBody = PhysicsBody::createBox( mySprite->getContentSize(), PhysicsMaterial( 0, 1, 0 ) );
 
-	spriteBody->setDynamic(false);
+	//spriteBody->setDynamic(false);
 	spriteBody->setCollisionBitmask( 2 );
 	spriteBody->setContactTestBitmask( true );
 	
@@ -212,4 +188,22 @@ bool HelloWorld::onContactBegin(cocos2d::PhysicsContact &contact)
     }
     
     return true;
+}
+
+cocos2d::Sprite* HelloWorld::createDynamicSprite(std::string filename, Vec2 startPosition)
+{
+	//create a sprite
+	auto sprite = Sprite::create( filename );
+	sprite->setPosition( Point( startPosition) );
+
+	auto spriteBody = PhysicsBody::createBox( sprite->getContentSize(), PhysicsMaterial( 0, 1, 0 ) );
+	
+	spriteBody->setCollisionBitmask( 1 );
+	spriteBody->setContactTestBitmask( true );
+	
+	sprite->setPhysicsBody( spriteBody );
+
+	this->addChild( sprite );
+
+	return sprite;
 }
