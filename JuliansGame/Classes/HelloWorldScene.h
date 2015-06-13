@@ -28,7 +28,8 @@ private:
 
 	void actionFinished(cocos2d::Sprite *bullet);
 
-	cocos2d::Sprite* createDynamicSprite(std::string filename, cocos2d::Vec2 startPosition);
+	cocos2d::Sprite* createDynamicSprite(std::string filename, cocos2d::Vec2 startPosition, cocos2d::PhysicsMaterial physicsMaterial);
+	cocos2d::Sprite* createStaticSprite(std::string filename, cocos2d::Vec2 startPosition, cocos2d::PhysicsMaterial physicsMaterial);
 };
 
 #endif // __HELLOWORLD_SCENE_H__

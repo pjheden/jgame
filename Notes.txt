@@ -1,0 +1,3 @@
+#playerSprite
+1.Have friction instead of setting the velocity to 0 after A/D is released?
+2.
