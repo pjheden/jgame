@@ -34,58 +34,34 @@ bool HelloWorld::init()
     Vec2 origin = Director::getInstance()->getVisibleOrigin();
 	
 	//screen boundary
-	auto edgeBody = PhysicsBody::createEdgeBox( visibleSize, PHYSICSBODY_MATERIAL_DEFAULT, 3 );
-
+	//auto edgeBody = PhysicsBody::createEdgeBox( visibleSize, PHYSICSBODY_MATERIAL_DEFAULT, 3 );
+	auto edgeBody = PhysicsBody::createEdgeBox( visibleSize, PhysicsMaterial( 0, 0, 0), 3 );
 	auto edgeNode = Node::create();
 	edgeNode->setPosition( Point(visibleSize.width / 2 + origin.x, visibleSize.height / 2 + origin.y) );
 	edgeNode->setPhysicsBody( edgeBody );
 
 	this->addChild( edgeNode );
 
-	//static-platform
-	auto sprite0 = HelloWorld::createStaticSprite( "player_blue.png", Vec2(visibleSize.width / 2 + origin.x, visibleSize.height / 2 + origin.y - 100), PhysicsMaterial( 0, 1, 0 ) );
-
-	//create enemy-sprites
-	auto sprite1 = HelloWorld::createDynamicSprite( "player_red.png", Vec2(visibleSize.width / 2 + origin.x, visibleSize.height / 2 + origin.y), PhysicsMaterial( 0, 1, 0 ) );
-	auto sprite2 = HelloWorld::createDynamicSprite( "player_red.png", Vec2(visibleSize.width / 2 + origin.x, visibleSize.height / 2 + origin.y + 200), PhysicsMaterial( 0, 1, 0 ) );
-
-	{
 	//create a sprite declared in header
 	mySprite = Sprite::create( "player_blue.png" );
 	mySprite->setPosition( Point( visibleSize.width / 2 + origin.x, mySprite->getContentSize().height + origin.y ) );
 	auto spriteBody = PhysicsBody::createBox( mySprite->getContentSize(), PhysicsMaterial( 0, 0, 0 ) );
-	//spriteBody->setDynamic(false); //Must be dynamic to be able to set velocity
-	spriteBody->setCollisionBitmask( 2 );
-	spriteBody->setContactTestBitmask( true );
+	spriteBody->setDynamic(true); //Must be dynamic to be able to set velocity
+	//spriteBody->setCollisionBitmask( 2 );
+	//spriteBody->setContactTestBitmask( true );
 	
 
 	mySprite->setPhysicsBody( spriteBody );
 
 	this->addChild( mySprite );
-	}
 
 	// listen for contact between objects
 	auto contactListener = EventListenerPhysicsContact::create();
     contactListener->onContactBegin = CC_CALLBACK_1( HelloWorld::onContactBegin, this) ;
     this->getEventDispatcher()->addEventListenerWithSceneGraphPriority( contactListener, this );
 
-	////touch listener
-	//auto event_listener = EventListenerTouchAllAtOnce::create();
-	////event_listener ->onTouchesBegan = someFunc();
-	//event_listener -> onTouchesEnded = [=](const std::vector<Touch*>& pTouches, Event* event){
-	//	auto touch = *pTouches.begin();
-	//	auto openGl_location = touch-> getLocation();
-	//
-	//	auto move_action = MoveTo::create(1.f, openGl_location);
-	//	mySprite-> runAction(move_action);
-	//	CCLOG("%.1f %.1f", mySprite-> getPositionX(), mySprite-> getPositionY());
-	//	};
-	//
-	//this-> getEventDispatcher()-> addEventListenerWithSceneGraphPriority(event_listener, mySprite);
-
 		//touch listener
 	auto event_listener = EventListenerTouchAllAtOnce::create();
-	//event_listener ->onTouchesBegan = someFunc();
 	event_listener -> onTouchesEnded = [=](const std::vector<Touch*>& pTouches, Event* event){
 		auto touch = *pTouches.begin();
 		auto openGl_location = touch-> getLocation();
@@ -93,7 +69,15 @@ bool HelloWorld::init()
 		auto move_action = MoveTo::create(1.f, openGl_location);
 		
 
-		auto bullet = createStaticSprite( "bullet2.png", mySprite->getPosition(), PhysicsMaterial( 0, 1, 0 ) );
+		auto bullet = Sprite::create( "bullet2.png" );
+		bullet->setPosition( mySprite->getPosition() );
+		auto bulletBody = PhysicsBody::createBox( bullet->getContentSize(), PhysicsMaterial( 0, 0, 0) );
+
+		bulletBody->setDynamic(true);
+
+		bullet->setPhysicsBody( bulletBody );
+		this->addChild( bullet );
+
 		auto callback = CallFunc::create( [this,bullet]() {
 			this->actionFinished(bullet);
 		});
@@ -120,53 +104,35 @@ bool HelloWorld::init()
 			event->getCurrentTarget()->getPhysicsBody()->setVelocity( Vect( 0, event->getCurrentTarget()->getPhysicsBody()->getVelocity().y) );
 		}
 
-
-
 	};
 
 	eventListener->onKeyPressed = [this](EventKeyboard::KeyCode keyCode, Event* event){
 
 		PhysicsBody* body = event->getCurrentTarget()->getPhysicsBody();
+		auto loc = event->getCurrentTarget()->getPosition();
+
 		switch(keyCode){
 			case EventKeyboard::KeyCode::KEY_LEFT_ARROW:
 			case EventKeyboard::KeyCode::KEY_A:
-				//event->getCurrentTarget()->setPosition(loc.x-10,loc.y);
-				body->setVelocity( Vect( body->getVelocity().x - 30, body->getVelocity().y) );
+				event->getCurrentTarget()->setPosition(loc.x-10,loc.y);
+				//body->setVelocity( Vect( body->getVelocity().x - 30, body->getVelocity().y) );
 				break;
 			case EventKeyboard::KeyCode::KEY_RIGHT_ARROW:
 			case EventKeyboard::KeyCode::KEY_D:
-				//event->getCurrentTarget()->setPosition(loc.x+10,loc.y);
-				body->setVelocity( Vect( body->getVelocity().x + 30, body->getVelocity().y) );
+				event->getCurrentTarget()->setPosition(loc.x+10,loc.y);
+				//body->setVelocity( Vect( body->getVelocity().x + 30, body->getVelocity().y) );
 				break;
 			case EventKeyboard::KeyCode::KEY_SPACE:
 				CCLOG("space");
-				/*auto randEnemy = Sprite::create("red_player.png");
-				auto physicBody = PhysicsBody::createBox( randEnemy->getContentSize(), PhysicsMaterial( 0, 1, 0), Vec2( 0, random(0, 50)));
-				
-				physicBody->setCollisionBitmask( 1 );
-				physicBody->setContactTestBitmask ( true );
-
-				randEnemy->setPhysicsBody( physicBody );
-
-				this->addChild( randEnemy );*/
 				break;
 			case EventKeyboard::KeyCode::KEY_UP_ARROW:
 			case EventKeyboard::KeyCode::KEY_W:
-				CCJumpTo* jumpTo = CCJumpTo::create(1, event->getCurrentTarget()->getPosition(), 1.2f, 1);
-				event->getCurrentTarget()->runAction(jumpTo);
-				CCLOG("Jumped");
-
-				/*if(event->getCurrentTarget()->getActionManager()->getNumberOfRunningActionsInTarget(event->getCurrentTarget()) == 0)
-				{
-					event->getCurrentTarget()->runAction(jumpTo);
-					CCLOG("Jumped");
-				}*/
+				CCLOG("CCJumptTo");
 				break;
 		}
 
 	};
     this->_eventDispatcher->addEventListenerWithSceneGraphPriority(eventListener, mySprite);
-
 
     return true;
 }
@@ -184,7 +150,7 @@ bool HelloWorld::onContactBegin(cocos2d::PhysicsContact &contact)
     PhysicsBody *a = contact.getShapeA()->getBody();
     PhysicsBody *b = contact.getShapeB()->getBody();
     
-    // check if the bodies have collided
+	// check if the bodies have collided
     if ( ( 1 == a->getCollisionBitmask() && 2 == b->getCollisionBitmask() ) 
 		|| ( 2 == a->getCollisionBitmask() && 1 == b->getCollisionBitmask() ) )
     {
@@ -194,38 +160,16 @@ bool HelloWorld::onContactBegin(cocos2d::PhysicsContact &contact)
     return true;
 }
 
-cocos2d::Sprite* HelloWorld::createDynamicSprite(std::string filename, cocos2d::Vec2 startPosition, cocos2d::PhysicsMaterial physicsMaterial)
-{
-	//create a sprite
-	auto sprite = Sprite::create( filename );
-	sprite->setPosition( Point( startPosition) );
 
-	auto spriteBody = PhysicsBody::createBox( sprite->getContentSize(), physicsMaterial );
-	
-	spriteBody->setCollisionBitmask( 1 );
-	spriteBody->setContactTestBitmask( true );
-	
-	sprite->setPhysicsBody( spriteBody );
+ //bool  HelloWorld::onContactPreSolve(cocos2d::PhysicsContact& contact,
+	//PhysicsContactPreSolve& solve) {
+	//	PhysicsBody* a = contact.getShapeA()->getBody();
+ //       PhysicsBody* b = contact.getShapeA()->getBody();
 
-	this->addChild( sprite );
-
-	return sprite;
-}
-
-cocos2d::Sprite* HelloWorld::createStaticSprite(std::string filename, cocos2d::Vec2 startPosition, cocos2d::PhysicsMaterial physicsMaterial)
-{
-	//create a sprite
-	auto sprite = Sprite::create( filename );
-	sprite->setPosition( Point( startPosition) );
-
-	auto spriteBody = PhysicsBody::createBox( sprite->getContentSize(), physicsMaterial );
-	
-	spriteBody->setCollisionBitmask( 2 );
-	spriteBody->setContactTestBitmask( true );
-	spriteBody->setDynamic(false);
-	sprite->setPhysicsBody( spriteBody );
-
-	this->addChild( sprite );
-
-	return sprite;
-}
+	//	//so the player dont bounce on the ground
+ //       if (a->getTag() == mySprite->getTag() || b->getTag() == 
+ //                     mySprite->getTag()){
+ //        solve.setRestitution(0);
+	//	}
+	//	return true;
+ //}

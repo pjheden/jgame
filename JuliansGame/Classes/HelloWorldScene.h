@@ -20,16 +20,13 @@ private:
 
 	void setPhyschisWorld( cocos2d::PhysicsWorld *world ) { sceneWorld = world; }
 
+		// Physics Contact Listener.....
 	bool onContactBegin ( cocos2d::PhysicsContact &contact );
 
 	//sprite
 	cocos2d::Sprite *mySprite;
-	//cocos2d::Sprite *bullet;
 
 	void actionFinished(cocos2d::Sprite *bullet);
-
-	cocos2d::Sprite* createDynamicSprite(std::string filename, cocos2d::Vec2 startPosition, cocos2d::PhysicsMaterial physicsMaterial);
-	cocos2d::Sprite* createStaticSprite(std::string filename, cocos2d::Vec2 startPosition, cocos2d::PhysicsMaterial physicsMaterial);
 };
 
 #endif // __HELLOWORLD_SCENE_H__
