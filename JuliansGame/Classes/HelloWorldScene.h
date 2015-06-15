@@ -22,6 +22,10 @@ private:
 
 		// Physics Contact Listener.....
 	bool onContactBegin ( cocos2d::PhysicsContact &contact );
+	bool onContactPreSolve(cocos2d::PhysicsContact& contact,
+			cocos2d::PhysicsContactPreSolve& solve);
+	void onContactPostSolve(cocos2d::PhysicsContact& contact,
+		const cocos2d::PhysicsContactPostSolve& solve);
 
 	//sprite
 	cocos2d::Sprite *mySprite;

@@ -46,9 +46,8 @@ bool HelloWorld::init()
 	mySprite = Sprite::create( "player_blue.png" );
 	mySprite->setPosition( Point( visibleSize.width / 2 + origin.x, mySprite->getContentSize().height + origin.y ) );
 	auto spriteBody = PhysicsBody::createBox( mySprite->getContentSize(), PhysicsMaterial( 0, 0, 0 ) );
+	spriteBody->setTag( 1 );
 	spriteBody->setDynamic(true); //Must be dynamic to be able to set velocity
-	//spriteBody->setCollisionBitmask( 2 );
-	//spriteBody->setContactTestBitmask( true );
 	
 
 	mySprite->setPhysicsBody( spriteBody );
@@ -58,6 +57,8 @@ bool HelloWorld::init()
 	// listen for contact between objects
 	auto contactListener = EventListenerPhysicsContact::create();
     contactListener->onContactBegin = CC_CALLBACK_1( HelloWorld::onContactBegin, this) ;
+	contactListener->onContactPreSolve = CC_CALLBACK_2( HelloWorld::onContactPreSolve, this );
+	contactListener->onContactPostSolve = CC_CALLBACK_2(HelloWorld::onContactPostSolve,this);
     this->getEventDispatcher()->addEventListenerWithSceneGraphPriority( contactListener, this );
 
 		//touch listener
@@ -161,15 +162,27 @@ bool HelloWorld::onContactBegin(cocos2d::PhysicsContact &contact)
 }
 
 
- //bool  HelloWorld::onContactPreSolve(cocos2d::PhysicsContact& contact,
-	//PhysicsContactPreSolve& solve) {
-	//	PhysicsBody* a = contact.getShapeA()->getBody();
- //       PhysicsBody* b = contact.getShapeA()->getBody();
+ bool  HelloWorld::onContactPreSolve(cocos2d::PhysicsContact& contact,
+	PhysicsContactPreSolve& solve) 
+ {
+		CCLOG( "PreSolve" );
+		PhysicsBody* a = contact.getShapeA()->getBody();
+        PhysicsBody* b = contact.getShapeA()->getBody();
 
-	//	//so the player dont bounce on the ground
- //       if (a->getTag() == mySprite->getTag() || b->getTag() == 
- //                     mySprite->getTag()){
- //        solve.setRestitution(0);
-	//	}
-	//	return true;
- //}
+		//so the player dont bounce on the ground
+        if (a->getTag() == mySprite->getTag() || b->getTag() == 
+                      mySprite->getTag())
+		{
+			CCLOG( "Restitution = 0" );
+			solve.setRestitution(0);
+		}
+		return true;
+ }
+
+ void HelloWorld::onContactPostSolve(cocos2d::PhysicsContact& contact,
+    	const cocos2d::PhysicsContactPostSolve& solve) {
+   PhysicsBody* a = contact.getShapeA()->getBody();
+   PhysicsBody* b = contact.getShapeA()->getBody();
+   PhysicsBody* playerBody = (a->getTag() == mySprite->getTag() )?a:b;
+    playerBody->setVelocity(cocos2d::Vect(0,0));
+}
