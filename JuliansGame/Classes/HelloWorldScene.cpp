@@ -8,7 +8,7 @@ Scene* HelloWorld::createScene()
     auto scene = Scene::createWithPhysics();
 	//disable for release:
     scene -> getPhysicsWorld() -> setDebugDrawMask( PhysicsWorld::DEBUGDRAW_ALL ); 
-
+	scene -> getPhysicsWorld() -> setGravity( Vect( 0,0 ) );
     // 'layer' is an autorelease object
     auto layer = HelloWorld::create();
 	layer -> setPhyschisWorld( scene -> getPhysicsWorld() );
@@ -42,7 +42,7 @@ bool HelloWorld::init()
 
 	this->addChild( edgeNode );
 
-	//create a sprite declared in header
+	//create the player-sprite
 	mySprite = Sprite::create( "player_blue.png" );
 	mySprite->setPosition( Point( visibleSize.width / 2 + origin.x, mySprite->getContentSize().height + origin.y ) );
 	auto spriteBody = PhysicsBody::createBox( mySprite->getContentSize(), PhysicsMaterial( 0, 0, 0 ) );
@@ -53,6 +53,14 @@ bool HelloWorld::init()
 	mySprite->setPhysicsBody( spriteBody );
 
 	this->addChild( mySprite );
+	
+	//create Énemyseals at random y location
+	for(int i = 0; i < 5; ++i)
+	{
+		HelloWorld::createEnemyseal(visibleSize);
+	}
+
+
 
 	// listen for contact between objects
 	auto contactListener = EventListenerPhysicsContact::create();
@@ -62,6 +70,7 @@ bool HelloWorld::init()
     this->getEventDispatcher()->addEventListenerWithSceneGraphPriority( contactListener, this );
 
 		//touch listener
+
 	auto event_listener = EventListenerTouchAllAtOnce::create();
 	event_listener -> onTouchesEnded = [=](const std::vector<Touch*>& pTouches, Event* event){
 		auto touch = *pTouches.begin();
@@ -89,8 +98,6 @@ bool HelloWorld::init()
 		};
 	
 	this-> getEventDispatcher()-> addEventListenerWithSceneGraphPriority(event_listener, mySprite);
-
-
 
 	//keyboard listener
 	auto eventListener = EventListenerKeyboard::create();
@@ -145,6 +152,20 @@ void HelloWorld::actionFinished(cocos2d::Sprite *bullet)
 	CCLOG("action completed!");
 }
 
+void HelloWorld::createEnemyseal(cocos2d::Size visibleSize)
+{
+	cocos2d::Sprite* sealSprite = Sprite::create( "Seal/seal_walk1.png" );
+	sealSprite -> setPosition ( Vec2 ( visibleSize.width, random( 0, (int) visibleSize.height ) ) );
+	auto sealBody = PhysicsBody::createBox( sealSprite->getContentSize(), PHYSICSBODY_MATERIAL_DEFAULT); 
+	sealBody -> setTag( 2 );
+	sealSprite -> setPhysicsBody( sealBody );
+	
+	sealSprite -> getPhysicsBody() ->setVelocity ( cocos2d::Vect( -10, 0 ) );
+
+	this->addChild( sealSprite );
+}
+
+
 
 bool HelloWorld::onContactBegin(cocos2d::PhysicsContact &contact)
 {
@@ -163,7 +184,7 @@ bool HelloWorld::onContactBegin(cocos2d::PhysicsContact &contact)
 
 
  bool  HelloWorld::onContactPreSolve(cocos2d::PhysicsContact& contact,
-	PhysicsContactPreSolve& solve) 
+PhysicsContactPreSolve& solve) 
  {
 		CCLOG( "PreSolve" );
 		PhysicsBody* a = contact.getShapeA()->getBody();

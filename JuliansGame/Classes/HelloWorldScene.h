@@ -31,6 +31,8 @@ private:
 	cocos2d::Sprite *mySprite;
 
 	void actionFinished(cocos2d::Sprite *bullet);
+
+	void createEnemyseal(cocos2d::Size visibleSize);
 };
 
 #endif // __HELLOWORLD_SCENE_H__
