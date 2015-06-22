@@ -44,11 +44,11 @@ bool HelloWorld::init()
 
 	//create the player-sprite
 	mySprite = Sprite::create( "player_blue.png" );
-	mySprite->setPosition( Point( origin.x + mySprite->getContentSize().width, origin.y + visibleSize.height ) );
-	auto spriteBody = PhysicsBody::createBox( mySprite->getContentSize(), PhysicsMaterial( 0, 0, 0 ) );
+	mySprite->setPosition( Point( origin.x + mySprite->getContentSize().width, origin.y + visibleSize.height / 2 ) );
+	auto spriteBody = PhysicsBody::createBox( mySprite->getContentSize(), PhysicsMaterial( 0, 0, 1 ) );
 	spriteBody->setTag( 1 );
-	spriteBody->setDynamic(true); //Must be dynamic to be able to set velocity
-	
+	spriteBody->setDynamic( true ); //Must be dynamic to be able to set velocity
+	spriteBody->setVelocityLimit( 60 ); //Max player movement speed
 
 	mySprite->setPhysicsBody( spriteBody );
 
@@ -78,7 +78,7 @@ bool HelloWorld::init()
 		
 
 		auto bullet = Sprite::create( "bullet2.png" );
-		bullet->setPosition( mySprite->getPosition() );
+		bullet->setPosition( mySprite->getPosition() + bullet->getContentSize() + Vec2( 10, 0 ) );
 		auto bulletBody = PhysicsBody::createBox( bullet->getContentSize(), PhysicsMaterial( 0, 0, 0) );
 
 		bulletBody->setDynamic(true);
@@ -99,19 +99,23 @@ bool HelloWorld::init()
 
 	//keyboard listener
 	auto eventListener = EventListenerKeyboard::create();
-	//eventListener->onKeyReleased = [](EventKeyboard::KeyCode keyCode, Event* event)
-	//{
-	//	switch(keyCode)
-	//	{
-	//	case EventKeyboard::KeyCode::KEY_LEFT_ARROW:
-	//	case EventKeyboard::KeyCode::KEY_A:
-	//	case EventKeyboard::KeyCode::KEY_RIGHT_ARROW:
-	//	case EventKeyboard::KeyCode::KEY_D:
-	//		event->getCurrentTarget()->getPhysicsBody()->setVelocity( Vect( 0, event->getCurrentTarget()->getPhysicsBody()->getVelocity().y) );
-	//	}
+	eventListener->onKeyReleased = [](EventKeyboard::KeyCode keyCode, Event* event)
+	{
+		switch(keyCode)
+		{
+		case EventKeyboard::KeyCode::KEY_LEFT_ARROW:
+		case EventKeyboard::KeyCode::KEY_A:
+		case EventKeyboard::KeyCode::KEY_RIGHT_ARROW:
+		case EventKeyboard::KeyCode::KEY_D:
+		case EventKeyboard::KeyCode::KEY_UP_ARROW:
+		case EventKeyboard::KeyCode::KEY_W:
+		case EventKeyboard::KeyCode::KEY_DOWN_ARROW:
+		case EventKeyboard::KeyCode::KEY_S:	
+		
+			event->getCurrentTarget()->getPhysicsBody()->setVelocity( Vect( 0, 0 ));
+		}
 
-	//};
-
+	};
 	eventListener->onKeyPressed = [this, origin, visibleSize](EventKeyboard::KeyCode keyCode, Event* event){
 
 		PhysicsBody* body = event->getCurrentTarget()->getPhysicsBody();
@@ -120,26 +124,26 @@ bool HelloWorld::init()
 		switch(keyCode){
 			case EventKeyboard::KeyCode::KEY_LEFT_ARROW:
 			case EventKeyboard::KeyCode::KEY_A:
-				event->getCurrentTarget()->setPosition(loc.x-10,loc.y);
-				//body->setVelocity( Vect( body->getVelocity().x - 30, body->getVelocity().y) );
+				//event->getCurrentTarget()->setPosition(loc.x-10,loc.y);
+				body->setVelocity( Vect( - mySprite->getPhysicsBody()->getVelocityLimit(), 0 ) );
 				break;
 
 			case EventKeyboard::KeyCode::KEY_RIGHT_ARROW:
 			case EventKeyboard::KeyCode::KEY_D:
-				event->getCurrentTarget()->setPosition(loc.x+10,loc.y);
-				//body->setVelocity( Vect( body->getVelocity().x + 30, body->getVelocity().y) );
+				//event->getCurrentTarget()->setPosition(loc.x+10,loc.y);
+				body->setVelocity( Vect( mySprite->getPhysicsBody()->getVelocityLimit(), 0 ) );
 				break;
 
 			case EventKeyboard::KeyCode::KEY_UP_ARROW:
 			case EventKeyboard::KeyCode::KEY_W:
-				event->getCurrentTarget()->setPosition( loc.x, loc.y + 10 );
-				//body->setVelocity( Vect( body->getVelocity().x - 30, body->getVelocity().y) 
+				//event->getCurrentTarget()->setPosition( loc.x, loc.y + 10 );
+				body->setVelocity( Vect( 0, mySprite->getPhysicsBody()->getVelocityLimit() ) );
 				break;
 
 			case EventKeyboard::KeyCode::KEY_DOWN_ARROW:
 			case EventKeyboard::KeyCode::KEY_S:
-				event->getCurrentTarget()->setPosition( loc.x, loc.y - 10 );
-				//body->setVelocity( Vect( body->getVelocity().x - 30, body->getVelocity().y) 
+				//event->getCurrentTarget()->setPosition( loc.x, loc.y - 10 );
+				body->setVelocity( Vect( 0, - mySprite->getPhysicsBody()->getVelocityLimit() ) );
 				break;
 
 			case EventKeyboard::KeyCode::KEY_SPACE:
@@ -149,7 +153,7 @@ bool HelloWorld::init()
 				auto move_action = MoveTo::create( distance / bulletSpeed, Vec2( origin.x + visibleSize.width, mySprite->getPosition().y ) );
 
 				auto bullet = Sprite::create ( "bullet2.png" );
-				bullet->setPosition ( mySprite->getPosition().x + bullet->getContentSize().width, mySprite->getPosition().y );
+				bullet->setPosition( mySprite->getPosition() + bullet->getContentSize() + Vec2( 10, 0 ) );
 				auto bulletBody = PhysicsBody::createBox( bullet->getContentSize(), PHYSICSBODY_MATERIAL_DEFAULT );
 
 				bulletBody->setDynamic( true );
@@ -178,14 +182,14 @@ bool HelloWorld::init()
 void HelloWorld::actionFinished(cocos2d::Sprite *bullet) 
 {
 	this->removeChild(bullet, true);
-	CCLOG("shot completed!");
+	//CCLOG("shot completed!");
 }
 
 void HelloWorld::createEnemyseal(cocos2d::Size visibleSize)
 {
 	cocos2d::Sprite* sealSprite = Sprite::create( "Seal/seal_walk1.png" );
 	sealSprite -> setPosition ( Vec2 ( visibleSize.width, random( 0, (int) visibleSize.height ) ) );
-	auto sealBody = PhysicsBody::createBox( sealSprite->getContentSize(), PHYSICSBODY_MATERIAL_DEFAULT); 
+	auto sealBody = PhysicsBody::createBox( sealSprite->getContentSize(), PhysicsMaterial() ); 
 	sealBody -> setTag( 2 );
 	sealBody -> setDynamic( true );
 

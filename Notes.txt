@@ -1,6 +1,6 @@
 #playerSprite
 1.Have friction instead of setting the velocity to 0 after A/D is released?
-2.
+2. give velocity with friction and have a max velocity
 
 look at this to fix the bouncing on the ground:
 http://discuss.cocos2d-x.org/t/physicsbody-dont-stop-bounce/11474
