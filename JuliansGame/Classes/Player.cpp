@@ -17,7 +17,7 @@ Player* Player::create()
 	auto physicsBody = PhysicsBody::createBox( pSprite->getContentSize(), PHYSICSBODY_MATERIAL_DEFAULT);
 	pSprite->setPhysicsBody( physicsBody );
 
-    if (pSprite->initWithFile( "C:/JuliansGame/JuliansGame/Resources/idle_1.png" ) )
+    if (pSprite && pSprite->initWithFile( "C:/JuliansGame/JuliansGame/Resources/Indian_idle1.png" ) )
     {
         pSprite->autorelease();
 
@@ -74,11 +74,11 @@ void Player::touchEvent(cocos2d::Touch* touch, cocos2d::Vec2 _point)
 void Player::initAnimations()
 {
 	// set the appropriate resource directory for this device
-	FileUtils::getInstance()->addSearchResolutionsOrder("playersheet/HD");
+	FileUtils::getInstance()->addSearchResolutionsOrder("indian_spreedsheet/HD");
 
 	// load and cache the texture and sprite frames
 	auto cacher = SpriteFrameCache::getInstance();
-	cacher->addSpriteFramesWithFile("walk.plist");
+	cacher->addSpriteFramesWithFile("indian_walk.plist");
 
 	#include <sstream>
 	// load all the animation frames into an array
@@ -89,33 +89,33 @@ void Player::initAnimations()
 		std::string s = std::to_string( i );
 
 		SpriteFrame* aFrame =
-		cacher->getSpriteFrameByName( "move_" + s + ".png" );
+		cacher->getSpriteFrameByName( "indian_walk" + s + ".png" );
 		frames.pushBack(aFrame);
 	}
 
 	// play the animation
-	auto animation = Animation::createWithSpriteFrames(frames, 0.09f);
+	auto animation = Animation::createWithSpriteFrames(frames, 0.40f);
 	animation->setRestoreOriginalFrame(true);
 	moveAnimate = Animate::create(animation);
 	moveAnimate->retain();
 	
 
 	auto cacher2 = SpriteFrameCache::getInstance();
-	cacher->addSpriteFramesWithFile( "idle.plist" );
+	cacher->addSpriteFramesWithFile( "indian_idle.plist" );
 	#include <sstream>
 	// load all the animation frames into an array
-	const int kNumberOfFrames2 = 2;
+	const int kNumberOfFrames2 = 4;
 	Vector<SpriteFrame*> frames2;
 	for (int i = 1; i < kNumberOfFrames2; i++)
 	{
 		std::string s = std::to_string( i );
 
 		SpriteFrame* aFrame2 =
-		cacher2->getSpriteFrameByName( "idle_" + s + ".png" );
+		cacher2->getSpriteFrameByName( "Indian_idle" + s + ".png" );
 		frames2.pushBack(aFrame2);
 	}
 
-	auto animation2 = Animation::createWithSpriteFrames( frames2, 0.20f );
+	auto animation2 = Animation::createWithSpriteFrames( frames2, 0.40f );
 	animation2->setRestoreOriginalFrame( true) ;
 	idleAnimate = Animate::create( animation2 );
 	idleAnimate->retain();

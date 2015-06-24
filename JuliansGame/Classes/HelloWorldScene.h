@@ -16,6 +16,7 @@ public:
     // implement the "static create()" method manually
     CREATE_FUNC(HelloWorld);
 
+
 private:
 	cocos2d::PhysicsWorld *sceneWorld;
 
@@ -43,6 +44,8 @@ private:
 	void menuCloseCallback( cocos2d::Ref* pSender );
 	void startGame( cocos2d::Ref* pSender );
 	void settings( cocos2d::Ref* pSender );
+
+	void mainMenu();
 };
 
 #endif // __HELLOWORLD_SCENE_H__
