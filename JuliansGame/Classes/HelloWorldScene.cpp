@@ -33,25 +33,78 @@ bool HelloWorld::init()
     Size visibleSize = Director::getInstance()->getVisibleSize();
     Vec2 origin = Director::getInstance()->getVisibleOrigin();
 
-	this->scheduleUpdate();
 
-	pSprite = Player::create();
-	pSprite->setPosition( Point( origin.x + visibleSize.width / 2, origin.y + visibleSize.height / 2 ) );
-	this->addChild(pSprite, 5); //second parameter is the drawing priority
+	//////////////
+	//
+	//  Main menu
+	//
+	//////////////
+
+	/*auto closeItem = MenuItemImage::create(
+                                      "CloseNormal.png",
+                                      "CloseSelected.png",
+                                      CC_CALLBACK_1(HelloWorld::menuCloseCallback, this));*/
+	auto closeItem = MenuItemFont::create(
+			"exit",
+			this,
+			menu_selector(HelloWorld::menuCloseCallback));    
+	closeItem->setPosition(Vec2(origin.x + visibleSize.width - closeItem->getContentSize().width/2,
+									origin.y + closeItem->getContentSize().height/2));
+
+	auto menuTitle = MenuItemFont::create( "Game Name" );
+	menuTitle->setPosition( Vec2( origin.x + visibleSize.width / 2,
+		origin.y + visibleSize.height - menuTitle->getContentSize().height) );
+
+	auto playTitle = MenuItemFont::create( "Play", this, menu_selector( HelloWorld::startGame ) );
+	playTitle->setPosition( Vec2( origin.x + visibleSize.width / 2,
+		menuTitle->getPosition().y - 2 * playTitle->getContentSize().height ) );
+
+	auto settingsTitle = MenuItemFont::create( "Settings", this, menu_selector( HelloWorld::settings ) );
+	settingsTitle->setPosition( Vec2( origin.x + visibleSize.width / 2,
+		playTitle->getPosition().y - 2 * settingsTitle->getContentSize().height ) );
+
+	auto menu = Menu::create(closeItem, menuTitle, playTitle, settingsTitle, NULL);
+	menu->setPosition(Vec2::ZERO);
+	this->addChild(menu, 1);
 
 
-	auto listener = EventListenerTouchOneByOne::create();
-	listener->setSwallowTouches(true);
- 
-	listener->onTouchBegan = CC_CALLBACK_2(HelloWorld::onTouchBegan, this);
-	listener->onTouchEnded = CC_CALLBACK_2(HelloWorld::onTouchEnded, this);
- 
-	Director::getInstance()->getEventDispatcher()->addEventListenerWithSceneGraphPriority(listener, this);
 
 
 
 
 
+
+
+	//////////////
+	//
+	//  Player movement with animation
+	//
+	////////////
+
+
+
+
+	//this->scheduleUpdate();
+
+	//pSprite = Player::create();
+	//pSprite->setPosition( Point( origin.x + visibleSize.width / 2, origin.y + visibleSize.height / 2 ) );
+	//this->addChild(pSprite, 5); //second parameter is the drawing priority
+
+
+	//auto listener = EventListenerTouchOneByOne::create();
+	//listener->setSwallowTouches(true);
+ //
+	//listener->onTouchBegan = CC_CALLBACK_2(HelloWorld::onTouchBegan, this);
+	//listener->onTouchEnded = CC_CALLBACK_2(HelloWorld::onTouchEnded, this);
+ //
+	//Director::getInstance()->getEventDispatcher()->addEventListenerWithSceneGraphPriority(listener, this);
+
+
+	//////////////
+	//
+	//  Seal hunter
+	//
+	////////////
 
 
 
@@ -282,4 +335,29 @@ void HelloWorld::onTouchEnded(Touch *touch, Event *event)
 void HelloWorld::update(float dt)
 {
 	pSprite->update();
+}
+
+//exit the game
+void HelloWorld::menuCloseCallback( cocos2d::Ref* pSender )
+{
+#if (CC_TARGET_PLATFORM == CC_PLATFORM_WP8) || (CC_TARGET_PLATFORM == CC_PLATFORM_WINRT)
+	MessageBox("You pressed the close button. Windows Store Apps do not implement a close button.","Alert");
+    return;
+#endif
+ 
+    Director::getInstance()->end();
+ 
+#if (CC_TARGET_PLATFORM == CC_PLATFORM_IOS)
+    exit(0);
+#endif
+}
+
+void HelloWorld::startGame( cocos2d::Ref* pSender )
+{
+	//start game
+}
+
+void HelloWorld::settings( cocos2d::Ref* pSender )
+{
+	//open settings menu
 }

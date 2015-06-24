@@ -39,6 +39,10 @@ private:
 	Player* pSprite;
 
 	void update(float dt);
+
+	void menuCloseCallback( cocos2d::Ref* pSender );
+	void startGame( cocos2d::Ref* pSender );
+	void settings( cocos2d::Ref* pSender );
 };
 
 #endif // __HELLOWORLD_SCENE_H__
