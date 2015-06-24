@@ -3,3 +3,7 @@ with C++.
 
 6/21/2015:
 	Started making a sealHunter - clone
+
+6/22/2015:
+	Fixed movement, and bullet spawn position
+	To do: Fix collisions ( player with seals and bullets with seals, bullets with player? )

@@ -136,3 +136,6 @@ tests/cpp-tests/Resources/audio
 /tests/lua-tests/src/cocos/
 /tests/js-tests/res/
 /tools/framework-compile/
+
+# ignore unused art
+/art

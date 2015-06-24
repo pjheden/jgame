@@ -32,148 +32,155 @@ bool HelloWorld::init()
     
     Size visibleSize = Director::getInstance()->getVisibleSize();
     Vec2 origin = Director::getInstance()->getVisibleOrigin();
+
+	pSprite = Player::create();
+	pSprite->setPosition( Point( origin.x + visibleSize.width / 2, origin.y + visibleSize.height / 2 ) );
+	this->addChild(pSprite, 5); //second parameter is the drawing priority
 	
-	//screen boundary
-	//auto edgeBody = PhysicsBody::createEdgeBox( visibleSize, PHYSICSBODY_MATERIAL_DEFAULT, 3 );
-	auto edgeBody = PhysicsBody::createEdgeBox( visibleSize, PhysicsMaterial( 0, 0, 0), 3 );
-	auto edgeNode = Node::create();
-	edgeNode->setPosition( Point(visibleSize.width / 2 + origin.x, visibleSize.height / 2 + origin.y) );
-	edgeNode->setPhysicsBody( edgeBody );
+	////screen boundary
+	////auto edgeBody = PhysicsBody::createEdgeBox( visibleSize, PHYSICSBODY_MATERIAL_DEFAULT, 3 );
+	//auto edgeBody = PhysicsBody::createEdgeBox( visibleSize, PhysicsMaterial( 0, 0, 0), 3 );
+	//auto edgeNode = Node::create();
+	//edgeNode->setPosition( Point(visibleSize.width / 2 + origin.x, visibleSize.height / 2 + origin.y) );
+	//edgeNode->setPhysicsBody( edgeBody );
 
-	this->addChild( edgeNode );
+	//this->addChild( edgeNode );
 
-	//create the player-sprite
-	mySprite = Sprite::create( "player_blue.png" );
-	mySprite->setPosition( Point( origin.x + mySprite->getContentSize().width, origin.y + visibleSize.height / 2 ) );
-	auto spriteBody = PhysicsBody::createBox( mySprite->getContentSize(), PhysicsMaterial( 0, 0, 1 ) );
-	spriteBody->setTag( 1 );
-	spriteBody->setDynamic( true ); //Must be dynamic to be able to set velocity
-	spriteBody->setVelocityLimit( 60 ); //Max player movement speed
+	////create the player-sprite
+	//mySprite = Sprite::create( "player_blue.png" );
+	//mySprite->setPosition( Point( origin.x + mySprite->getContentSize().width, origin.y + visibleSize.height / 2 ) );
+	//auto spriteBody = PhysicsBody::createBox( mySprite->getContentSize(), PhysicsMaterial( 0, 0, 1 ) );
+	//spriteBody->setCollisionBitmask( 1 );
+	//spriteBody->setContactTestBitmask( true );
+	//spriteBody->setDynamic( true ); //Must be dynamic to be able to set velocity
+	//spriteBody->setVelocityLimit( 60 ); //Max player movement speed
 
-	mySprite->setPhysicsBody( spriteBody );
+	//mySprite->setPhysicsBody( spriteBody );
 
-	this->addChild( mySprite );
-	
-	//create Enemyseals at random y location
-	for(int i = 0; i < 5; ++i)
-	{
-		HelloWorld::createEnemyseal(visibleSize);
-	}
+	//this->addChild( mySprite );
+	//
+	////create Enemyseals at random y location
+	//for(int i = 0; i < 5; ++i)
+	//{
+	//	HelloWorld::createEnemyseal(visibleSize);
+	//}
 
 
 
-	// listen for contact between objects
-	auto contactListener = EventListenerPhysicsContact::create();
-    contactListener->onContactBegin = CC_CALLBACK_1( HelloWorld::onContactBegin, this) ;
-    this->getEventDispatcher()->addEventListenerWithSceneGraphPriority( contactListener, this );
+	//// listen for contact between objects
+	//auto contactListener = EventListenerPhysicsContact::create();
+ //   contactListener->onContactBegin = CC_CALLBACK_1( HelloWorld::onContactBegin, this) ;
+ //   this->getEventDispatcher()->addEventListenerWithSceneGraphPriority( contactListener, this );
 
-		//touch listener
+	//	//touch listener
 
-	auto event_listener = EventListenerTouchAllAtOnce::create();
-	event_listener -> onTouchesEnded = [=](const std::vector<Touch*>& pTouches, Event* event){
-		auto touch = *pTouches.begin();
-		auto openGl_location = touch-> getLocation();
-	
-		auto move_action = MoveTo::create(1.f, openGl_location);
-		
+	//auto event_listener = EventListenerTouchAllAtOnce::create();
+	//event_listener -> onTouchesEnded = [=](const std::vector<Touch*>& pTouches, Event* event){
+	//	auto touch = *pTouches.begin();
+	//	auto openGl_location = touch-> getLocation();
+	//
+	//	auto move_action = MoveTo::create(1.f, openGl_location);
+	//	
 
-		auto bullet = Sprite::create( "bullet2.png" );
-		bullet->setPosition( mySprite->getPosition() + bullet->getContentSize() + Vec2( 10, 0 ) );
-		auto bulletBody = PhysicsBody::createBox( bullet->getContentSize(), PhysicsMaterial( 0, 0, 0) );
+	//	auto bullet = Sprite::create( "bullet2.png" );
+	//	bullet->setPosition( mySprite->getPosition() + bullet->getContentSize() + Vec2( 10, 0 ) );
+	//	auto bulletBody = PhysicsBody::createBox( bullet->getContentSize(), PhysicsMaterial( 0, 0, 0) );
 
-		bulletBody->setDynamic(true);
-		bulletBody->setTag( 3 );
+	//	bulletBody->setDynamic(true);
+	//	bulletBody->setCollisionBitmask( 3 );
+	//	bulletBody->setContactTestBitmask( true );
 
-		bullet->setPhysicsBody( bulletBody );
-		this->addChild( bullet );
+	//	bullet->setPhysicsBody( bulletBody );
+	//	this->addChild( bullet );
 
-		auto callback = CallFunc::create( [this,bullet]() {
-			this->actionFinished(bullet);
-		});
-		auto sequence = Sequence::create(move_action, callback, NULL);
-		bullet-> runAction(sequence);
-		
-		};
-	
-	this-> getEventDispatcher()-> addEventListenerWithSceneGraphPriority(event_listener, mySprite);
+	//	auto callback = CallFunc::create( [this,bullet]() {
+	//		this->actionFinished(bullet);
+	//	});
+	//	auto sequence = Sequence::create(move_action, callback, NULL);
+	//	bullet-> runAction(sequence);
+	//	
+	//	};
+	//
+	//this-> getEventDispatcher()-> addEventListenerWithSceneGraphPriority(event_listener, mySprite);
 
-	//keyboard listener
-	auto eventListener = EventListenerKeyboard::create();
-	eventListener->onKeyReleased = [](EventKeyboard::KeyCode keyCode, Event* event)
-	{
-		switch(keyCode)
-		{
-		case EventKeyboard::KeyCode::KEY_LEFT_ARROW:
-		case EventKeyboard::KeyCode::KEY_A:
-		case EventKeyboard::KeyCode::KEY_RIGHT_ARROW:
-		case EventKeyboard::KeyCode::KEY_D:
-		case EventKeyboard::KeyCode::KEY_UP_ARROW:
-		case EventKeyboard::KeyCode::KEY_W:
-		case EventKeyboard::KeyCode::KEY_DOWN_ARROW:
-		case EventKeyboard::KeyCode::KEY_S:	
-		
-			event->getCurrentTarget()->getPhysicsBody()->setVelocity( Vect( 0, 0 ));
-		}
+	////keyboard listener
+	//auto eventListener = EventListenerKeyboard::create();
+	//eventListener->onKeyReleased = [](EventKeyboard::KeyCode keyCode, Event* event)
+	//{
+	//	switch(keyCode)
+	//	{
+	//	case EventKeyboard::KeyCode::KEY_LEFT_ARROW:
+	//	case EventKeyboard::KeyCode::KEY_A:
+	//	case EventKeyboard::KeyCode::KEY_RIGHT_ARROW:
+	//	case EventKeyboard::KeyCode::KEY_D:
+	//	case EventKeyboard::KeyCode::KEY_UP_ARROW:
+	//	case EventKeyboard::KeyCode::KEY_W:
+	//	case EventKeyboard::KeyCode::KEY_DOWN_ARROW:
+	//	case EventKeyboard::KeyCode::KEY_S:	
+	//	
+	//		event->getCurrentTarget()->getPhysicsBody()->setVelocity( Vect( 0, 0 ));
+	//	}
 
-	};
-	eventListener->onKeyPressed = [this, origin, visibleSize](EventKeyboard::KeyCode keyCode, Event* event){
+	//};
+	//eventListener->onKeyPressed = [this, origin, visibleSize](EventKeyboard::KeyCode keyCode, Event* event){
 
-		PhysicsBody* body = event->getCurrentTarget()->getPhysicsBody();
-		auto loc = event->getCurrentTarget()->getPosition();
+	//	PhysicsBody* body = event->getCurrentTarget()->getPhysicsBody();
+	//	auto loc = event->getCurrentTarget()->getPosition();
 
-		switch(keyCode){
-			case EventKeyboard::KeyCode::KEY_LEFT_ARROW:
-			case EventKeyboard::KeyCode::KEY_A:
-				//event->getCurrentTarget()->setPosition(loc.x-10,loc.y);
-				body->setVelocity( Vect( - mySprite->getPhysicsBody()->getVelocityLimit(), 0 ) );
-				break;
+	//	switch(keyCode){
+	//		case EventKeyboard::KeyCode::KEY_LEFT_ARROW:
+	//		case EventKeyboard::KeyCode::KEY_A:
+	//			//event->getCurrentTarget()->setPosition(loc.x-10,loc.y);
+	//			body->setVelocity( Vect( - mySprite->getPhysicsBody()->getVelocityLimit(), 0 ) );
+	//			break;
 
-			case EventKeyboard::KeyCode::KEY_RIGHT_ARROW:
-			case EventKeyboard::KeyCode::KEY_D:
-				//event->getCurrentTarget()->setPosition(loc.x+10,loc.y);
-				body->setVelocity( Vect( mySprite->getPhysicsBody()->getVelocityLimit(), 0 ) );
-				break;
+	//		case EventKeyboard::KeyCode::KEY_RIGHT_ARROW:
+	//		case EventKeyboard::KeyCode::KEY_D:
+	//			//event->getCurrentTarget()->setPosition(loc.x+10,loc.y);
+	//			body->setVelocity( Vect( mySprite->getPhysicsBody()->getVelocityLimit(), 0 ) );
+	//			break;
 
-			case EventKeyboard::KeyCode::KEY_UP_ARROW:
-			case EventKeyboard::KeyCode::KEY_W:
-				//event->getCurrentTarget()->setPosition( loc.x, loc.y + 10 );
-				body->setVelocity( Vect( 0, mySprite->getPhysicsBody()->getVelocityLimit() ) );
-				break;
+	//		case EventKeyboard::KeyCode::KEY_UP_ARROW:
+	//		case EventKeyboard::KeyCode::KEY_W:
+	//			//event->getCurrentTarget()->setPosition( loc.x, loc.y + 10 );
+	//			body->setVelocity( Vect( 0, mySprite->getPhysicsBody()->getVelocityLimit() ) );
+	//			break;
 
-			case EventKeyboard::KeyCode::KEY_DOWN_ARROW:
-			case EventKeyboard::KeyCode::KEY_S:
-				//event->getCurrentTarget()->setPosition( loc.x, loc.y - 10 );
-				body->setVelocity( Vect( 0, - mySprite->getPhysicsBody()->getVelocityLimit() ) );
-				break;
+	//		case EventKeyboard::KeyCode::KEY_DOWN_ARROW:
+	//		case EventKeyboard::KeyCode::KEY_S:
+	//			//event->getCurrentTarget()->setPosition( loc.x, loc.y - 10 );
+	//			body->setVelocity( Vect( 0, - mySprite->getPhysicsBody()->getVelocityLimit() ) );
+	//			break;
 
-			case EventKeyboard::KeyCode::KEY_SPACE:
-				//shoot a bullet straight forward
-				auto bulletSpeed = 300.0f;
-				auto distance = origin.x + visibleSize.width - mySprite->getPosition().x;
-				auto move_action = MoveTo::create( distance / bulletSpeed, Vec2( origin.x + visibleSize.width, mySprite->getPosition().y ) );
+	//		case EventKeyboard::KeyCode::KEY_SPACE:
+	//			//shoot a bullet straight forward
+	//			auto bulletSpeed = 300.0f;
+	//			auto distance = origin.x + visibleSize.width - mySprite->getPosition().x;
+	//			auto move_action = MoveTo::create( distance / bulletSpeed, Vec2( origin.x + visibleSize.width, mySprite->getPosition().y ) );
 
-				auto bullet = Sprite::create ( "bullet2.png" );
-				bullet->setPosition( mySprite->getPosition() + bullet->getContentSize() + Vec2( 10, 0 ) );
-				auto bulletBody = PhysicsBody::createBox( bullet->getContentSize(), PHYSICSBODY_MATERIAL_DEFAULT );
+	//			auto bullet = Sprite::create ( "bullet2.png" );
+	//			bullet->setPosition( mySprite->getPosition() + bullet->getContentSize() + Vec2( 10, 0 ) );
+	//			auto bulletBody = PhysicsBody::createBox( bullet->getContentSize(), PHYSICSBODY_MATERIAL_DEFAULT );
 
-				bulletBody->setDynamic( true );
-				bulletBody->setTag( 3 );
+	//			bulletBody->setDynamic( true );
+	//			bulletBody->setCollisionBitmask( 3 );
+	//			bulletBody->setContactTestBitmask( true );
 
-				bullet->setPhysicsBody( bulletBody );
-				this->addChild( bullet );
+	//			bullet->setPhysicsBody( bulletBody );
+	//			this->addChild( bullet );
 
-				auto callback = CallFunc::create( [this,bullet]() { this->actionFinished(bullet); } );
-				auto sequence = Sequence::create(move_action, callback, NULL);
-				bullet-> runAction(sequence);
-		
-					
+	//			auto callback = CallFunc::create( [this,bullet]() { this->actionFinished(bullet); } );
+	//			auto sequence = Sequence::create(move_action, callback, NULL);
+	//			bullet-> runAction(sequence);
+	//	
+	//				
 
-				break;
+	//			break;
 
-		}
+	//	}
 
-	};
-    this->_eventDispatcher->addEventListenerWithSceneGraphPriority(eventListener, mySprite);
+	//};
+ //   this->_eventDispatcher->addEventListenerWithSceneGraphPriority(eventListener, mySprite);
 
     return true;
 }
@@ -190,7 +197,8 @@ void HelloWorld::createEnemyseal(cocos2d::Size visibleSize)
 	cocos2d::Sprite* sealSprite = Sprite::create( "Seal/seal_walk1.png" );
 	sealSprite -> setPosition ( Vec2 ( visibleSize.width, random( 0, (int) visibleSize.height ) ) );
 	auto sealBody = PhysicsBody::createBox( sealSprite->getContentSize(), PhysicsMaterial() ); 
-	sealBody -> setTag( 2 );
+	sealBody->setCollisionBitmask(2);
+    sealBody->setContactTestBitmask(true);
 	sealBody -> setDynamic( true );
 
 	sealSprite -> setPhysicsBody( sealBody );
@@ -221,11 +229,9 @@ bool HelloWorld::onContactBegin(cocos2d::PhysicsContact &contact)
 	{
 		if( a->getCollisionBitmask() == 2)
 		{
-			a->removeFromWorld();
-			CCLOG( "Remove a from world");
+			a->getNode()->removeFromParent();
 		}else{
-			b->removeFromWorld();
-			CCLOG( "Remove b from world");
+			b->getNode()->removeFromParent();
 		}
 		CCLOG( "Seal collide with bullet" );
 	}

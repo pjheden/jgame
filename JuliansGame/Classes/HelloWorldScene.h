@@ -2,6 +2,7 @@
 #define __HELLOWORLD_SCENE_H__
 
 #include "cocos2d.h"
+#include "Player.h"
 
 class HelloWorld : public cocos2d::Layer
 {
@@ -26,9 +27,13 @@ private:
 	//sprite
 	cocos2d::Sprite *mySprite;
 
+	//removes sprite when it's called
 	void actionFinished(cocos2d::Sprite *bullet);
 
+	//creates a enemy seal-sprite
 	void createEnemyseal(cocos2d::Size visibleSize);
+
+	Player* pSprite;
 };
 
 #endif // __HELLOWORLD_SCENE_H__
