@@ -33,10 +33,29 @@ bool HelloWorld::init()
     Size visibleSize = Director::getInstance()->getVisibleSize();
     Vec2 origin = Director::getInstance()->getVisibleOrigin();
 
+	this->scheduleUpdate();
+
 	pSprite = Player::create();
 	pSprite->setPosition( Point( origin.x + visibleSize.width / 2, origin.y + visibleSize.height / 2 ) );
 	this->addChild(pSprite, 5); //second parameter is the drawing priority
-	
+
+
+	auto listener = EventListenerTouchOneByOne::create();
+	listener->setSwallowTouches(true);
+ 
+	listener->onTouchBegan = CC_CALLBACK_2(HelloWorld::onTouchBegan, this);
+	listener->onTouchEnded = CC_CALLBACK_2(HelloWorld::onTouchEnded, this);
+ 
+	Director::getInstance()->getEventDispatcher()->addEventListenerWithSceneGraphPriority(listener, this);
+
+
+
+
+
+
+
+
+
 	////screen boundary
 	////auto edgeBody = PhysicsBody::createEdgeBox( visibleSize, PHYSICSBODY_MATERIAL_DEFAULT, 3 );
 	//auto edgeBody = PhysicsBody::createEdgeBox( visibleSize, PhysicsMaterial( 0, 0, 0), 3 );
@@ -238,4 +257,29 @@ bool HelloWorld::onContactBegin(cocos2d::PhysicsContact &contact)
 
     
     return true;
+}
+
+bool HelloWorld::onTouchBegan( cocos2d::Touch *touch, cocos2d::Event *event )
+{
+	if(touch->getLocation().x < pSprite->getPositionX())
+	{
+		pSprite->move( Vec2( -60, 0 ) ); // left
+	}
+	if(touch->getLocation().x > pSprite->getPositionX())
+	{
+		pSprite->move( Vec2( 60, 0 ) ); // right
+	}
+ 
+	return true;
+}
+ 
+void HelloWorld::onTouchEnded(Touch *touch, Event *event)
+{
+	pSprite->idle();
+}
+
+//called for every update of the game
+void HelloWorld::update(float dt)
+{
+	pSprite->update();
 }

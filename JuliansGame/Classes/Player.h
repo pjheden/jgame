@@ -11,6 +11,8 @@ class Player : public cocos2d::Sprite
 
 		Animate * idleAnimate;
 		Animate * moveAnimate;
+		bool	moving;
+		int dir;
 
         Player();
         ~Player();
@@ -21,6 +23,12 @@ class Player : public cocos2d::Sprite
         void addEvents();
         void touchEvent( cocos2d::Touch* touch, cocos2d::Vec2 _p );
 		void initAnimations();
+
+		void move( cocos2d::Vec2 direction );
+
+		void idle();
+
+		void update();
 
     private:
 

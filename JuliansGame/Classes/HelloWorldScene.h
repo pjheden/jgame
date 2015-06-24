@@ -24,6 +24,9 @@ private:
 		// Physics Contact Listener.....
 	bool onContactBegin ( cocos2d::PhysicsContact &contact );
 
+	bool onTouchBegan(cocos2d::Touch *touch, cocos2d::Event *event);
+	void onTouchEnded(cocos2d::Touch *touch, cocos2d::Event *event);
+
 	//sprite
 	cocos2d::Sprite *mySprite;
 
@@ -34,6 +37,8 @@ private:
 	void createEnemyseal(cocos2d::Size visibleSize);
 
 	Player* pSprite;
+
+	void update(float dt);
 };
 
 #endif // __HELLOWORLD_SCENE_H__
