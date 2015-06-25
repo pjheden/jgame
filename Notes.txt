@@ -1,4 +1,8 @@
-To Do:
+To do:
+1. Fix animation ( some of the png's are red!? )
+2. Implement the seals (and add animation) 
+3. Score
+4. settings
 
 
 Tag-List:
@@ -17,7 +21,7 @@ Tag-List:
 	Collisions fixed
 	Started setting up a general skeleton of a game, i.e. making Player & enemy classes,
 	setting up for animations.
-	To do:
-	*Finish player class
-		-finished
-	*Make a main menu
+	Player class finished
+	Main menu finished
+	
+6/25/2015:

@@ -37,10 +37,58 @@ Player* Player::create()
 void Player::initOptions()
 {
     // do things here like setTag(), setPosition(), any custom logic.
+	this->getPhysicsBody()->setVelocityLimit( 60.0f );
 }
 
 void Player::addEvents()
 {
+	///////
+	// Keyboard listener
+	///////
+	auto eventlistener = EventListenerKeyboard::create();
+	eventlistener->onKeyPressed = [ this ] ( cocos2d::EventKeyboard::KeyCode keyCode, cocos2d::Event* event )
+	{
+		switch (keyCode)
+		{
+		case cocos2d::EventKeyboard::KeyCode::KEY_A:
+			this->Player::move( Vec2( - this->getPhysicsBody()->getVelocityLimit(), 0 ) );
+			break;
+
+		case cocos2d::EventKeyboard::KeyCode::KEY_D:
+			this->Player::move( Vec2( this->getPhysicsBody()->getVelocityLimit(), 0 ) );
+			break;
+
+		case cocos2d::EventKeyboard::KeyCode::KEY_S:
+			this->Player::move( Vec2( 0, - this->getPhysicsBody()->getVelocityLimit()) );
+			break;
+
+		case cocos2d::EventKeyboard::KeyCode::KEY_W:
+			this->Player::move( Vec2( 0, this->getPhysicsBody()->getVelocityLimit()) );
+			break;
+		}
+	};
+
+	eventlistener->onKeyReleased = [ this ] ( EventKeyboard::KeyCode keyCode, Event* event )
+	{
+		switch (keyCode)
+		{
+		case cocos2d::EventKeyboard::KeyCode::KEY_A:
+		case cocos2d::EventKeyboard::KeyCode::KEY_D:
+		case cocos2d::EventKeyboard::KeyCode::KEY_S:
+		case cocos2d::EventKeyboard::KeyCode::KEY_W:
+			this->Player::idle();
+		}
+	};
+
+	this->_eventDispatcher->addEventListenerWithSceneGraphPriority(eventlistener, this);
+
+
+
+
+	/////
+	// If player is touched or not
+	/////
+
     auto listener = cocos2d::EventListenerTouchOneByOne::create();
     listener->setSwallowTouches(true);
 
@@ -133,7 +181,7 @@ void Player::move( cocos2d::Vec2 direction )
 	if( direction.x > 0 )
 	{
 		dir = 1; //right
-	}else{
+	}else if ( direction.x < 0 ) {
 		dir = 0; //left
 	}
 

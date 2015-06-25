@@ -28,8 +28,6 @@ private:
 	bool onTouchBegan(cocos2d::Touch *touch, cocos2d::Event *event);
 	void onTouchEnded(cocos2d::Touch *touch, cocos2d::Event *event);
 
-	//sprite
-	cocos2d::Sprite *mySprite;
 
 	//removes sprite when it's called
 	void actionFinished(cocos2d::Sprite *bullet);
@@ -43,9 +41,22 @@ private:
 
 	void menuCloseCallback( cocos2d::Ref* pSender );
 	void startGame( cocos2d::Ref* pSender );
-	void settings( cocos2d::Ref* pSender );
+	void settings( cocos2d::Ref* pSender);
 
 	void mainMenu();
+	void removeMainMenu();
+	
+	void settingsMenu();
+	void removeSettingsMenu();
+
+	void playMenu();
+	void removePlayMenu();
+
+	void gameMenu();
+	void removeGameMenu();
+
+	
+	void initShooting();
 };
 
 #endif // __HELLOWORLD_SCENE_H__

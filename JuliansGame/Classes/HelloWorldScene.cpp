@@ -1,4 +1,5 @@
 #include "HelloWorldScene.h"
+#include "ui/CocosGUI.h"
 
 USING_NS_CC;
 
@@ -34,14 +35,13 @@ bool HelloWorld::init()
     Vec2 origin = Director::getInstance()->getVisibleOrigin();
 
 	HelloWorld::mainMenu();
-
+	//HelloWorld::initKeyboardListener();
 
 	//////////////
 	//
 	//  Seal hunter
 	//
 	////////////
-
 
 
 
@@ -79,116 +79,6 @@ bool HelloWorld::init()
 	//auto contactListener = EventListenerPhysicsContact::create();
  //   contactListener->onContactBegin = CC_CALLBACK_1( HelloWorld::onContactBegin, this) ;
  //   this->getEventDispatcher()->addEventListenerWithSceneGraphPriority( contactListener, this );
-
-	//	//touch listener
-
-	//auto event_listener = EventListenerTouchAllAtOnce::create();
-	//event_listener -> onTouchesEnded = [=](const std::vector<Touch*>& pTouches, Event* event){
-	//	auto touch = *pTouches.begin();
-	//	auto openGl_location = touch-> getLocation();
-	//
-	//	auto move_action = MoveTo::create(1.f, openGl_location);
-	//	
-
-	//	auto bullet = Sprite::create( "bullet2.png" );
-	//	bullet->setPosition( mySprite->getPosition() + bullet->getContentSize() + Vec2( 10, 0 ) );
-	//	auto bulletBody = PhysicsBody::createBox( bullet->getContentSize(), PhysicsMaterial( 0, 0, 0) );
-
-	//	bulletBody->setDynamic(true);
-	//	bulletBody->setCollisionBitmask( 3 );
-	//	bulletBody->setContactTestBitmask( true );
-
-	//	bullet->setPhysicsBody( bulletBody );
-	//	this->addChild( bullet );
-
-	//	auto callback = CallFunc::create( [this,bullet]() {
-	//		this->actionFinished(bullet);
-	//	});
-	//	auto sequence = Sequence::create(move_action, callback, NULL);
-	//	bullet-> runAction(sequence);
-	//	
-	//	};
-	//
-	//this-> getEventDispatcher()-> addEventListenerWithSceneGraphPriority(event_listener, mySprite);
-
-	////keyboard listener
-	//auto eventListener = EventListenerKeyboard::create();
-	//eventListener->onKeyReleased = [](EventKeyboard::KeyCode keyCode, Event* event)
-	//{
-	//	switch(keyCode)
-	//	{
-	//	case EventKeyboard::KeyCode::KEY_LEFT_ARROW:
-	//	case EventKeyboard::KeyCode::KEY_A:
-	//	case EventKeyboard::KeyCode::KEY_RIGHT_ARROW:
-	//	case EventKeyboard::KeyCode::KEY_D:
-	//	case EventKeyboard::KeyCode::KEY_UP_ARROW:
-	//	case EventKeyboard::KeyCode::KEY_W:
-	//	case EventKeyboard::KeyCode::KEY_DOWN_ARROW:
-	//	case EventKeyboard::KeyCode::KEY_S:	
-	//	
-	//		event->getCurrentTarget()->getPhysicsBody()->setVelocity( Vect( 0, 0 ));
-	//	}
-
-	//};
-	//eventListener->onKeyPressed = [this, origin, visibleSize](EventKeyboard::KeyCode keyCode, Event* event){
-
-	//	PhysicsBody* body = event->getCurrentTarget()->getPhysicsBody();
-	//	auto loc = event->getCurrentTarget()->getPosition();
-
-	//	switch(keyCode){
-	//		case EventKeyboard::KeyCode::KEY_LEFT_ARROW:
-	//		case EventKeyboard::KeyCode::KEY_A:
-	//			//event->getCurrentTarget()->setPosition(loc.x-10,loc.y);
-	//			body->setVelocity( Vect( - mySprite->getPhysicsBody()->getVelocityLimit(), 0 ) );
-	//			break;
-
-	//		case EventKeyboard::KeyCode::KEY_RIGHT_ARROW:
-	//		case EventKeyboard::KeyCode::KEY_D:
-	//			//event->getCurrentTarget()->setPosition(loc.x+10,loc.y);
-	//			body->setVelocity( Vect( mySprite->getPhysicsBody()->getVelocityLimit(), 0 ) );
-	//			break;
-
-	//		case EventKeyboard::KeyCode::KEY_UP_ARROW:
-	//		case EventKeyboard::KeyCode::KEY_W:
-	//			//event->getCurrentTarget()->setPosition( loc.x, loc.y + 10 );
-	//			body->setVelocity( Vect( 0, mySprite->getPhysicsBody()->getVelocityLimit() ) );
-	//			break;
-
-	//		case EventKeyboard::KeyCode::KEY_DOWN_ARROW:
-	//		case EventKeyboard::KeyCode::KEY_S:
-	//			//event->getCurrentTarget()->setPosition( loc.x, loc.y - 10 );
-	//			body->setVelocity( Vect( 0, - mySprite->getPhysicsBody()->getVelocityLimit() ) );
-	//			break;
-
-	//		case EventKeyboard::KeyCode::KEY_SPACE:
-	//			//shoot a bullet straight forward
-	//			auto bulletSpeed = 300.0f;
-	//			auto distance = origin.x + visibleSize.width - mySprite->getPosition().x;
-	//			auto move_action = MoveTo::create( distance / bulletSpeed, Vec2( origin.x + visibleSize.width, mySprite->getPosition().y ) );
-
-	//			auto bullet = Sprite::create ( "bullet2.png" );
-	//			bullet->setPosition( mySprite->getPosition() + bullet->getContentSize() + Vec2( 10, 0 ) );
-	//			auto bulletBody = PhysicsBody::createBox( bullet->getContentSize(), PHYSICSBODY_MATERIAL_DEFAULT );
-
-	//			bulletBody->setDynamic( true );
-	//			bulletBody->setCollisionBitmask( 3 );
-	//			bulletBody->setContactTestBitmask( true );
-
-	//			bullet->setPhysicsBody( bulletBody );
-	//			this->addChild( bullet );
-
-	//			auto callback = CallFunc::create( [this,bullet]() { this->actionFinished(bullet); } );
-	//			auto sequence = Sequence::create(move_action, callback, NULL);
-	//			bullet-> runAction(sequence);
-	//	
-	//				
-
-	//			break;
-
-	//	}
-
-	//};
- //   this->_eventDispatcher->addEventListenerWithSceneGraphPriority(eventListener, mySprite);
 
     return true;
 }
@@ -290,6 +180,9 @@ void HelloWorld::menuCloseCallback( cocos2d::Ref* pSender )
 
 void HelloWorld::startGame( cocos2d::Ref* pSender )
 {
+	HelloWorld::gameMenu();
+
+	//game
 	//////////////
 	//
 	//  Player movement with animation
@@ -305,6 +198,7 @@ void HelloWorld::startGame( cocos2d::Ref* pSender )
 	pSprite->setPosition( Point( origin.x + visibleSize.width / 2, origin.y + visibleSize.height / 2 ) );
 	this->addChild(pSprite, 5); //second parameter is the drawing priority
 
+	HelloWorld::initShooting();
 
 	auto listener = EventListenerTouchOneByOne::create();
 	listener->setSwallowTouches(true);
@@ -313,22 +207,19 @@ void HelloWorld::startGame( cocos2d::Ref* pSender )
 	listener->onTouchEnded = CC_CALLBACK_2(HelloWorld::onTouchEnded, this);
  
 	Director::getInstance()->getEventDispatcher()->addEventListenerWithSceneGraphPriority(listener, this);
+
 }
 
 void HelloWorld::settings( cocos2d::Ref* pSender )
 {
-	//open settings menu
+
+	HelloWorld::settingsMenu();
 }
 
 void HelloWorld::mainMenu()
 {
-
 	Size visibleSize = Director::getInstance()->getVisibleSize();
     Vec2 origin = Director::getInstance()->getVisibleOrigin();
-
-	auto closeItem = MenuItemFont::create( "exit", this, menu_selector(HelloWorld::menuCloseCallback));    
-	closeItem->setPosition(Vec2(origin.x + visibleSize.width - closeItem->getContentSize().width/2,
-									origin.y + closeItem->getContentSize().height/2));
 
 	auto menuTitle = MenuItemFont::create( "Game Name" );
 	menuTitle->setPosition( Vec2( origin.x + visibleSize.width / 2,
@@ -336,13 +227,164 @@ void HelloWorld::mainMenu()
 
 	auto playTitle = MenuItemFont::create( "Play", this, menu_selector( HelloWorld::startGame ) );
 	playTitle->setPosition( Vec2( origin.x + visibleSize.width / 2,
-		menuTitle->getPosition().y - 2 * playTitle->getContentSize().height ) );
+		origin.y + visibleSize.height / 2 ) );
 
 	auto settingsTitle = MenuItemFont::create( "Settings", this, menu_selector( HelloWorld::settings ) );
 	settingsTitle->setPosition( Vec2( origin.x + visibleSize.width / 2,
 		playTitle->getPosition().y - 2 * settingsTitle->getContentSize().height ) );
 
+	auto closeItem = MenuItemFont::create( "Exit", this, menu_selector(HelloWorld::menuCloseCallback));    
+	closeItem->setPosition( Vec2( origin.x + visibleSize.width / 2,
+		settingsTitle->getPosition().y - 2 * closeItem->getContentSize().height ) );
+
 	auto menu = Menu::create(closeItem, menuTitle, playTitle, settingsTitle, NULL);
 	menu->setPosition(Vec2::ZERO);
+	menu->setName( "mainMenu" );
 	this->addChild(menu, 1);
 }
+void HelloWorld::removeMainMenu()
+{
+	this->removeChildByName( "mainMenu" );
+}
+
+void HelloWorld::settingsMenu()
+{
+	HelloWorld::removeMainMenu();
+
+	Size visibleSize = Director::getInstance()->getVisibleSize();
+    Vec2 origin = Director::getInstance()->getVisibleOrigin();
+
+	auto slider = ui::Slider::create();
+	slider->setPosition( origin + visibleSize / 2 );
+	slider->loadBarTexture("Slider_Back.png"); // what the slider looks like
+	slider->loadSlidBallTextures("SliderNode_Normal.png", "SliderNode_Press.png", "SliderNode_Disable.png");
+	slider->loadProgressBarTexture("Slider_PressBar.png");
+	slider->addTouchEventListener([&](Ref* sender, ui::Widget::TouchEventType type){
+			switch (type)
+			{
+					case ui::Widget::TouchEventType::BEGAN:
+							break;
+					case ui::Widget::TouchEventType::ENDED:
+							CCLOG( "Slider moved" );
+							break;
+					default:
+							break;
+			}
+	});
+	slider->setName( "slider" );
+	this->addChild( slider );
+
+	auto soundText = ui::TextField::create( "Sound", "fonts/Marker Felt.ttf", 30 );
+	soundText->setPosition( Vec2( slider->getPosition().x - slider->getContentSize().width / 2 -  soundText->getContentSize().width,
+		slider->getPosition().y ));
+	soundText->setName( "soundText" );
+
+	this->addChild( soundText );
+
+	// kan annars ta bort denna texten och ha png med text på, för knappen under
+	auto buttonText = ui::TextField::create( "Back", "fonts/Marker Felt.ttf", 30 );
+	buttonText->setPosition( Vec2( slider->getPosition().x,
+		slider->getPosition().y - slider->getContentSize().height - 2 * buttonText->getContentSize().height ) );
+	buttonText->setName( "buttonText" );
+
+	this->addChild( buttonText );
+
+	auto backButton = ui::Button::create( "Button_Normal.png", "Button_Press.png", "Button_Disable.png" );
+
+	backButton->setPosition( Vec2( buttonText->getPosition().x,
+		buttonText->getPosition().y - buttonText->getContentSize().height - backButton->getContentSize().height / 2 ) );
+	backButton->addTouchEventListener([&](Ref* sender, ui::Widget::TouchEventType type){
+        switch (type)
+        {
+                case ui::Widget::TouchEventType::BEGAN:
+                        break;
+                case ui::Widget::TouchEventType::ENDED:
+                        HelloWorld::removeSettingsMenu();
+                        break;
+                default:
+                        break;
+        }
+	});
+	backButton->setName( "backButton" );
+	this->addChild(backButton);
+
+}
+void HelloWorld::removeSettingsMenu()
+{
+	this->removeChildByName( "slider" );
+	this->removeChildByName( "soundText" );
+	this->removeChildByName( "backButton" );
+	this->removeChildByName( "buttonText" );
+
+	HelloWorld::mainMenu();
+}
+
+void HelloWorld::playMenu()
+{
+	HelloWorld::removeMainMenu();
+}
+void HelloWorld::removePlayMenu()
+{
+	this->removeChildByName( "playMenu" );
+}
+
+void HelloWorld::gameMenu()
+{
+	HelloWorld::removeMainMenu();
+
+	//score
+	//weapon indicator
+	//level
+}
+
+void HelloWorld::removeGameMenu()
+{
+	this->removeChildByName( "gameMenu" );
+}
+
+
+
+void HelloWorld::initShooting()
+{
+
+	Size visibleSize = Director::getInstance()->getVisibleSize();
+    Vec2 origin = Director::getInstance()->getVisibleOrigin();
+
+	//keyboard listener
+	auto eventListener = EventListenerKeyboard::create();
+	eventListener->onKeyPressed = [ this, origin, visibleSize]( EventKeyboard::KeyCode keyCode, Event* event ){
+
+		PhysicsBody* body = event->getCurrentTarget()->getPhysicsBody();
+
+		switch(keyCode){
+			case EventKeyboard::KeyCode::KEY_SPACE:
+				//shoot a bullet straight forward
+				auto bulletSpeed = 300.0f;
+				auto distance = origin.x + visibleSize.width - pSprite->getPosition().x;
+				auto move_action = MoveTo::create( distance / bulletSpeed, Vec2( origin.x + visibleSize.width, pSprite->getPosition().y ) );
+
+				auto bullet = Sprite::create ( "arrow.png" );
+				bullet->setPosition( pSprite->getPosition() + bullet->getContentSize() + Vec2( 10, 0 ) );
+				auto bulletBody = PhysicsBody::createBox( bullet->getContentSize(), PHYSICSBODY_MATERIAL_DEFAULT );
+
+				bulletBody->setDynamic( true );
+				bulletBody->setCollisionBitmask( 3 );
+				bulletBody->setContactTestBitmask( true );
+
+				bullet->setPhysicsBody( bulletBody );
+				this->addChild( bullet );
+
+				auto callback = CallFunc::create( [this,bullet]() { this->actionFinished(bullet); } );
+				auto sequence = Sequence::create(move_action, callback, NULL);
+				bullet-> runAction(sequence);
+		
+					
+
+				break;
+
+		}
+
+	};
+    this->_eventDispatcher->addEventListenerWithSceneGraphPriority(eventListener, pSprite);
+}
+
