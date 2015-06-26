@@ -8,7 +8,7 @@ Scene* HelloWorld::createScene()
     // 'scene' is an autorelease object
     auto scene = Scene::createWithPhysics();
 	//disable for release:
-    scene -> getPhysicsWorld() -> setDebugDrawMask( PhysicsWorld::DEBUGDRAW_ALL ); 
+    //scene -> getPhysicsWorld() -> setDebugDrawMask( PhysicsWorld::DEBUGDRAW_ALL ); 
 	scene -> getPhysicsWorld() -> setGravity( Vect( 0,0 ) );
     // 'layer' is an autorelease object
     auto layer = HelloWorld::create();
@@ -35,14 +35,8 @@ bool HelloWorld::init()
     Vec2 origin = Director::getInstance()->getVisibleOrigin();
 
 	HelloWorld::mainMenu();
+	
 	//HelloWorld::initKeyboardListener();
-
-	//////////////
-	//
-	//  Seal hunter
-	//
-	////////////
-
 
 
 	////screen boundary
@@ -52,33 +46,11 @@ bool HelloWorld::init()
 	//edgeNode->setPosition( Point(visibleSize.width / 2 + origin.x, visibleSize.height / 2 + origin.y) );
 	//edgeNode->setPhysicsBody( edgeBody );
 
-	//this->addChild( edgeNode );
 
-	////create the player-sprite
-	//mySprite = Sprite::create( "player_blue.png" );
-	//mySprite->setPosition( Point( origin.x + mySprite->getContentSize().width, origin.y + visibleSize.height / 2 ) );
-	//auto spriteBody = PhysicsBody::createBox( mySprite->getContentSize(), PhysicsMaterial( 0, 0, 1 ) );
-	//spriteBody->setCollisionBitmask( 1 );
-	//spriteBody->setContactTestBitmask( true );
-	//spriteBody->setDynamic( true ); //Must be dynamic to be able to set velocity
-	//spriteBody->setVelocityLimit( 60 ); //Max player movement speed
-
-	//mySprite->setPhysicsBody( spriteBody );
-
-	//this->addChild( mySprite );
-	//
-	////create Enemyseals at random y location
-	//for(int i = 0; i < 5; ++i)
-	//{
-	//	HelloWorld::createEnemyseal(visibleSize);
-	//}
-
-
-
-	//// listen for contact between objects
-	//auto contactListener = EventListenerPhysicsContact::create();
- //   contactListener->onContactBegin = CC_CALLBACK_1( HelloWorld::onContactBegin, this) ;
- //   this->getEventDispatcher()->addEventListenerWithSceneGraphPriority( contactListener, this );
+	// listen for contact between objects
+	auto contactListener = EventListenerPhysicsContact::create();
+    contactListener->onContactBegin = CC_CALLBACK_1( HelloWorld::onContactBegin, this) ;
+    this->getEventDispatcher()->addEventListenerWithSceneGraphPriority( contactListener, this );
 
     return true;
 }
@@ -90,8 +62,11 @@ void HelloWorld::actionFinished(cocos2d::Sprite *bullet)
 	//CCLOG("shot completed!");
 }
 
-void HelloWorld::createEnemyseal(cocos2d::Size visibleSize)
+Sprite* HelloWorld::createEnemyseal()
 {
+
+	Size visibleSize = Director::getInstance()->getVisibleSize();
+
 	cocos2d::Sprite* sealSprite = Sprite::create( "Seal/seal_walk1.png" );
 	sealSprite -> setPosition ( Vec2 ( visibleSize.width, random( 0, (int) visibleSize.height ) ) );
 	auto sealBody = PhysicsBody::createBox( sealSprite->getContentSize(), PhysicsMaterial() ); 
@@ -104,15 +79,16 @@ void HelloWorld::createEnemyseal(cocos2d::Size visibleSize)
 	sealSprite -> getPhysicsBody() ->setVelocity ( cocos2d::Vect( -10, 0 ) );
 
 	this->addChild( sealSprite );
-}
 
+	return sealSprite;
+}
 
 
 bool HelloWorld::onContactBegin(cocos2d::PhysicsContact &contact)
 {
     PhysicsBody *a = contact.getShapeA()->getBody();
     PhysicsBody *b = contact.getShapeB()->getBody();
-    
+
 	// check if the bodies have collided
 
 	//if player collide with seal
@@ -125,13 +101,10 @@ bool HelloWorld::onContactBegin(cocos2d::PhysicsContact &contact)
 	else if( ( 2 == a->getCollisionBitmask() && 3 == b->getCollisionBitmask() ) 
 		|| ( 3 == a->getCollisionBitmask() && 2 == b->getCollisionBitmask() ) )
 	{
-		if( a->getCollisionBitmask() == 2)
-		{
-			a->getNode()->removeFromParent();
-		}else{
-			b->getNode()->removeFromParent();
-		}
-		CCLOG( "Seal collide with bullet" );
+ 		a->getNode()->removeFromParent();
+		b->getNode()->removeFromParent();
+
+		HelloWorld::updateScore( 30 );		
 	}
 
     
@@ -160,6 +133,10 @@ void HelloWorld::onTouchEnded(Touch *touch, Event *event)
 //called for every update of the game
 void HelloWorld::update(float dt)
 {
+	/*std::string s = std::to_string( dt );
+	const char * chr = s.c_str();
+	CCLOG ( chr );*/
+
 	pSprite->update();
 }
 
@@ -193,9 +170,9 @@ void HelloWorld::startGame( cocos2d::Ref* pSender )
     Vec2 origin = Director::getInstance()->getVisibleOrigin();
 	//start game
 	this->scheduleUpdate();
-
+	
 	pSprite = Player::create();
-	pSprite->setPosition( Point( origin.x + visibleSize.width / 2, origin.y + visibleSize.height / 2 ) );
+	pSprite->setPosition( Point( origin.x + visibleSize.width / 10, origin.y + visibleSize.height / 2 ) );
 	this->addChild(pSprite, 5); //second parameter is the drawing priority
 
 	HelloWorld::initShooting();
@@ -207,6 +184,9 @@ void HelloWorld::startGame( cocos2d::Ref* pSender )
 	listener->onTouchEnded = CC_CALLBACK_2(HelloWorld::onTouchEnded, this);
  
 	Director::getInstance()->getEventDispatcher()->addEventListenerWithSceneGraphPriority(listener, this);
+
+	srand((unsigned int)time(nullptr));
+	this->schedule(schedule_selector(HelloWorld::addMonster), 1.5);
 
 }
 
@@ -240,7 +220,7 @@ void HelloWorld::mainMenu()
 	auto menu = Menu::create(closeItem, menuTitle, playTitle, settingsTitle, NULL);
 	menu->setPosition(Vec2::ZERO);
 	menu->setName( "mainMenu" );
-	this->addChild(menu, 1);
+	this->addChild(menu);
 }
 void HelloWorld::removeMainMenu()
 {
@@ -256,11 +236,11 @@ void HelloWorld::settingsMenu()
 
 	auto slider = ui::Slider::create();
 	slider->setPosition( origin + visibleSize / 2 );
-	slider->loadBarTexture("Slider_Back.png"); // what the slider looks like
-	slider->loadSlidBallTextures("SliderNode_Normal.png", "SliderNode_Press.png", "SliderNode_Disable.png");
-	slider->loadProgressBarTexture("Slider_PressBar.png");
-	slider->addTouchEventListener([&](Ref* sender, ui::Widget::TouchEventType type){
-			switch (type)
+	slider->loadBarTexture( "Slider_Back.png" ); // what the slider looks like
+	slider->loadSlidBallTextures( "SliderNode_Normal.png", "SliderNode_Press.png", "SliderNode_Disable.png" );
+	slider->loadProgressBarTexture( "Slider_PressBar.png" );
+	slider->addTouchEventListener( [ & ]( Ref* sender, ui::Widget::TouchEventType type ){
+			switch ( type )
 			{
 					case ui::Widget::TouchEventType::BEGAN:
 							break;
@@ -319,29 +299,87 @@ void HelloWorld::removeSettingsMenu()
 	HelloWorld::mainMenu();
 }
 
-void HelloWorld::playMenu()
-{
-	HelloWorld::removeMainMenu();
-}
-void HelloWorld::removePlayMenu()
-{
-	this->removeChildByName( "playMenu" );
-}
-
 void HelloWorld::gameMenu()
 {
 	HelloWorld::removeMainMenu();
 
 	//score
+	Size visibleSize = Director::getInstance()->getVisibleSize();
+    Vec2 origin = Director::getInstance()->getVisibleOrigin();
+
+	auto scoreText = Label::create( "Score: ", "fonts/Marker Felt.ttf", 30);
+	scoreText->setPosition( Vec2( origin.x + scoreText->getContentSize().width / 2,
+		origin.y + visibleSize.height - scoreText->getContentSize().height / 2 ) );
+	scoreText->setName( "scoreText" );
+
+	this->addChild( scoreText );
+
+	auto scoreInt = Label::create( "  000", "fonts/Marker Felt.ttf", 30);
+	scoreInt->setPosition( Vec2( scoreText->getPosition().x + scoreText->getContentSize().width / 2 + scoreInt->getContentSize().width / 2,
+		scoreText->getPosition().y ) );
+	scoreInt->setName( "scoreInt" );
+
+	this->addChild( scoreInt );
+
+	
 	//weapon indicator
 	//level
 }
-
 void HelloWorld::removeGameMenu()
 {
-	this->removeChildByName( "gameMenu" );
+	this->removeChildByName( "scoreText" );
+	this->removeChildByName( "scoreInt" );
 }
 
+void HelloWorld::lostMenu()
+{
+	auto sco = (Label*) this->getChildByName( "scoreInt" );
+	std::string finalScore = sco->getString();
+
+	HelloWorld::removeGameMenu();
+	this->removeAllChildren();
+	this->unscheduleUpdate();
+	this->unscheduleAllCallbacks();
+	this->unscheduleAllSelectors();
+	this->getEventDispatcher()->removeAllEventListeners();
+	
+	Size visibleSize = Director::getInstance()->getVisibleSize();
+    Vec2 origin = Director::getInstance()->getVisibleOrigin();
+
+	auto ggText = MenuItemFont::create( "G G" );
+	ggText->setPosition( Vec2( origin.x + visibleSize.width / 2, 
+		origin.y + visibleSize.height - ggText->getContentSize().height) );
+
+	auto tryAgain = MenuItemFont::create( "Try Again?", this, menu_selector( HelloWorld::lostMenuTryAgain ) );
+	tryAgain->setPosition( Vec2( origin.x + visibleSize.width / 2,
+		origin.y + visibleSize.height / 2 ) );
+
+	auto scoreTxt = MenuItemFont::create( "Score: ");
+	scoreTxt->setPosition( Vec2( origin.x + scoreTxt->getContentSize().width / 2,
+		origin.y + visibleSize.height / 2 - scoreTxt->getContentSize().height / 2 ) );
+
+	auto scoreInt = MenuItemFont::create( finalScore );
+	scoreInt->setPosition( Vec2( scoreTxt->getPosition().x + scoreTxt->getContentSize().width / 2 + scoreInt->getContentSize().width / 2,
+		scoreTxt->getPosition().y ) );
+
+	auto closeItem = MenuItemFont::create( "Exit", this, menu_selector(HelloWorld::menuCloseCallback));    
+	closeItem->setPosition( Vec2( origin.x + visibleSize.width / 2,
+		scoreTxt->getPosition().y - 2 * closeItem->getContentSize().height ) );
+
+	auto menu = Menu::create(closeItem, ggText, tryAgain, scoreTxt, NULL);
+	menu->setPosition(Vec2::ZERO);
+	menu->setName( "mainMenu" );
+	this->addChild(menu);
+}
+void HelloWorld::removeLostMenu()
+{
+	this->removeChildByName( "mainMenu" );
+}
+void HelloWorld::lostMenuTryAgain( cocos2d::Ref* pSender )
+{
+	HelloWorld::removeLostMenu();
+	HelloWorld::startGame( pSender );
+}
 
 
 void HelloWorld::initShooting()
@@ -364,7 +402,7 @@ void HelloWorld::initShooting()
 				auto move_action = MoveTo::create( distance / bulletSpeed, Vec2( origin.x + visibleSize.width, pSprite->getPosition().y ) );
 
 				auto bullet = Sprite::create ( "arrow.png" );
-				bullet->setPosition( pSprite->getPosition() + bullet->getContentSize() + Vec2( 10, 0 ) );
+				bullet->setPosition( Vec2( pSprite->getPosition().x + bullet->getContentSize().width, pSprite->getPosition().y ) );
 				auto bulletBody = PhysicsBody::createBox( bullet->getContentSize(), PHYSICSBODY_MATERIAL_DEFAULT );
 
 				bulletBody->setDynamic( true );
@@ -388,3 +426,56 @@ void HelloWorld::initShooting()
     this->_eventDispatcher->addEventListenerWithSceneGraphPriority(eventListener, pSprite);
 }
 
+void HelloWorld::addMonster(float dt) 
+{
+	auto monster = Sprite::create( "Seal/seal_walk1.png" );
+	auto monsterBody = PhysicsBody::createBox( monster->getContentSize(), PHYSICSBODY_MATERIAL_DEFAULT );
+	monsterBody->setContactTestBitmask( true );
+	monsterBody->setCollisionBitmask( 2 );
+
+	monster->setPhysicsBody( monsterBody );
+	// 1
+	auto monsterContentSize = monster->getContentSize();
+	auto selfContentSize = this->getContentSize();
+	int minY = monsterContentSize.height/2;
+	int maxY = selfContentSize.height - monsterContentSize.height/2;
+	int rangeY = maxY - minY;
+	int randomY = ( rand() % rangeY ) + minY;
+ 
+	monster->setPosition( Vec2( selfContentSize.width + monsterContentSize.width/2, randomY ) );
+	monster->setName( "monster" );
+	this->addChild(monster);
+ 
+	// 2
+	int minDuration = 12.0;
+	int maxDuration = 14.0;
+	int rangeDuration = maxDuration - minDuration;
+	int randomDuration = ( rand() % rangeDuration ) + minDuration;
+ 
+	// 3
+	auto actionMove = MoveTo::create( randomDuration, Vec2( -monsterContentSize.width/2, randomY ) );
+
+	//does actionMove, then calls monsterOutside when it's done. ( add parameters by: monsterOutside, this, param1, param2)
+	monster->runAction( Sequence::create( actionMove, CallFunc::create( std::bind( &HelloWorld::monsterOutside, this ) ), nullptr ) );
+}
+
+void HelloWorld::monsterOutside()
+{
+	auto monster = this->getChildByName( "monster" );
+	auto actionRemove = RemoveSelf::create();
+	monster->runAction( actionRemove );
+	HelloWorld::lostMenu();
+
+}
+
+//updates the score by nr, shown in game.
+void HelloWorld::updateScore( int nr )
+{
+	Label* scoreLabel = (Label*) this->getChildByName( "scoreInt" );
+	if(scoreLabel)
+	{
+		auto str = scoreLabel->getString();
+		int tempScore = std::stoi( str );
+		scoreLabel->setString( std::to_string( tempScore + nr ) );
+	}
+}

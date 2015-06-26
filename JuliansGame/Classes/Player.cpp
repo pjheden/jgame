@@ -15,6 +15,8 @@ Player* Player::create()
 {
     Player* pSprite = new Player();
 	auto physicsBody = PhysicsBody::createBox( pSprite->getContentSize(), PHYSICSBODY_MATERIAL_DEFAULT);
+	physicsBody->setCollisionBitmask( 1 );
+	physicsBody->setContactTestBitmask( true );
 	pSprite->setPhysicsBody( physicsBody );
 
     if (pSprite && pSprite->initWithFile( "C:/JuliansGame/JuliansGame/Resources/Indian_idle1.png" ) )
@@ -37,7 +39,7 @@ Player* Player::create()
 void Player::initOptions()
 {
     // do things here like setTag(), setPosition(), any custom logic.
-	this->getPhysicsBody()->setVelocityLimit( 60.0f );
+	this->getPhysicsBody()->setVelocityLimit( 80.0f );
 }
 
 void Player::addEvents()
@@ -121,12 +123,13 @@ void Player::touchEvent(cocos2d::Touch* touch, cocos2d::Vec2 _point)
 
 void Player::initAnimations()
 {
-	// set the appropriate resource directory for this device
-	FileUtils::getInstance()->addSearchResolutionsOrder("indian_spreedsheet/HD");
+
+	//// set the appropriate resource directory for this device
+	//FileUtils::getInstance()->addSearchResolutionsOrder("indian_spreedsheet");
 
 	// load and cache the texture and sprite frames
 	auto cacher = SpriteFrameCache::getInstance();
-	cacher->addSpriteFramesWithFile("indian_walk.plist");
+	cacher->addSpriteFramesWithFile("C:/JuliansGame/JuliansGame/Resources/indian_walk.plist");
 
 	#include <sstream>
 	// load all the animation frames into an array
@@ -159,7 +162,7 @@ void Player::initAnimations()
 		std::string s = std::to_string( i );
 
 		SpriteFrame* aFrame2 =
-		cacher2->getSpriteFrameByName( "Indian_idle" + s + ".png" );
+		cacher2->getSpriteFrameByName( "indian_idle" + s + ".png" );
 		frames2.pushBack(aFrame2);
 	}
 

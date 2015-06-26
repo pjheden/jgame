@@ -33,7 +33,7 @@ private:
 	void actionFinished(cocos2d::Sprite *bullet);
 
 	//creates a enemy seal-sprite
-	void createEnemyseal(cocos2d::Size visibleSize);
+	Sprite* createEnemyseal();
 
 	Player* pSprite;
 
@@ -49,14 +49,20 @@ private:
 	void settingsMenu();
 	void removeSettingsMenu();
 
-	void playMenu();
-	void removePlayMenu();
-
 	void gameMenu();
 	void removeGameMenu();
 
-	
+	void lostMenu();
+	void removeLostMenu();
+	void lostMenuTryAgain( cocos2d::Ref* pSender );
+
 	void initShooting();
+
+	void addMonster(float dt);
+
+	void updateScore( int nr );
+
+	void monsterOutside();
 };
 
 #endif // __HELLOWORLD_SCENE_H__
