@@ -47,10 +47,6 @@ bool HelloWorld::init()
 	//edgeNode->setPhysicsBody( edgeBody );
 
 
-	// listen for contact between objects
-	auto contactListener = EventListenerPhysicsContact::create();
-    contactListener->onContactBegin = CC_CALLBACK_1( HelloWorld::onContactBegin, this) ;
-    this->getEventDispatcher()->addEventListenerWithSceneGraphPriority( contactListener, this );
 
     return true;
 }
@@ -176,6 +172,11 @@ void HelloWorld::startGame( cocos2d::Ref* pSender )
 	this->addChild(pSprite, 5); //second parameter is the drawing priority
 
 	HelloWorld::initShooting();
+
+	// listen for contact between objects
+	auto contactListener = EventListenerPhysicsContact::create();
+    contactListener->onContactBegin = CC_CALLBACK_1( HelloWorld::onContactBegin, this) ;
+    this->getEventDispatcher()->addEventListenerWithSceneGraphPriority( contactListener, this );
 
 	auto listener = EventListenerTouchOneByOne::create();
 	listener->setSwallowTouches(true);
@@ -337,6 +338,7 @@ void HelloWorld::lostMenu()
 	std::string finalScore = sco->getString();
 
 	HelloWorld::removeGameMenu();
+	//make a function?
 	this->removeAllChildren();
 	this->unscheduleUpdate();
 	this->unscheduleAllCallbacks();
@@ -355,8 +357,7 @@ void HelloWorld::lostMenu()
 		origin.y + visibleSize.height / 2 ) );
 
 	auto scoreTxt = MenuItemFont::create( "Score: ");
-	scoreTxt->setPosition( Vec2( origin.x + scoreTxt->getContentSize().width / 2,
-		origin.y + visibleSize.height / 2 - scoreTxt->getContentSize().height / 2 ) );
+	scoreTxt->setPosition( Vec2( origin.x + scoreTxt->getContentSize().width / 2, origin.y + visibleSize.height - scoreTxt->getContentSize().height / 2 ) );
 
 	auto scoreInt = MenuItemFont::create( finalScore );
 	scoreInt->setPosition( Vec2( scoreTxt->getPosition().x + scoreTxt->getContentSize().width / 2 + scoreInt->getContentSize().width / 2,
@@ -364,9 +365,9 @@ void HelloWorld::lostMenu()
 
 	auto closeItem = MenuItemFont::create( "Exit", this, menu_selector(HelloWorld::menuCloseCallback));    
 	closeItem->setPosition( Vec2( origin.x + visibleSize.width / 2,
-		scoreTxt->getPosition().y - 2 * closeItem->getContentSize().height ) );
+		tryAgain->getPosition().y - 2 * closeItem->getContentSize().height ) );
 
-	auto menu = Menu::create(closeItem, ggText, tryAgain, scoreTxt, NULL);
+	auto menu = Menu::create(closeItem, ggText, tryAgain, scoreTxt, scoreInt, NULL);
 	menu->setPosition(Vec2::ZERO);
 	menu->setName( "mainMenu" );
 	this->addChild(menu);
