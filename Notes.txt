@@ -4,11 +4,9 @@ To do:
 3. Score
 4. settings
 
-
-Tag-List:
-1: player
-2: Seals
-3: bullets
+Ideas:
+1. Variable to keep track on which level we are
+2. Have a function which changes level
 
 6/21/2015:
 	Started making a sealHunter - clone

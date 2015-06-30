@@ -8,6 +8,8 @@ import os, os.path
 import shutil
 from optparse import OptionParser
 
+NDK_ROOT=“C:\Users\Julian\Private\AndroidDev\android-ndk-r9d”
+
 def get_num_of_cpu():
 	''' The build process can be accelerated by running multiple concurrent job processes using the -j-option.
 	'''
