@@ -7,12 +7,13 @@ EnemyCB::EnemyCB(){}
 
 EnemyCB::~EnemyCB()
 {
-	//CC_SAFE_RELEASE(moveAnimate);
+	CC_SAFE_RELEASE(moveAnimate);
 }
 
 EnemyCB* EnemyCB::create()
 {
 	EnemyCB* eSprite = new EnemyCB();
+	eSprite->setName( "EnemyCB" );
 	
 	eSprite->setScaleX( -1 );
 
@@ -30,7 +31,29 @@ EnemyCB* EnemyCB::create()
 
 void EnemyCB::initAnimations()
 {
+	// load and cache the texture and sprite frames
+	auto cacher = SpriteFrameCache::getInstance();
+	cacher->addSpriteFramesWithFile("C:/JuliansGame/JuliansGame/Resources/cowboy.plist");
 
+	#include <sstream>
+	// load all the animation frames into an array
+	const int kNumberOfFrames = 2;
+	Vector<SpriteFrame*> frames;
+	for (int i = 1; i < kNumberOfFrames; i++)
+	{
+		std::string s = std::to_string( i );
+
+		SpriteFrame* aFrame =
+		cacher->getSpriteFrameByName( "cowboy2" + s + ".png" );
+		frames.pushBack(aFrame);
+	}
+
+	// play the animation
+	auto animation = Animation::createWithSpriteFrames(frames, 0.20f);
+	animation->setRestoreOriginalFrame(true);
+	moveAnimate = Animate::create(animation);
+	moveAnimate->retain();
+	this->runAction( RepeatForever::create( moveAnimate ) );
 }
 
 
@@ -39,6 +62,7 @@ PhysicsBody* EnemyCB::getBody()
 	auto physicsBody = PhysicsBody::createBox( this->getContentSize(), PHYSICSBODY_MATERIAL_DEFAULT );
 	physicsBody->setCollisionBitmask( 2 );
 	physicsBody->setContactTestBitmask( true );
+	physicsBody->setRotationEnable ( false );
 
 	return physicsBody;
 }
@@ -55,7 +79,6 @@ void EnemyCB::move()
 	int randomY = ( rand() % rangeY ) + minY;
 
 	this->setPosition( Vec2( selfContentSize.width + monsterContentSize.width/2, randomY ) );
-	this->setName( "EnemyCB" );
 
 	// 2
 	int minDuration = 6.0;
@@ -70,4 +93,3 @@ void EnemyCB::move()
 	//does actionMove, then calls monsterOutside when it's done. ( add parameters by: monsterOutside, this, param1, param2)
 	//this->runAction( Sequence::create( actionMove, CallFunc::create( std::bind( &HelloWorld::monsterOutside, this ) ), nullptr ) );
 }
-

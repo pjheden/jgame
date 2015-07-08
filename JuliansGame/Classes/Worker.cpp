@@ -7,12 +7,14 @@ Worker::Worker(){}
 
 Worker::~Worker()
 {
-	//CC_SAFE_RELEASE(moveAnimate);
+	CC_SAFE_RELEASE(moveAnimate);
 }
 
 Worker* Worker::create()
 {
 	Worker* eSprite = new Worker();
+	eSprite->setName( "Worker" );
+
 
     if (eSprite && eSprite->initWithFile( "C:/JuliansGame/JuliansGame/Resources/Constructor21.png" ) )
     {
@@ -28,30 +30,31 @@ Worker* Worker::create()
 
 void Worker::initAnimations()
 {
-	//	// load and cache the texture and sprite frames
-	//auto cacher = SpriteFrameCache::getInstance();
-	//cacher->addSpriteFramesWithFile("C:/JuliansGame/JuliansGame/Resources/indian_walk.plist");
+	// load and cache the texture and sprite frames
+	auto cacher = SpriteFrameCache::getInstance();
+	cacher->addSpriteFramesWithFile("C:/JuliansGame/JuliansGame/Resources/constructor.plist");
 
-	//#include <sstream>
-	//// load all the animation frames into an array
-	//const int kNumberOfFrames = 4;
-	//Vector<SpriteFrame*> frames;
-	//for (int i = 1; i < kNumberOfFrames; i++)
-	//{
-	//	std::string s = std::to_string( i );
+	#include <sstream>
+	// load all the animation frames into an array
+	const int kNumberOfFrames = 4;
+	Vector<SpriteFrame*> frames;
+	for (int i = 1; i < kNumberOfFrames; i++)
+	{
+		std::string s = std::to_string( i );
 
-	//	SpriteFrame* aFrame =
-	//	cacher->getSpriteFrameByName( "indian_walk" + s + ".png" );
-	//	frames.pushBack(aFrame);
-	//}
+		SpriteFrame* aFrame =
+		cacher->getSpriteFrameByName( "Constructor2" + s + ".png" );
+		frames.pushBack(aFrame);
+	}
 
-	//// play the animation
-	//auto animation = Animation::createWithSpriteFrames(frames, 0.40f);
-	//animation->setRestoreOriginalFrame(true);
-	//moveAnimate = Animate::create(animation);
-	//moveAnimate->retain();
-	//this->runAction( RepeatForever::create( idleAnimate ) );
+	// play the animation
+	auto animation = Animation::createWithSpriteFrames(frames, 0.20f);
+	animation->setRestoreOriginalFrame(true);
+	moveAnimate = Animate::create(animation);
+	moveAnimate->retain();
+	this->runAction( RepeatForever::create( moveAnimate ) );
 }
+
 
 void Worker::move()
 {
@@ -64,7 +67,6 @@ void Worker::move()
 	int randomY = ( rand() % rangeY ) + minY;
 
 	this->setPosition( Vec2( selfContentSize.width + monsterContentSize.width/2, randomY ) );
-	this->setName( "Worker" );
 
 	// 2
 	int minDuration = 12.0;
@@ -86,6 +88,7 @@ PhysicsBody* Worker::getBody()
 	auto physicsBody = PhysicsBody::createBox( this->getContentSize(), PHYSICSBODY_MATERIAL_DEFAULT);
 	physicsBody->setCollisionBitmask( 2 );
 	physicsBody->setContactTestBitmask( true );
+	physicsBody->setRotationEnable( false );
 
 	return physicsBody;
 }

@@ -47,6 +47,7 @@ void Player::initOptions()
 {
     // do things here like setTag(), setPosition(), any custom logic.
 	this->getPhysicsBody()->setVelocityLimit( 120.0f );
+	this->getPhysicsBody()->setRotationEnable( false );
 }
 
 void Player::addEvents()

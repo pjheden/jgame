@@ -38,14 +38,24 @@ bool HelloWorld::init()
 	//HelloWorld::initKeyboardListener();
 
 
-	//screen boundary
-	//auto edgeBody = PhysicsBody::createEdgeBox( visibleSize, PHYSICSBODY_MATERIAL_DEFAULT, 3 );
-	auto edgeBody = PhysicsBody::createEdgeBox( visibleSize, PhysicsMaterial( 0, 0, 0), 3 );
-	auto edgeNode = Node::create();
-	edgeNode->setPosition( Point(visibleSize.width / 2 + origin.x, visibleSize.height / 2 + origin.y) );
-	edgeNode->setPhysicsBody( edgeBody );
+	////screen boundary
+	////auto edgeBody = PhysicsBody::createEdgeBox( visibleSize, PHYSICSBODY_MATERIAL_DEFAULT, 3 );
+	//auto edgeBody = PhysicsBody::createEdgeBox( visibleSize, PhysicsMaterial( 0, 0, 0), 3 );
+	//auto edgeNode = Node::create();
+	//edgeNode->setPosition( Point(visibleSize.width / 2 + origin.x, visibleSize.height / 2 + origin.y) );
+	//edgeNode->setPhysicsBody( edgeBody );
+	//this->addChild( edgeNode );
 
+	//create left wall for sprite Removal
+	auto leftWall = Node::create();
+	auto leftBody = PhysicsBody::createBox ( Size( visibleSize.width / 20 , visibleSize.height ), PHYSICSBODY_MATERIAL_DEFAULT );
+	leftBody->setDynamic( false );
+	leftBody->setCollisionBitmask( 4 );
+	leftBody->setContactTestBitmask( true );
 
+	leftWall->setPosition( Vec2(origin.x, origin.y + visibleSize.height / 2 ) );
+	leftWall->setPhysicsBody( leftBody );
+	this->addChild ( leftWall );
 
     return true;
 }
@@ -86,13 +96,13 @@ bool HelloWorld::onContactBegin(cocos2d::PhysicsContact &contact)
 
 	// check if the bodies have collided
 
-	//if player collide with seal
+	//if player collide with Worker,Cowboy
     if ( ( 1 == a->getCollisionBitmask() && 2 == b->getCollisionBitmask() ) 
 		|| ( 2 == a->getCollisionBitmask() && 1 == b->getCollisionBitmask() ) )
     {
-        CCLOG( "Player collide with seal" );
+        CCLOG( "Player collide with Worker / Cowboy" );
     }
-	//if seal collide with bullet
+	//if Worker,Cowboy collide with bullet
 	else if( ( 2 == a->getCollisionBitmask() && 3 == b->getCollisionBitmask() ) 
 		|| ( 3 == a->getCollisionBitmask() && 2 == b->getCollisionBitmask() ) )
 	{
@@ -101,7 +111,19 @@ bool HelloWorld::onContactBegin(cocos2d::PhysicsContact &contact)
 
 		HelloWorld::updateScore( 30 );		
 	}
-
+	//if Worker, Cowboy collide with LeftWall
+	else if( ( 2 == a->getCollisionBitmask() && 4 == b->getCollisionBitmask() ) 
+		|| ( 4 == a->getCollisionBitmask() && 2 == b->getCollisionBitmask() ) )
+	{
+		//remove Worker / Cowboy
+		if( 2 == a->getCollisionBitmask() )
+		{
+			a->getNode()->removeFromParent();
+		}else{
+			b->getNode()->removeFromParent();
+		}
+		HelloWorld::lostMenu();
+	}
     
     return true;
 }
@@ -193,14 +215,15 @@ void HelloWorld::startGame( cocos2d::Ref* pSender )
 
 
 	//spawn cowboys
-	srand((unsigned int)time(nullptr));
-	this->schedule(schedule_selector(HelloWorld::addCowboy), 1.5);
+	srand( ( unsigned int )time( nullptr ) );
+	this->schedule(schedule_selector( HelloWorld::addCowboy ), 3.0 );
 
 	//spawn workers
-	srand((unsigned int)time(nullptr));
-	this->schedule(schedule_selector(HelloWorld::addWorker), 3);
+	srand( ( unsigned int )time( nullptr ) );
+	this->schedule(schedule_selector( HelloWorld::addWorker ), 3.0 );
 
 }
+
 void HelloWorld::addCowboy( float dt )
 {
 	auto cbSprite= EnemyCB::create();
@@ -430,7 +453,6 @@ void HelloWorld::initShooting()
 				bullet->setPosition( Vec2( pSprite->getPosition().x + bullet->getContentSize().width, pSprite->getPosition().y ) );
 				auto bulletBody = PhysicsBody::createBox( bullet->getContentSize(), PHYSICSBODY_MATERIAL_DEFAULT );
 
-				bulletBody->setDynamic( true );
 				bulletBody->setCollisionBitmask( 3 );
 				bulletBody->setContactTestBitmask( true );
 

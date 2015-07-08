@@ -1,20 +1,42 @@
 To do:
-DONE 1. Flytta physicsbody (PLayer, Cowboy, Worker) till HelloWorld.cpp
-2. Cowboy skjuta tilbaka
-3. add cowboy and worker animations
+2. Cowboy shoot back
+	- difficult
+	- draw cowboy bullet
+
 4. HighScore
 5. settings
+
+8. Add railroad building for Workers
+
+Note:
+1. try Eclipse to run HelloWorld on android
+	- Compiling works through cmd, but not the emulator
+	- Check cocos2d-x emulator guide and try again
 
 Ideas:
 1. Variable to keep track on which level we are
 2. Have a function which changes level
 
-6/21/2015:
-	Started making a sealHunter - clone
+CollisionBitmasks:
+1: Player
+2: Workers, Cowboys
+3: Arrows
+4: LeftWall
 
-6/22/2015:
-	Fixed movement, and bullet spawn position
-	To do: Fix collisions ( player with seals and bullets with seals, bullets with player? )
+07/08/2015:
+DONE 1. Flytta physicsbody (PLayer, Cowboy, Worker) till HelloWorld.cpp
+
+DONE 3. add cowboy and worker animations
+
+DONE 6. cowboys and workers should be removed if they leave the screen (left side)
+	- Can be done by putting a wall with a collisionbitmask ?
+
+DONE 7. Turn off sprite rotation
+
+
+6/25/2015:
+Note to self:
+to create a runable win32 file, use the cocos run command ( cocos run -s path -p win32)
 
 6/24/2015:
 	Collisions fixed
@@ -22,8 +44,10 @@ Ideas:
 	setting up for animations.
 	Player class finished
 	Main menu finished
-	
-6/25/2015:
 
-Note to self:
-to create a runable win32 file, use the cocos run command ( cocos run -s path -p win32)
+6/22/2015:
+	Fixed movement, and bullet spawn position
+	To do: Fix collisions ( player with seals and bullets with seals, bullets with player? )
+
+6/21/2015:
+	Started making a sealHunter - clone

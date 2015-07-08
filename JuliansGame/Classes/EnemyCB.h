@@ -18,7 +18,6 @@ public:
 
 	void move();
 
-
 	PhysicsBody* getBody();
 
 private:
