@@ -8,7 +8,7 @@ Scene* HelloWorld::createScene()
     // 'scene' is an autorelease object
     auto scene = Scene::createWithPhysics();
 	//disable for release:
-    //scene -> getPhysicsWorld() -> setDebugDrawMask( PhysicsWorld::DEBUGDRAW_ALL ); 
+    scene -> getPhysicsWorld() -> setDebugDrawMask( PhysicsWorld::DEBUGDRAW_ALL ); 
 	scene -> getPhysicsWorld() -> setGravity( Vect( 0,0 ) );
     // 'layer' is an autorelease object
     auto layer = HelloWorld::create();
@@ -33,18 +33,17 @@ bool HelloWorld::init()
     
     Size visibleSize = Director::getInstance()->getVisibleSize();
     Vec2 origin = Director::getInstance()->getVisibleOrigin();
-
 	HelloWorld::mainMenu();
 	
 	//HelloWorld::initKeyboardListener();
 
 
-	////screen boundary
-	////auto edgeBody = PhysicsBody::createEdgeBox( visibleSize, PHYSICSBODY_MATERIAL_DEFAULT, 3 );
-	//auto edgeBody = PhysicsBody::createEdgeBox( visibleSize, PhysicsMaterial( 0, 0, 0), 3 );
-	//auto edgeNode = Node::create();
-	//edgeNode->setPosition( Point(visibleSize.width / 2 + origin.x, visibleSize.height / 2 + origin.y) );
-	//edgeNode->setPhysicsBody( edgeBody );
+	//screen boundary
+	//auto edgeBody = PhysicsBody::createEdgeBox( visibleSize, PHYSICSBODY_MATERIAL_DEFAULT, 3 );
+	auto edgeBody = PhysicsBody::createEdgeBox( visibleSize, PhysicsMaterial( 0, 0, 0), 3 );
+	auto edgeNode = Node::create();
+	edgeNode->setPosition( Point(visibleSize.width / 2 + origin.x, visibleSize.height / 2 + origin.y) );
+	edgeNode->setPhysicsBody( edgeBody );
 
 
 
@@ -169,7 +168,9 @@ void HelloWorld::startGame( cocos2d::Ref* pSender )
 	
 	pSprite = Player::create();
 	pSprite->setPosition( Point( origin.x + visibleSize.width / 10, origin.y + visibleSize.height / 2 ) );
-	this->addChild(pSprite, 5); //second parameter is the drawing priority
+	//pSprite->setPhysicsBody( pSprite->getBody() );
+
+	this->addChild( pSprite, 5 ); //second parameter is the drawing priority
 
 	HelloWorld::initShooting();
 
@@ -186,9 +187,32 @@ void HelloWorld::startGame( cocos2d::Ref* pSender )
  
 	Director::getInstance()->getEventDispatcher()->addEventListenerWithSceneGraphPriority(listener, this);
 
-	srand((unsigned int)time(nullptr));
-	this->schedule(schedule_selector(HelloWorld::addMonster), 1.5);
+	//spawn random monsters
+	//srand((unsigned int)time(nullptr));
+	//this->schedule(schedule_selector(HelloWorld::addMonster), 1.5);
 
+
+	//spawn cowboys
+	srand((unsigned int)time(nullptr));
+	this->schedule(schedule_selector(HelloWorld::addCowboy), 1.5);
+
+	//spawn workers
+	srand((unsigned int)time(nullptr));
+	this->schedule(schedule_selector(HelloWorld::addWorker), 3);
+
+}
+void HelloWorld::addCowboy( float dt )
+{
+	auto cbSprite= EnemyCB::create();
+	cbSprite->setPhysicsBody( cbSprite->getBody() );
+	this->addChild( cbSprite );
+}
+
+void HelloWorld::addWorker( float dt )
+{
+	auto wSprite= Worker::create();
+	wSprite->setPhysicsBody( wSprite->getBody() );
+	this->addChild( wSprite );
 }
 
 void HelloWorld::settings( cocos2d::Ref* pSender )
@@ -427,14 +451,16 @@ void HelloWorld::initShooting()
     this->_eventDispatcher->addEventListenerWithSceneGraphPriority(eventListener, pSprite);
 }
 
+//old monsterSpawner function
 void HelloWorld::addMonster(float dt) 
 {
-	auto monster = Sprite::create( "Seal/seal_walk1.png" );
+	auto monster = Sprite::create( "cowboy21.png" );
 	auto monsterBody = PhysicsBody::createBox( monster->getContentSize(), PHYSICSBODY_MATERIAL_DEFAULT );
 	monsterBody->setContactTestBitmask( true );
 	monsterBody->setCollisionBitmask( 2 );
 
 	monster->setPhysicsBody( monsterBody );
+	monster->setScaleX ( -1 );
 	// 1
 	auto monsterContentSize = monster->getContentSize();
 	auto selfContentSize = this->getContentSize();
@@ -460,6 +486,7 @@ void HelloWorld::addMonster(float dt)
 	monster->runAction( Sequence::create( actionMove, CallFunc::create( std::bind( &HelloWorld::monsterOutside, this ) ), nullptr ) );
 }
 
+//called if a monster completes it's moveTo, loses game
 void HelloWorld::monsterOutside()
 {
 	auto monster = this->getChildByName( "monster" );
@@ -469,7 +496,7 @@ void HelloWorld::monsterOutside()
 
 }
 
-//updates the score by nr, shown in game.
+//updates the score by parameter nr, shown in game.
 void HelloWorld::updateScore( int nr )
 {
 	Label* scoreLabel = (Label*) this->getChildByName( "scoreInt" );
@@ -480,3 +507,4 @@ void HelloWorld::updateScore( int nr )
 		scoreLabel->setString( std::to_string( tempScore + nr ) );
 	}
 }
+

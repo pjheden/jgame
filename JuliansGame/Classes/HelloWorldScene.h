@@ -3,6 +3,8 @@
 
 #include "cocos2d.h"
 #include "Player.h"
+#include "EnemyCB.h"
+#include "Worker.h"
 
 class HelloWorld : public cocos2d::Layer
 {
@@ -37,7 +39,8 @@ private:
 
 	Player* pSprite;
 
-	void update(float dt);
+	void update( float dt );
+
 
 	void menuCloseCallback( cocos2d::Ref* pSender );
 	void startGame( cocos2d::Ref* pSender );
@@ -59,6 +62,8 @@ private:
 	void initShooting();
 
 	void addMonster(float dt);
+	void addCowboy( float dt );
+	void addWorker( float dt );
 
 	void updateScore( int nr );
 

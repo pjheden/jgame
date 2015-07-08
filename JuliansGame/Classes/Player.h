@@ -18,6 +18,8 @@ class Player : public cocos2d::Sprite
         ~Player();
         static Player* create();
 
+		PhysicsBody* getBody();
+
         void initOptions();
 
         void addEvents();

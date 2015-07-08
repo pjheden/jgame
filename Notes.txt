@@ -1,8 +1,9 @@
 To do:
-1. Fix animation ( some of the png's are red!? )
-2. Implement the seals (and add animation) 
-3. Score
-4. settings
+DONE 1. Flytta physicsbody (PLayer, Cowboy, Worker) till HelloWorld.cpp
+2. Cowboy skjuta tilbaka
+3. add cowboy and worker animations
+4. HighScore
+5. settings
 
 Ideas:
 1. Variable to keep track on which level we are
@@ -23,3 +24,6 @@ Ideas:
 	Main menu finished
 	
 6/25/2015:
+
+Note to self:
+to create a runable win32 file, use the cocos run command ( cocos run -s path -p win32)

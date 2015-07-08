@@ -14,10 +14,11 @@ Player::~Player()
 Player* Player::create()
 {
     Player* pSprite = new Player();
-	auto physicsBody = PhysicsBody::createBox( pSprite->getContentSize(), PHYSICSBODY_MATERIAL_DEFAULT);
-	physicsBody->setCollisionBitmask( 1 );
-	physicsBody->setContactTestBitmask( true );
-	pSprite->setPhysicsBody( physicsBody );
+
+	auto pBody = PhysicsBody::createBox( pSprite->getContentSize(), PHYSICSBODY_MATERIAL_DEFAULT);
+	pBody->setCollisionBitmask( 1 );
+	pBody->setContactTestBitmask( true );
+	pSprite->setPhysicsBody( pBody );
 
     if (pSprite && pSprite->initWithFile( "C:/JuliansGame/JuliansGame/Resources/Indian_idle1.png" ) )
     {
@@ -36,10 +37,16 @@ Player* Player::create()
     return NULL;
 }
 
+PhysicsBody* Player::getBody()
+{
+	return this->getPhysicsBody();
+}
+
+
 void Player::initOptions()
 {
     // do things here like setTag(), setPosition(), any custom logic.
-	this->getPhysicsBody()->setVelocityLimit( 80.0f );
+	this->getPhysicsBody()->setVelocityLimit( 120.0f );
 }
 
 void Player::addEvents()
@@ -170,7 +177,7 @@ void Player::initAnimations()
 	animation2->setRestoreOriginalFrame( true) ;
 	idleAnimate = Animate::create( animation2 );
 	idleAnimate->retain();
-	this->runAction( RepeatForever::create( moveAnimate ) );
+	this->runAction( RepeatForever::create( idleAnimate ) );
 }
 
 void Player::move( cocos2d::Vec2 direction )
@@ -207,7 +214,7 @@ void Player::update()
 	{
 		if( dir == 1 ){ //right
 			this->setScaleX( 1 ); //flip
-		}else{ //left
+		}else if( dir == 0 ){ //left
 			this->setScaleX( -1 ); //flip
 		}
 
