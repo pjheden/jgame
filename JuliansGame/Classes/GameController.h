@@ -4,6 +4,8 @@
 #include "cocos2d.h";
 #include "Bullet.h";
 #include "EnemyCB.h";
+#include "Player.h";
+
 
 USING_NS_CC;
 
@@ -16,6 +18,8 @@ public:
 
 	static Vector<Bullet*> bullets;
 	static Vector<EnemyCB*> enemies;
+	static Player* _player;
+
 
 	bool init();
 
@@ -24,6 +28,8 @@ public:
 	static EnemyCB* spawnEnemy(int type);
 
 	static void erase( Node* node );
+
+	static void eraseAll();
 
 };
 

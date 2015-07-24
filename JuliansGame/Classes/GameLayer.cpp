@@ -3,25 +3,25 @@
 
 USING_NS_CC;
 bool GameLayer::_dead = false;
+Scene* GameLayer::_gameScene;
 
 GameLayer::GameLayer(void){}
 GameLayer::~GameLayer(void){}
 
 cocos2d::Scene* GameLayer::createScene()
 {
-	auto scene = Scene::createWithPhysics();
-	scene -> getPhysicsWorld() -> setGravity( Vect( 0, 0 ) );
-    scene -> getPhysicsWorld() -> setDebugDrawMask( PhysicsWorld::DEBUGDRAW_ALL ); 
+	_gameScene = Scene::createWithPhysics();
+	_gameScene -> getPhysicsWorld() -> setGravity( Vect( 0, 0 ) );
+    _gameScene -> getPhysicsWorld() -> setDebugDrawMask( PhysicsWorld::DEBUGDRAW_ALL ); 
 
 	auto layer = GameLayer::create();
-	layer -> setPhyschisWorld( scene -> getPhysicsWorld() );
+	layer -> setPhyschisWorld( _gameScene -> getPhysicsWorld() );
 
 
-    scene->addChild(layer);
+    _gameScene->addChild(layer);
 
-    return scene;
+    return _gameScene;
 }
-
 
 bool GameLayer::init()
 {
@@ -32,9 +32,10 @@ bool GameLayer::init()
 	//Create the background
 
 	//Create the player
-	_player = Player::create();
-	_player->setPosition( Point( origin.x + visibleSize.width / 10, origin.y + visibleSize.height / 2 ) );
-	addChild( _player );
+	GameController::_player = Player::create();
+	GameController::_player->setPhysicsBody ( GameController::_player->getBody() );
+	GameController::_player->setPosition( Point( origin.x + visibleSize.width / 10, origin.y + visibleSize.height / 2 ) );
+	addChild( GameController::_player );
 
 	// listen for contact between objects
 	auto contactListener = EventListenerPhysicsContact::create();
@@ -57,7 +58,7 @@ bool GameLayer::init()
 	this->addChild( scoreInt );
 
 	//init the schedule for the game, main loop
-    schedule(schedule_selector(GameLayer::update));
+    schedule( schedule_selector( GameLayer::update ) );
 
 	//init controller
 
@@ -161,9 +162,11 @@ bool GameLayer::onContactBegin ( cocos2d::PhysicsContact &contact )
 	else if( ( 1 == a->getCollisionBitmask() && 4 == b->getCollisionBitmask() ) 
 		|| ( 4 == a->getCollisionBitmask() && 1 == b->getCollisionBitmask() ) )
 	{
- 		//remove player
-		//remove bullet
-		CCLOG("Player shot, game lost");	
+		CCLOG("Player shot, game lost");
+		GameLayer::_dead = true;
+		GameController::eraseAll();
+		GameLayer::lostLayer();
+
 	}
 	//if Worker, Cowboy collide with LeftWall
 	//remove later
@@ -183,7 +186,6 @@ bool GameLayer::onContactBegin ( cocos2d::PhysicsContact &contact )
     return true;
 }
 
-
 void GameLayer::updateScore( int nr )
 {
 	Label* scoreLabel = (Label*) this->getChildByName( "scoreInt" );
@@ -193,4 +195,36 @@ void GameLayer::updateScore( int nr )
 		int tempScore = std::stoi( str );
 		scoreLabel->setString( std::to_string( tempScore + nr ) );
 	}
+}
+
+void GameLayer::lostLayer()
+{
+	//Can make this so it isnt remade everytime, but instead retained?
+	Size visibleSize = Director::getInstance()->getVisibleSize();
+    Vec2 origin = Director::getInstance()->getVisibleOrigin();
+
+	auto layer = Layer::create();
+	layer->setName( "lostLayer" );
+
+	auto lostText = Label::create( "Game Over", "fonts/Marker Felt.ttf", 30);
+	lostText->setPosition( Vec2( origin.x + visibleSize.width / 2, origin.y + visibleSize.height / 2 ) );
+	layer->addChild( lostText );
+
+	auto retryText = MenuItemFont::create( "Retry?", this, menu_selector( GameLayer::retryGame ) );
+	retryText->setPosition( Vec2( lostText->getPosition().x, lostText->getPosition().y - retryText->getContentSize().height ) );
+
+	auto menu = Menu::create( retryText, NULL );
+	menu->setPosition(Vec2::ZERO);
+	layer->addChild( menu );
+
+	//GameLayer::_gameScene->unscheduleUpdate();
+	GameLayer::_gameScene->addChild( layer );
+}
+
+void GameLayer::retryGame( cocos2d::Ref* pSender )
+{
+	_gameScene->removeChildByName( "lostLayer" );
+
+	GameLayer::_dead = false;
+	GameLayer::init();
 }

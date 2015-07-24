@@ -2,6 +2,7 @@
 #include "GameController.h"
 
 using namespace cocos2d;
+cocos2d::PhysicsBody* pBody;
 
 Player::Player() {}
 
@@ -15,13 +16,15 @@ Player::~Player()
 Player* Player::create()
 {
     Player* pSprite = new Player();
+	pSprite->initWithFile( "C:/JuliansGame/JuliansGame/Resources/Indian_idle1.png" );
 
-	auto pBody = PhysicsBody::createBox( pSprite->getContentSize(), PHYSICSBODY_MATERIAL_DEFAULT);
+	pBody = PhysicsBody::createBox( pSprite->getContentSize(), PHYSICSBODY_MATERIAL_DEFAULT);
 	pBody->setCollisionBitmask( 1 );
 	pBody->setContactTestBitmask( true );
-	pSprite->setPhysicsBody( pBody );
+	pBody->setRotationEnable( false );
+	//pSprite->setPhysicsBody( pBody );
 
-    if (pSprite && pSprite->initWithFile( "C:/JuliansGame/JuliansGame/Resources/Indian_idle1.png" ) )
+    if ( pSprite )
     {
         pSprite->autorelease();
 
@@ -40,15 +43,15 @@ Player* Player::create()
 
 PhysicsBody* Player::getBody()
 {
-	return this->getPhysicsBody();
+	return pBody;
 }
 
 
 void Player::initOptions()
 {
     // do things here like setTag(), setPosition(), any custom logic.
-	this->getPhysicsBody()->setVelocityLimit( 120.0f );
-	this->getPhysicsBody()->setRotationEnable( false );
+	pBody->setVelocityLimit( 120.0f );
+	pBody->setRotationEnable( false );
 }
 
 void Player::addEvents()
@@ -62,19 +65,19 @@ void Player::addEvents()
 		switch (keyCode)
 		{
 		case cocos2d::EventKeyboard::KeyCode::KEY_A:
-			this->Player::move( Vec2( - this->getPhysicsBody()->getVelocityLimit(), 0 ) );
+			this->Player::move( Vec2( - pBody->getVelocityLimit(), 0 ) );
 			break;
 
 		case cocos2d::EventKeyboard::KeyCode::KEY_D:
-			this->Player::move( Vec2( this->getPhysicsBody()->getVelocityLimit(), 0 ) );
+			this->Player::move( Vec2( pBody->getVelocityLimit(), 0 ) );
 			break;
 
 		case cocos2d::EventKeyboard::KeyCode::KEY_S:
-			this->Player::move( Vec2( 0, - this->getPhysicsBody()->getVelocityLimit()) );
+			this->Player::move( Vec2( 0, - pBody->getVelocityLimit()) );
 			break;
 
 		case cocos2d::EventKeyboard::KeyCode::KEY_W:
-			this->Player::move( Vec2( 0, this->getPhysicsBody()->getVelocityLimit()) );
+			this->Player::move( Vec2( 0, pBody->getVelocityLimit()) );
 			break;
 
 		case cocos2d::EventKeyboard::KeyCode::KEY_SPACE:
@@ -96,43 +99,8 @@ void Player::addEvents()
 	};
 
 	this->_eventDispatcher->addEventListenerWithSceneGraphPriority(eventlistener, this);
-
-
-
-
-	/////
-	// If player is touched or not
-	/////
-
-    auto listener = cocos2d::EventListenerTouchOneByOne::create();
-    listener->setSwallowTouches(true);
-
-    listener->onTouchBegan = [&](cocos2d::Touch* touch, cocos2d::Event* event)
-    {   
-        cocos2d::Vec2 p = touch->getLocation();
-        cocos2d::Rect rect = this->getBoundingBox();
-
-        if(rect.containsPoint(p))
-        {
-            return true; // to indicate that we have consumed it.
-        }
-
-        return false; // we did not consume this event, pass thru.
-    };
-
-    listener->onTouchEnded = [=](cocos2d::Touch* touch, cocos2d::Event* event)
-    {
-		auto openGl_location = touch-> getLocation();
-        Player::touchEvent( touch, openGl_location );
-    };
-
-    cocos2d::Director::getInstance()->getEventDispatcher()->addEventListenerWithFixedPriority(listener, 30);
 }
 
-void Player::touchEvent(cocos2d::Touch* touch, cocos2d::Vec2 _point)
-{
-    CCLOG("touched Player");
-}
 
 void Player::initAnimations()
 {
@@ -192,7 +160,7 @@ void Player::move( cocos2d::Vec2 direction )
 
 	this->stopAllActions();
 	this->runAction( RepeatForever::create( moveAnimate ) );
-	this->getPhysicsBody()->setVelocity( direction );
+	pBody->setVelocity( direction );
 
 	if( direction.x > 0 )
 	{
@@ -209,7 +177,7 @@ void Player::idle()
 
 	this->stopAllActions();
 	this->runAction(RepeatForever::create( idleAnimate ) );
-	this->getPhysicsBody()->setVelocity( cocos2d::Vec2( 0, 0 ) );
+	pBody->setVelocity( cocos2d::Vec2( 0, 0 ) );
 }
 
 void Player::update()

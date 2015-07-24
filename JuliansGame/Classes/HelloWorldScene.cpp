@@ -36,28 +36,6 @@ bool HelloWorld::init()
     Vec2 origin = Director::getInstance()->getVisibleOrigin();
 	HelloWorld::mainMenu();
 	
-	//HelloWorld::initKeyboardListener();
-
-
-	////screen boundary
-	////auto edgeBody = PhysicsBody::createEdgeBox( visibleSize, PHYSICSBODY_MATERIAL_DEFAULT, 3 );
-	//auto edgeBody = PhysicsBody::createEdgeBox( visibleSize, PhysicsMaterial( 0, 0, 0), 3 );
-	//auto edgeNode = Node::create();
-	//edgeNode->setPosition( Point(visibleSize.width / 2 + origin.x, visibleSize.height / 2 + origin.y) );
-	//edgeNode->setPhysicsBody( edgeBody );
-	//this->addChild( edgeNode );
-
-	//create left wall for sprite Removal
-	auto leftWall = Node::create();
-	auto leftBody = PhysicsBody::createBox ( Size( visibleSize.width / 20 , visibleSize.height ), PHYSICSBODY_MATERIAL_DEFAULT );
-	leftBody->setDynamic( false );
-	leftBody->setCollisionBitmask( 4 );
-	leftBody->setContactTestBitmask( true );
-
-	leftWall->setPosition( Vec2(origin.x, origin.y + visibleSize.height / 2 ) );
-	leftWall->setPhysicsBody( leftBody );
-	this->addChild ( leftWall );
-
     return true;
 }
 
@@ -67,28 +45,6 @@ void HelloWorld::actionFinished(cocos2d::Sprite *bullet)
 	this->removeChild(bullet, true);
 	//CCLOG("shot completed!");
 }
-
-Sprite* HelloWorld::createEnemyseal()
-{
-
-	Size visibleSize = Director::getInstance()->getVisibleSize();
-
-	cocos2d::Sprite* sealSprite = Sprite::create( "Seal/seal_walk1.png" );
-	sealSprite -> setPosition ( Vec2 ( visibleSize.width, random( 0, (int) visibleSize.height ) ) );
-	auto sealBody = PhysicsBody::createBox( sealSprite->getContentSize(), PhysicsMaterial() ); 
-	sealBody->setCollisionBitmask(2);
-    sealBody->setContactTestBitmask(true);
-	sealBody -> setDynamic( true );
-
-	sealSprite -> setPhysicsBody( sealBody );
-	
-	sealSprite -> getPhysicsBody() ->setVelocity ( cocos2d::Vect( -10, 0 ) );
-
-	this->addChild( sealSprite );
-
-	return sealSprite;
-}
-
 
 bool HelloWorld::onContactBegin(cocos2d::PhysicsContact &contact)
 {

@@ -57,7 +57,6 @@ void EnemyCB::initAnimations()
 	this->runAction( RepeatForever::create( moveAnimate ) );
 }
 
-
 PhysicsBody* EnemyCB::getBody()
 {
 	auto physicsBody = PhysicsBody::createBox( this->getContentSize(), PHYSICSBODY_MATERIAL_DEFAULT );

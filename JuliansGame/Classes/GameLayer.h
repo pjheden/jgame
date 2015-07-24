@@ -11,6 +11,7 @@ class Bullet;
 class GameLayer : public cocos2d::Layer {
 public:
 	static cocos2d::Scene* createScene();
+	static Scene* _gameScene;
 
 	cocos2d::PhysicsWorld *sceneWorld;
 	void setPhyschisWorld( cocos2d::PhysicsWorld *world ) { sceneWorld = world; }
@@ -23,7 +24,6 @@ public:
 
 	void update(float dt);
 
-	Player* _player;
 	static bool _dead;
 
 	void bulletControl();
@@ -33,6 +33,10 @@ public:
 	void updateScore( int nr );
 
 	bool onContactBegin ( cocos2d::PhysicsContact &contact );
+
+	void lostLayer();
+
+	void retryGame( cocos2d::Ref* pSender );
 };
 
 #endif // _GAMELAYER_HPP_

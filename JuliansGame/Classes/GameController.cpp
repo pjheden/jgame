@@ -1,8 +1,10 @@
 #include "GameController.h"
+
 USING_NS_CC;
 
 Vector<Bullet*> GameController::bullets;
 Vector<EnemyCB*> GameController::enemies;
+Player* GameController::_player;
 
 GameController::GameController(void)
 {
@@ -97,3 +99,23 @@ void GameController::erase( Node* node )
 	node->removeFromParentAndCleanup( true );
 }
 
+void GameController::eraseAll()
+{
+	//remove player & touch events
+	GameController::_player->removeFromParentAndCleanup( true );
+//	GameController::_player->getEventDispatcher()->removeAllEventListeners();
+
+	//remove all bullets
+	while( !bullets.empty() )
+	{
+		bullets.at( 0 )->removeFromParentAndCleanup( true );
+		bullets.erase( 0 );
+	}
+
+	//remove all enemies
+	while( !enemies.empty() )
+	{
+		enemies.at( 0 )->removeFromParentAndCleanup( true );
+		enemies.erase( 0 );
+	}
+}
