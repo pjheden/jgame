@@ -20,8 +20,27 @@ public:
 
 	PhysicsBody* getBody();
 
+	virtual void shoot( float dt );
+
+
 private:
 
+};
+
+class Worker : public EnemyCB
+{
+public:
+	Animate * moveAnimate;
+
+	Worker();
+	~Worker();
+	static Worker* create();
+
+	void initAnimations();
+
+	void move();
+
+	PhysicsBody* getBody();
 };
 
 #endif // _ENEMYCB_HPP_

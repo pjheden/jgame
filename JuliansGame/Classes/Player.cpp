@@ -1,4 +1,5 @@
 #include "Player.h"
+#include "GameController.h"
 
 using namespace cocos2d;
 
@@ -74,6 +75,10 @@ void Player::addEvents()
 
 		case cocos2d::EventKeyboard::KeyCode::KEY_W:
 			this->Player::move( Vec2( 0, this->getPhysicsBody()->getVelocityLimit()) );
+			break;
+
+		case cocos2d::EventKeyboard::KeyCode::KEY_SPACE:
+			this->Player::shoot();
 			break;
 		}
 	};
@@ -221,4 +226,14 @@ void Player::update()
 
 	}
 
+}
+
+void Player::shoot()
+{
+	Size visibleSize = Director::getInstance()->getVisibleSize();
+    Vec2 origin = Director::getInstance()->getVisibleOrigin();
+
+	auto tar = Vec2( origin.x + visibleSize.width, this->getPosition().y );
+
+    GameController::spawnBullet( 1, this->getPosition(), tar );
 }

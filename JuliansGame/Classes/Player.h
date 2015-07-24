@@ -32,6 +32,8 @@ class Player : public cocos2d::Sprite
 
 		void update();
 
+		void shoot();
+
     private:
 
 };

@@ -139,3 +139,5 @@ tests/cpp-tests/Resources/audio
 
 # ignore unused art
 /art
+
+/Class_graveyard

@@ -4,7 +4,7 @@
 #include "cocos2d.h"
 #include "Player.h"
 #include "EnemyCB.h"
-#include "Worker.h"
+
 
 class HelloWorld : public cocos2d::Layer
 {
@@ -68,6 +68,8 @@ private:
 	void updateScore( int nr );
 
 	void monsterOutside();
+
+	void gameInit( cocos2d::Ref* pSender );
 };
 
 #endif // __HELLOWORLD_SCENE_H__

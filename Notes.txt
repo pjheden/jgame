@@ -1,17 +1,21 @@
 To do:
+1. Rebuild the program, GameController, Bullet class, GameLayer
 2. Cowboy shoot back
 	- difficult
 	- draw cowboy bullet
-
+3. Use the global variable for screen size (_screenSize)
 4. HighScore
 5. settings
-
+6. create multiple scenes
+	-i.e: MainMenu scene, Settings scene, game scene etc
 8. Add railroad building for Workers
 
 Note:
 1. try Eclipse to run HelloWorld on android
 	- Compiling works through cmd, but not the emulator
 	- Check cocos2d-x emulator guide and try again
+2. Add all files to Appication.mk or Android.mk
+3. Move all the files to Classes
 
 Ideas:
 1. Variable to keep track on which level we are
@@ -21,7 +25,43 @@ CollisionBitmasks:
 1: Player
 2: Workers, Cowboys
 3: Arrows
-4: LeftWall
+4: bullets
+5: leftwall
+
+Type:
+1: Indian / arrow
+2: Cowboy / bullet
+3: workers
+
+int to char* for CCLOG reasons:
+std::string s2 = std::to_string( distance );
+char const *pchar2 = s2.c_str();
+
+Studying EarthWarriod3D (github):
+GameLayer controls the game track of the game. -------
+init: creates player, inits bulletcontroller, enemycontroller. Starts schedule for gameMaster
+gameMaster: checks if player is dead, check if it has to spawn new enemies, iniate a schedule for enemy shooting
+
+Bullets class
+to init methods, one for creating cowboy bullet and other for indian bullet
+
+Gamecontroller
+Calls bullets class to create bullets, keeps track of the bullets in a list
+remove bullets
+
+Player class
+Player::shoot()
+{
+	BulletController:SpawnBullet();
+}
+
+07/23/2015:
+DONE 1.Fix cowboys shooting
+*Had negative velocity
+DONE 2. Arrow shooting bugged
+*When arrows are declared as bullets and its functions are called they use the
+super classes function, thus it the type and speed values was unset
+
 
 07/08/2015:
 DONE 1. Flytta physicsbody (PLayer, Cowboy, Worker) till HelloWorld.cpp

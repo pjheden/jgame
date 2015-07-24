@@ -1,5 +1,6 @@
 #include "HelloWorldScene.h"
 #include "ui/CocosGUI.h"
+#include "GameLayer.h"
 
 USING_NS_CC;
 
@@ -8,7 +9,7 @@ Scene* HelloWorld::createScene()
     // 'scene' is an autorelease object
     auto scene = Scene::createWithPhysics();
 	//disable for release:
-    scene -> getPhysicsWorld() -> setDebugDrawMask( PhysicsWorld::DEBUGDRAW_ALL ); 
+    //scene -> getPhysicsWorld() -> setDebugDrawMask( PhysicsWorld::DEBUGDRAW_ALL ); 
 	scene -> getPhysicsWorld() -> setGravity( Vect( 0,0 ) );
     // 'layer' is an autorelease object
     auto layer = HelloWorld::create();
@@ -240,8 +241,13 @@ void HelloWorld::addWorker( float dt )
 
 void HelloWorld::settings( cocos2d::Ref* pSender )
 {
-
 	HelloWorld::settingsMenu();
+}
+void HelloWorld::gameInit( cocos2d::Ref* pSender )
+{
+	auto scene = GameLayer::createScene();
+
+	Director::getInstance()->pushScene( scene );
 }
 
 void HelloWorld::mainMenu()
@@ -253,7 +259,10 @@ void HelloWorld::mainMenu()
 	menuTitle->setPosition( Vec2( origin.x + visibleSize.width / 2,
 		origin.y + visibleSize.height - menuTitle->getContentSize().height) );
 
-	auto playTitle = MenuItemFont::create( "Play", this, menu_selector( HelloWorld::startGame ) );
+	/*auto playTitle = MenuItemFont::create( "Play", this, menu_selector( HelloWorld::startGame ) );
+	playTitle->setPosition( Vec2( origin.x + visibleSize.width / 2,
+		origin.y + visibleSize.height / 2 ) );*/
+	auto playTitle = MenuItemFont::create( "Play", this, menu_selector( HelloWorld::gameInit ) );
 	playTitle->setPosition( Vec2( origin.x + visibleSize.width / 2,
 		origin.y + visibleSize.height / 2 ) );
 
@@ -529,4 +538,3 @@ void HelloWorld::updateScore( int nr )
 		scoreLabel->setString( std::to_string( tempScore + nr ) );
 	}
 }
-
