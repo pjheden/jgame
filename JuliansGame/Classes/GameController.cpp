@@ -54,7 +54,6 @@ Bullet* GameController::spawnBullet( int type, Vec2 pos, Vec2 tar)
 
 };
 
-
 EnemyCB* GameController::spawnEnemy( int type )
 {
 	EnemyCB* cbSprite = nullptr;
@@ -80,6 +79,14 @@ EnemyCB* GameController::spawnEnemy( int type )
 		return cbSprite;
 	}
 	return cbSprite;
+}
+
+Player* GameController::spawnPlayer()
+{
+	GameController::_player = Player::create();
+	GameController::_player->setPhysicsBody ( GameController::_player->getBody() );
+
+	return _player;
 }
 
 void GameController::erase( Node* node )

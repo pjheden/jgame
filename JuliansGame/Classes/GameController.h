@@ -27,6 +27,8 @@ public:
 
 	static EnemyCB* spawnEnemy(int type);
 
+	static Player* spawnPlayer();
+
 	static void erase( Node* node );
 
 	static void eraseAll();

@@ -12,7 +12,7 @@ cocos2d::Scene* GameLayer::createScene()
 {
 	_gameScene = Scene::createWithPhysics();
 	_gameScene -> getPhysicsWorld() -> setGravity( Vect( 0, 0 ) );
-    _gameScene -> getPhysicsWorld() -> setDebugDrawMask( PhysicsWorld::DEBUGDRAW_ALL ); 
+    //_gameScene -> getPhysicsWorld() -> setDebugDrawMask( PhysicsWorld::DEBUGDRAW_ALL ); 
 
 	auto layer = GameLayer::create();
 	layer -> setPhyschisWorld( _gameScene -> getPhysicsWorld() );
@@ -27,40 +27,17 @@ bool GameLayer::init()
 {
 	 if ( !Layer::init() ) return false;
 
-	Size visibleSize = Director::getInstance()->getVisibleSize();
-    Vec2 origin = Director::getInstance()->getVisibleOrigin();
 	//Create the background
 
-	//Create the player
-	GameController::_player = Player::create();
-	GameController::_player->setPhysicsBody ( GameController::_player->getBody() );
-	GameController::_player->setPosition( Point( origin.x + visibleSize.width / 10, origin.y + visibleSize.height / 2 ) );
-	addChild( GameController::_player );
+	 GameLayer::initGame();
 
 	// listen for contact between objects
 	auto contactListener = EventListenerPhysicsContact::create();
     contactListener->onContactBegin = CC_CALLBACK_1( GameLayer::onContactBegin, this) ;
     this->getEventDispatcher()->addEventListenerWithSceneGraphPriority( contactListener, this );
 
-	//draw the score
-	auto scoreText = Label::create( "Score:   ", "fonts/Marker Felt.ttf", 30);
-	scoreText->setPosition( Vec2( origin.x + scoreText->getContentSize().width / 2,
-		origin.y + visibleSize.height - scoreText->getContentSize().height / 2 ) );
-	scoreText->setName( "scoreText" );
-
-	this->addChild( scoreText );
-
-	auto scoreInt = Label::create( "000", "fonts/Marker Felt.ttf", 30);
-	scoreInt->setPosition( Vec2( scoreText->getPosition().x + scoreText->getContentSize().width / 2 + scoreInt->getContentSize().width / 2,
-		scoreText->getPosition().y ) );
-	scoreInt->setName( "scoreInt" );
-
-	this->addChild( scoreInt );
-
 	//init the schedule for the game, main loop
     schedule( schedule_selector( GameLayer::update ) );
-
-	//init controller
 
 	return true;
 }
@@ -221,10 +198,36 @@ void GameLayer::lostLayer()
 	GameLayer::_gameScene->addChild( layer );
 }
 
+void GameLayer::initGame()
+{
+	Size visibleSize = Director::getInstance()->getVisibleSize();
+    Vec2 origin = Director::getInstance()->getVisibleOrigin();
+
+	//Create the player
+	GameController::spawnPlayer();
+	GameController::_player->setPosition( Point( origin.x + visibleSize.width / 10, origin.y + visibleSize.height / 2 ) );
+	addChild( GameController::_player );
+
+	//draw the score
+	auto scoreText = Label::create( "Score:   ", "fonts/Marker Felt.ttf", 30);
+	scoreText->setPosition( Vec2( origin.x + scoreText->getContentSize().width / 2,
+		origin.y + visibleSize.height - scoreText->getContentSize().height / 2 ) );
+	scoreText->setName( "scoreText" );
+
+	this->addChild( scoreText );
+
+	auto scoreInt = Label::create( "000", "fonts/Marker Felt.ttf", 30);
+	scoreInt->setPosition( Vec2( scoreText->getPosition().x + scoreText->getContentSize().width / 2 + scoreInt->getContentSize().width / 2,
+		scoreText->getPosition().y ) );
+	scoreInt->setName( "scoreInt" );
+
+	this->addChild( scoreInt );
+}
+
 void GameLayer::retryGame( cocos2d::Ref* pSender )
 {
 	_gameScene->removeChildByName( "lostLayer" );
 
 	GameLayer::_dead = false;
-	GameLayer::init();
+	GameLayer::initGame();
 }

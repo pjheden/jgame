@@ -36,6 +36,8 @@ public:
 
 	void lostLayer();
 
+	void initGame();
+
 	void retryGame( cocos2d::Ref* pSender );
 };
 
