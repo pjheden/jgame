@@ -46,7 +46,6 @@ PhysicsBody* Player::getBody()
 	return pBody;
 }
 
-
 void Player::initOptions()
 {
     // do things here like setTag(), setPosition(), any custom logic.
@@ -203,5 +202,5 @@ void Player::shoot()
 
 	auto tar = Vec2( origin.x + visibleSize.width, this->getPosition().y );
 
-    GameController::spawnBullet( 1, this->getPosition(), tar );
+    GameController::spawnBullet( 1, Vec2( this->getPosition().x + this->getContentSize().width, this->getPosition().y) , tar );
 }

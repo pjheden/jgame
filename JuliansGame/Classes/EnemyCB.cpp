@@ -101,7 +101,7 @@ void EnemyCB::shoot( float dt )
 
 	auto tar = Vec2( origin.x, this->getPosition().y );
 
-    GameController::spawnBullet( 2, this->getPosition(), tar );
+    GameController::spawnBullet( 2, Vec2( this->getPosition().x - this->getContentSize().width, this->getPosition().y), tar );
 }
 
 

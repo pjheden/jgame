@@ -33,7 +33,7 @@ bool GameLayer::init()
 
 	// listen for contact between objects
 	auto contactListener = EventListenerPhysicsContact::create();
-    contactListener->onContactBegin = CC_CALLBACK_1( GameLayer::onContactBegin, this) ;
+    contactListener->onContactBegin = CC_CALLBACK_1( GameLayer::onContactBegin, this );
     this->getEventDispatcher()->addEventListenerWithSceneGraphPriority( contactListener, this );
 
 	//init the schedule for the game, main loop
@@ -60,12 +60,12 @@ void GameLayer::update(float dt)
 		cb = GameController::spawnEnemy( 2 ); //int 2=cowboy, 3=worker
 		if( cb )
 		{
-		addChild( cb );
+			addChild( cb );
 		}
 		worker = GameController::spawnEnemy( 3 ); //int 2=cowboy, 3=worker
 		if( worker )
 		{
-		addChild( worker );
+			addChild( worker );
 		}
 	 }
 
@@ -165,7 +165,7 @@ bool GameLayer::onContactBegin ( cocos2d::PhysicsContact &contact )
 
 void GameLayer::updateScore( int nr )
 {
-	Label* scoreLabel = (Label*) this->getChildByName( "scoreInt" );
+	Label* scoreLabel = (Label*) 	_gameScene->getChildByName( "scoreInt" );
 	if(scoreLabel)
 	{
 		auto str = scoreLabel->getString();
@@ -214,19 +214,21 @@ void GameLayer::initGame()
 		origin.y + visibleSize.height - scoreText->getContentSize().height / 2 ) );
 	scoreText->setName( "scoreText" );
 
-	this->addChild( scoreText );
+	_gameScene->addChild( scoreText );
 
 	auto scoreInt = Label::create( "000", "fonts/Marker Felt.ttf", 30);
 	scoreInt->setPosition( Vec2( scoreText->getPosition().x + scoreText->getContentSize().width / 2 + scoreInt->getContentSize().width / 2,
 		scoreText->getPosition().y ) );
 	scoreInt->setName( "scoreInt" );
 
-	this->addChild( scoreInt );
+	_gameScene->addChild( scoreInt );
 }
 
 void GameLayer::retryGame( cocos2d::Ref* pSender )
 {
 	_gameScene->removeChildByName( "lostLayer" );
+	_gameScene->removeChildByName( "scoreText" );
+	_gameScene->removeChildByName( "scoreInt" );
 
 	GameLayer::_dead = false;
 	GameLayer::initGame();
