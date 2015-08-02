@@ -1,7 +1,10 @@
 #include "GameLayer.h"
 #include "GameController.h"
+#include "SimpleAudioEngine.h"
 
 USING_NS_CC;
+const char* HIGH_SCORE="key1";
+
 bool GameLayer::_dead = false;
 Scene* GameLayer::_gameScene;
 
@@ -27,7 +30,10 @@ bool GameLayer::init()
 {
 	 if ( !Layer::init() ) return false;
 
-	//Create the background
+	//init the music
+	 auto audio = CocosDenshion::SimpleAudioEngine::getInstance();
+	 //audio -> playBackgroundMusic( "backgroundMusic.mp3", true );
+	 //audio->playEffect( "shoot.mp3", false, 1.0f, 1.0f, 1.0f );
 
 	 GameLayer::initGame();
 
@@ -42,7 +48,7 @@ bool GameLayer::init()
 	return true;
 }
 
-void GameLayer::update(float dt)
+void GameLayer::update( float dt )
 {
 	if(_dead)
 	{
@@ -54,7 +60,7 @@ void GameLayer::update(float dt)
 
 	//spawn enemies
 	 EnemyCB* cb;
-	 EnemyCB* worker;
+	 //EnemyCB* worker;
 	 if(GameController::enemies.size() < 5)
 	 {
 		cb = GameController::spawnEnemy( 2 ); //int 2=cowboy, 3=worker
@@ -62,11 +68,12 @@ void GameLayer::update(float dt)
 		{
 			addChild( cb );
 		}
-		worker = GameController::spawnEnemy( 3 ); //int 2=cowboy, 3=worker
-		if( worker )
-		{
-			addChild( worker );
-		}
+
+		//worker = GameController::spawnEnemy( 3 ); //int 2=cowboy, 3=worker
+		//if( worker )
+		//{
+		//	addChild( worker );
+		//}
 	 }
 
 }
@@ -139,7 +146,6 @@ bool GameLayer::onContactBegin ( cocos2d::PhysicsContact &contact )
 	else if( ( 1 == a->getCollisionBitmask() && 4 == b->getCollisionBitmask() ) 
 		|| ( 4 == a->getCollisionBitmask() && 1 == b->getCollisionBitmask() ) )
 	{
-		CCLOG("Player shot, game lost");
 		GameLayer::_dead = true;
 		GameController::eraseAll();
 		GameLayer::lostLayer();
@@ -194,6 +200,30 @@ void GameLayer::lostLayer()
 	menu->setPosition(Vec2::ZERO);
 	layer->addChild( menu );
 
+	
+
+	//draws the Highscore 
+	auto def = CCUserDefault::sharedUserDefault();
+	auto highScoreKey = def->getIntegerForKey( HIGH_SCORE );
+	char score[10];
+	sprintf( score, "%d", highScoreKey );
+
+	std::string tempString( "Highscore: ");
+	//checks if its a highscore
+	auto playerScore = (Label* )  _gameScene->getChildByName( "scoreInt" );
+	if( std::stoi(playerScore->getString() ) > highScoreKey )
+	{
+		tempString += playerScore->getString();
+		def->setIntegerForKey(HIGH_SCORE, std::stoi(playerScore->getString() ));
+		def->flush();
+	} else {
+		tempString += score;
+	}
+
+	auto highScore = Label::create( tempString , "fonts/Marker Felt.ttf", 30 );
+	highScore->setPosition( Vec2( origin.x + visibleSize.width / 2, origin.y + visibleSize.height - highScore->getContentSize().height / 2 ) );
+	layer->addChild( highScore );
+
 	//GameLayer::_gameScene->unscheduleUpdate();
 	GameLayer::_gameScene->addChild( layer );
 }
@@ -203,10 +233,16 @@ void GameLayer::initGame()
 	Size visibleSize = Director::getInstance()->getVisibleSize();
     Vec2 origin = Director::getInstance()->getVisibleOrigin();
 
+	//draw background
+	cocos2d::Sprite* backgroundSprite = Sprite::create( "background.png" );
+	backgroundSprite->setPosition( Vec2( origin.x + visibleSize.width / 2, origin.y + visibleSize.height / 2 ) );
+	backgroundSprite->setLocalZOrder( -10 );
+	_gameScene->addChild( backgroundSprite );
+
 	//Create the player
 	GameController::spawnPlayer();
 	GameController::_player->setPosition( Point( origin.x + visibleSize.width / 10, origin.y + visibleSize.height / 2 ) );
-	addChild( GameController::_player );
+	_gameScene->addChild( GameController::_player );
 
 	//draw the score
 	auto scoreText = Label::create( "Score:   ", "fonts/Marker Felt.ttf", 30);
