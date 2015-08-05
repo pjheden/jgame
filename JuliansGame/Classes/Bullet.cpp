@@ -15,6 +15,7 @@ bool Bullet::init()
 	{
 		auto bulletBody = PhysicsBody::createBox( model->getContentSize(), PHYSICSBODY_MATERIAL_DEFAULT );
 
+		//bulletBody->setCategoryBitmask( 4 );
 		bulletBody->setCollisionBitmask( 4 );
 		bulletBody->setContactTestBitmask( true );
 

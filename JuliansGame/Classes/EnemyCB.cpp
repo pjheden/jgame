@@ -60,8 +60,11 @@ void EnemyCB::initAnimations()
 PhysicsBody* EnemyCB::getBody()
 {
 	auto physicsBody = PhysicsBody::createBox( this->getContentSize(), PHYSICSBODY_MATERIAL_DEFAULT );
+
+	//physicsBody->setCategoryBitmask( 2 );
 	physicsBody->setCollisionBitmask( 2 );
 	physicsBody->setContactTestBitmask( true );
+
 	physicsBody->setRotationEnable ( false );
 
 	return physicsBody;
@@ -74,7 +77,7 @@ void EnemyCB::move()
 	auto monsterContentSize = this->getContentSize();
 	auto selfContentSize = Director::getInstance()->getWinSize();
 	int minY = monsterContentSize.height/2;
-	int maxY = selfContentSize.height - monsterContentSize.height/2;
+	int maxY = selfContentSize.height - monsterContentSize.height;
 	int rangeY = maxY - minY;
 	int randomY = ( rand() % rangeY ) + minY;
 

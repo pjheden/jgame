@@ -1,4 +1,6 @@
 #include "GameController.h"
+#include "SimpleAudioEngine.h"
+#include "GameLayer.h"
 
 USING_NS_CC;
 
@@ -20,20 +22,25 @@ bool GameController::init()
 
 Bullet* GameController::spawnBullet( int type, Vec2 pos, Vec2 tar)
 {
-	
+	auto audio = CocosDenshion::SimpleAudioEngine::getInstance();
 	Bullet* bullet = nullptr;
 	switch( type )
 	{
 	case 1 : //indian
 		{
-		bullet = Arrow::create();
-		bullet->setPosition( pos );
-		bullet->setTarget( tar );
-		
+			if (_player->nrOfArrows >= 0)
+			{
+				audio->playEffect( "arrow.wav", false, 1.0f, 1.0f, 1.0f );
+				bullet = Arrow::create();
+				bullet->setPosition( pos );
+				bullet->setTarget( tar );
+				_player->nrOfArrows -= 1;
+			}
 		break;
 		} 
 	case 2 : //cowboy
 		{
+		audio->playEffect( "gunshot.wav", false, 1.0f, 1.0f, 1.0f );
 		bullet = Bullet::create();
 		bullet->setPosition( pos );
 		bullet->setTarget( tar );
@@ -67,7 +74,7 @@ EnemyCB* GameController::spawnEnemy( int type )
 		cbSprite= EnemyCB::create();
 		cbSprite->setPhysicsBody( cbSprite->getBody() );
 
-		cbSprite->schedule(schedule_selector( EnemyCB::shoot ), 6.0f);
+		cbSprite->schedule(schedule_selector( EnemyCB::shoot ), RandomHelper::random_int( 4.0f, 6.0f ) );
 
 		break;
 
@@ -100,6 +107,7 @@ void GameController::erase( Node* node )
 		enemies.eraseObject( (EnemyCB*) node );
 		break;
 	case 3: //projectile
+		//GameController::_player->nrOfArrows -= 1;
 		bullets.eraseObject( (Bullet*) node );
 		break;
 	}

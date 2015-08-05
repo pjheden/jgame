@@ -25,22 +25,10 @@ private:
 	void setPhyschisWorld( cocos2d::PhysicsWorld *world ) { sceneWorld = world; }
 
 		// Physics Contact Listener.....
-	bool onContactBegin ( cocos2d::PhysicsContact &contact );
+	//bool onContactBegin ( cocos2d::PhysicsContact &contact );
 
-	bool onTouchBegan(cocos2d::Touch *touch, cocos2d::Event *event);
-	void onTouchEnded(cocos2d::Touch *touch, cocos2d::Event *event);
-
-
-	//removes sprite when it's called
-	void actionFinished(cocos2d::Sprite *bullet);
-
-	//creates a enemy seal-sprite
-	Sprite* createEnemyseal();
-
-	Player* pSprite;
-
-	void update( float dt );
-
+	//bool onTouchBegan(cocos2d::Touch *touch, cocos2d::Event *event);
+	//void onTouchEnded(cocos2d::Touch *touch, cocos2d::Event *event);
 
 	void menuCloseCallback( cocos2d::Ref* pSender );
 	void startGame( cocos2d::Ref* pSender );
@@ -52,24 +40,11 @@ private:
 	void settingsMenu();
 	void removeSettingsMenu();
 
-	void gameMenu();
-	void removeGameMenu();
-
-	void lostMenu();
-	void removeLostMenu();
-	void lostMenuTryAgain( cocos2d::Ref* pSender );
-
-	void initShooting();
-
-	void addMonster(float dt);
-	void addCowboy( float dt );
-	void addWorker( float dt );
-
-	void updateScore( int nr );
-
-	void monsterOutside();
-
 	void gameInit( cocos2d::Ref* pSender );
+	
+	//testing
+	bool onContactBegan(PhysicsContact &contact);
+	void gameTest( cocos2d::Ref* pSender );
 };
 
 #endif // __HELLOWORLD_SCENE_H__

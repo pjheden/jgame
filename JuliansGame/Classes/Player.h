@@ -11,8 +11,10 @@ class Player : public cocos2d::Sprite
 
 		Animate * idleAnimate;
 		Animate * moveAnimate;
+		Animate * shootAnimate;
 		bool	moving;
 		int dir;
+		int nrOfArrows;
 
         Player();
         ~Player();

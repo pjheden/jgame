@@ -1,6 +1,7 @@
 #include "HelloWorldScene.h"
 #include "ui/CocosGUI.h"
 #include "GameLayer.h"
+#include "SimpleAudioEngine.h"
 
 USING_NS_CC;
 
@@ -9,7 +10,7 @@ Scene* HelloWorld::createScene()
     // 'scene' is an autorelease object
     auto scene = Scene::createWithPhysics();
 	//disable for release:
-    //scene -> getPhysicsWorld() -> setDebugDrawMask( PhysicsWorld::DEBUGDRAW_ALL ); 
+    scene -> getPhysicsWorld() -> setDebugDrawMask( PhysicsWorld::DEBUGDRAW_ALL ); 
 	scene -> getPhysicsWorld() -> setGravity( Vect( 0,0 ) );
     // 'layer' is an autorelease object
     auto layer = HelloWorld::create();
@@ -31,90 +32,19 @@ bool HelloWorld::init()
     {
         return false;
     }
-    
-    Size visibleSize = Director::getInstance()->getVisibleSize();
-    Vec2 origin = Director::getInstance()->getVisibleOrigin();
+	auto audio = CocosDenshion::SimpleAudioEngine::getInstance();
+	if ( !audio->isBackgroundMusicPlaying() )
+	{
+		audio->playBackgroundMusic( "sky-loop.wav", true );
+	}
+
+    /*Size visibleSize = Director::getInstance()->getVisibleSize();
+    Vec2 origin = Director::getInstance()->getVisibleOrigin();*/
 	HelloWorld::mainMenu();
 	
     return true;
 }
 
-// do something on complete
-void HelloWorld::actionFinished(cocos2d::Sprite *bullet) 
-{
-	this->removeChild(bullet, true);
-	//CCLOG("shot completed!");
-}
-
-bool HelloWorld::onContactBegin(cocos2d::PhysicsContact &contact)
-{
-    PhysicsBody *a = contact.getShapeA()->getBody();
-    PhysicsBody *b = contact.getShapeB()->getBody();
-
-	// check if the bodies have collided
-
-	//if player collide with Worker,Cowboy
-    if ( ( 1 == a->getCollisionBitmask() && 2 == b->getCollisionBitmask() ) 
-		|| ( 2 == a->getCollisionBitmask() && 1 == b->getCollisionBitmask() ) )
-    {
-        CCLOG( "Player collide with Worker / Cowboy" );
-    }
-	//if Worker,Cowboy collide with bullet
-	else if( ( 2 == a->getCollisionBitmask() && 3 == b->getCollisionBitmask() ) 
-		|| ( 3 == a->getCollisionBitmask() && 2 == b->getCollisionBitmask() ) )
-	{
- 		a->getNode()->removeFromParent();
-		b->getNode()->removeFromParent();
-
-		HelloWorld::updateScore( 30 );		
-	}
-	//if Worker, Cowboy collide with LeftWall
-	else if( ( 2 == a->getCollisionBitmask() && 4 == b->getCollisionBitmask() ) 
-		|| ( 4 == a->getCollisionBitmask() && 2 == b->getCollisionBitmask() ) )
-	{
-		//remove Worker / Cowboy
-		if( 2 == a->getCollisionBitmask() )
-		{
-			a->getNode()->removeFromParent();
-		}else{
-			b->getNode()->removeFromParent();
-		}
-		HelloWorld::lostMenu();
-	}
-    
-    return true;
-}
-
-bool HelloWorld::onTouchBegan( cocos2d::Touch *touch, cocos2d::Event *event )
-{
-	if(touch->getLocation().x < pSprite->getPositionX())
-	{
-		pSprite->move( Vec2( -60, 0 ) ); // left
-	}
-	if(touch->getLocation().x > pSprite->getPositionX())
-	{
-		pSprite->move( Vec2( 60, 0 ) ); // right
-	}
- 
-	return true;
-}
- 
-void HelloWorld::onTouchEnded(Touch *touch, Event *event)
-{
-	pSprite->idle();
-}
-
-//called for every update of the game
-void HelloWorld::update(float dt)
-{
-	/*std::string s = std::to_string( dt );
-	const char * chr = s.c_str();
-	CCLOG ( chr );*/
-
-	pSprite->update();
-}
-
-//exit the game
 void HelloWorld::menuCloseCallback( cocos2d::Ref* pSender )
 {
 #if (CC_TARGET_PLATFORM == CC_PLATFORM_WP8) || (CC_TARGET_PLATFORM == CC_PLATFORM_WINRT)
@@ -129,95 +59,32 @@ void HelloWorld::menuCloseCallback( cocos2d::Ref* pSender )
 #endif
 }
 
-void HelloWorld::startGame( cocos2d::Ref* pSender )
-{
-	HelloWorld::gameMenu();
-
-	//game
-	//////////////
-	//
-	//  Player movement with animation
-	//
-	////////////
-
-	Size visibleSize = Director::getInstance()->getVisibleSize();
-    Vec2 origin = Director::getInstance()->getVisibleOrigin();
-	//start game
-	this->scheduleUpdate();
-	
-	pSprite = Player::create();
-	pSprite->setPosition( Point( origin.x + visibleSize.width / 10, origin.y + visibleSize.height / 2 ) );
-	//pSprite->setPhysicsBody( pSprite->getBody() );
-
-	this->addChild( pSprite, 5 ); //second parameter is the drawing priority
-
-	HelloWorld::initShooting();
-
-	// listen for contact between objects
-	auto contactListener = EventListenerPhysicsContact::create();
-    contactListener->onContactBegin = CC_CALLBACK_1( HelloWorld::onContactBegin, this) ;
-    this->getEventDispatcher()->addEventListenerWithSceneGraphPriority( contactListener, this );
-
-	auto listener = EventListenerTouchOneByOne::create();
-	listener->setSwallowTouches(true);
- 
-	listener->onTouchBegan = CC_CALLBACK_2(HelloWorld::onTouchBegan, this);
-	listener->onTouchEnded = CC_CALLBACK_2(HelloWorld::onTouchEnded, this);
- 
-	Director::getInstance()->getEventDispatcher()->addEventListenerWithSceneGraphPriority(listener, this);
-
-	//spawn random monsters
-	//srand((unsigned int)time(nullptr));
-	//this->schedule(schedule_selector(HelloWorld::addMonster), 1.5);
-
-
-	//spawn cowboys
-	srand( ( unsigned int )time( nullptr ) );
-	this->schedule(schedule_selector( HelloWorld::addCowboy ), 3.0 );
-
-	//spawn workers
-	srand( ( unsigned int )time( nullptr ) );
-	this->schedule(schedule_selector( HelloWorld::addWorker ), 3.0 );
-
-}
-
-void HelloWorld::addCowboy( float dt )
-{
-	auto cbSprite= EnemyCB::create();
-	cbSprite->setPhysicsBody( cbSprite->getBody() );
-	this->addChild( cbSprite );
-}
-
-void HelloWorld::addWorker( float dt )
-{
-	auto wSprite= Worker::create();
-	wSprite->setPhysicsBody( wSprite->getBody() );
-	this->addChild( wSprite );
-}
-
 void HelloWorld::settings( cocos2d::Ref* pSender )
 {
 	HelloWorld::settingsMenu();
 }
 void HelloWorld::gameInit( cocos2d::Ref* pSender )
 {
+	auto audio = CocosDenshion::SimpleAudioEngine::getInstance();
+	if ( audio->isBackgroundMusicPlaying() )
+	{
+		audio->stopBackgroundMusic();
+	}
 	auto scene = GameLayer::createScene();
-
 	Director::getInstance()->pushScene( scene );
 }
+
+
 
 void HelloWorld::mainMenu()
 {
 	Size visibleSize = Director::getInstance()->getVisibleSize();
     Vec2 origin = Director::getInstance()->getVisibleOrigin();
 
-	auto menuTitle = MenuItemFont::create( "Game Name" );
+	auto menuTitle = MenuItemFont::create( "White Man Came" );
 	menuTitle->setPosition( Vec2( origin.x + visibleSize.width / 2,
 		origin.y + visibleSize.height - menuTitle->getContentSize().height) );
 
-	/*auto playTitle = MenuItemFont::create( "Play", this, menu_selector( HelloWorld::startGame ) );
-	playTitle->setPosition( Vec2( origin.x + visibleSize.width / 2,
-		origin.y + visibleSize.height / 2 ) );*/
 	auto playTitle = MenuItemFont::create( "Play", this, menu_selector( HelloWorld::gameInit ) );
 	playTitle->setPosition( Vec2( origin.x + visibleSize.width / 2,
 		origin.y + visibleSize.height / 2 ) );
@@ -230,7 +97,11 @@ void HelloWorld::mainMenu()
 	closeItem->setPosition( Vec2( origin.x + visibleSize.width / 2,
 		settingsTitle->getPosition().y - 2 * closeItem->getContentSize().height ) );
 
-	auto menu = Menu::create(closeItem, menuTitle, playTitle, settingsTitle, NULL);
+	auto testItem = MenuItemFont::create( "Test", this, menu_selector( HelloWorld::gameTest ) );
+	testItem->setPosition( Vec2( origin.x + visibleSize.width / 2,
+		closeItem->getPosition().y -2 * testItem->getContentSize().height ) );
+
+	auto menu = Menu::create(closeItem, menuTitle, playTitle, settingsTitle, testItem, NULL);
 	menu->setPosition(Vec2::ZERO);
 	menu->setName( "mainMenu" );
 	this->addChild(menu);
@@ -258,9 +129,9 @@ void HelloWorld::settingsMenu()
 					case ui::Widget::TouchEventType::BEGAN:
 							break;
 					case ui::Widget::TouchEventType::ENDED:
-							CCLOG( "Slider moved" );
-							break;
-					default:
+							auto audio = CocosDenshion::SimpleAudioEngine::getInstance();
+							audio->setEffectsVolume( slider->getPercent() / 100 );
+							audio->setBackgroundMusicVolume( slider->getPercent() / 100 );
 							break;
 			}
 	});
@@ -312,185 +183,92 @@ void HelloWorld::removeSettingsMenu()
 	HelloWorld::mainMenu();
 }
 
-void HelloWorld::gameMenu()
-{
-	HelloWorld::removeMainMenu();
 
-	//score
+
+
+
+
+
+void HelloWorld::gameTest( cocos2d::Ref* pSender )
+{
+	auto contactListener = EventListenerPhysicsContact::create();
+	contactListener->onContactBegin = CC_CALLBACK_1(HelloWorld::onContactBegan, this);
+	this->getEventDispatcher()->addEventListenerWithSceneGraphPriority(contactListener, this);
+
 	Size visibleSize = Director::getInstance()->getVisibleSize();
     Vec2 origin = Director::getInstance()->getVisibleOrigin();
 
-	auto scoreText = Label::create( "Score: ", "fonts/Marker Felt.ttf", 30);
-	scoreText->setPosition( Vec2( origin.x + scoreText->getContentSize().width / 2,
-		origin.y + visibleSize.height - scoreText->getContentSize().height / 2 ) );
-	scoreText->setName( "scoreText" );
+	auto sprite1 = Sprite::create( "player_blue.png" );
+	auto body1 = PhysicsBody::createBox( sprite1->getContentSize(), PHYSICSBODY_MATERIAL_DEFAULT );
 
-	this->addChild( scoreText );
+	body1->setCategoryBitmask(10);    
+	body1->setCollisionBitmask(2);  
+	body1->setContactTestBitmask( 0 );
 
-	auto scoreInt = Label::create( "  000", "fonts/Marker Felt.ttf", 30);
-	scoreInt->setPosition( Vec2( scoreText->getPosition().x + scoreText->getContentSize().width / 2 + scoreInt->getContentSize().width / 2,
-		scoreText->getPosition().y ) );
-	scoreInt->setName( "scoreInt" );
+	sprite1->setPhysicsBody( body1 );
+	sprite1->setPosition( origin.x +  2* sprite1->getContentSize().width, origin.y + visibleSize.height / 2);
 
-	this->addChild( scoreInt );
+	this->addChild(sprite1);
+
+
+	auto sprite2 = Sprite::create( "player_blue.png" );
+	auto body2 = PhysicsBody::createBox( sprite1->getContentSize(), PHYSICSBODY_MATERIAL_DEFAULT );
+
+	body2->setCategoryBitmask(1);   
+	body2->setCollisionBitmask(10);  
+	body2->setContactTestBitmask( 0 );
+
+	sprite2->setPhysicsBody( body2 );
+	sprite2->setPosition( origin.x +  2* sprite2->getContentSize().width + 100, origin.y + visibleSize.height / 2);
+
+	this->addChild(sprite2);
+
+	auto sprite3 = Sprite::create( "player_red.png" );
+	auto body3 = PhysicsBody::createBox( sprite1->getContentSize(), PHYSICSBODY_MATERIAL_DEFAULT );
+
+	body3->setCategoryBitmask(10);    // 0010
+	body3->setCollisionBitmask(1);   // 0001
+	body3->setContactTestBitmask( 0 );
+
+
+	sprite3->setPhysicsBody( body3 );
+	sprite3->setPosition( origin.x +  2* sprite2->getContentSize().width, origin.y + visibleSize.height / 2 - 100);
+
+	this->addChild(sprite3);
+
+	auto sprite4 = Sprite::create( "player_red.png" );
+	auto body4 = PhysicsBody::createBox( sprite1->getContentSize(), PHYSICSBODY_MATERIAL_DEFAULT );
+
+	body4->setCategoryBitmask(10);    // 0010
+	body4->setCollisionBitmask(1);   // 0001
+	body4->setContactTestBitmask( 0 );
+
+	sprite4->setPhysicsBody( body4);
+	
+	sprite4->setPosition( origin.x +  2* sprite2->getContentSize().width + 100, origin.y + visibleSize.height / 2 - 100);
+
+	this->addChild(sprite4);
+
+
+	sprite3->getPhysicsBody()->setVelocity( Vec2( 10, 0 ) );
+
+	sprite1->setPosition( sprite4->getPosition().x + 100, sprite4->getPosition().y );
+	sprite2->setPosition( sprite1->getPosition().x + 100, sprite4->getPosition().y );
+
+	sprite1->getPhysicsBody()->setVelocity( Vec2( -10, 0 ) );
 
 	
-	//weapon indicator
-	//level
-}
-void HelloWorld::removeGameMenu()
-{
-	this->removeChildByName( "scoreText" );
-	this->removeChildByName( "scoreInt" );
 }
 
-void HelloWorld::lostMenu()
+bool HelloWorld::onContactBegan(PhysicsContact &contact)
 {
-	auto sco = (Label*) this->getChildByName( "scoreInt" );
-	std::string finalScore = sco->getString();
+	auto nodeA = contact.getShapeA()->getBody()->getNode();
+	auto nodeB = contact.getShapeB()->getBody()->getNode();
 
-	HelloWorld::removeGameMenu();
-	//make a function?
-	this->removeAllChildren();
-	this->unscheduleUpdate();
-	this->unscheduleAllCallbacks();
-	this->unscheduleAllSelectors();
-	this->getEventDispatcher()->removeAllEventListeners();
-	
-	Size visibleSize = Director::getInstance()->getVisibleSize();
-    Vec2 origin = Director::getInstance()->getVisibleOrigin();
-
-	auto ggText = MenuItemFont::create( "G G" );
-	ggText->setPosition( Vec2( origin.x + visibleSize.width / 2, 
-		origin.y + visibleSize.height - ggText->getContentSize().height) );
-
-	auto tryAgain = MenuItemFont::create( "Try Again?", this, menu_selector( HelloWorld::lostMenuTryAgain ) );
-	tryAgain->setPosition( Vec2( origin.x + visibleSize.width / 2,
-		origin.y + visibleSize.height / 2 ) );
-
-	auto scoreTxt = MenuItemFont::create( "Score: ");
-	scoreTxt->setPosition( Vec2( origin.x + scoreTxt->getContentSize().width / 2, origin.y + visibleSize.height - scoreTxt->getContentSize().height / 2 ) );
-
-	auto scoreInt = MenuItemFont::create( finalScore );
-	scoreInt->setPosition( Vec2( scoreTxt->getPosition().x + scoreTxt->getContentSize().width / 2 + scoreInt->getContentSize().width / 2,
-		scoreTxt->getPosition().y ) );
-
-	auto closeItem = MenuItemFont::create( "Exit", this, menu_selector(HelloWorld::menuCloseCallback));    
-	closeItem->setPosition( Vec2( origin.x + visibleSize.width / 2,
-		tryAgain->getPosition().y - 2 * closeItem->getContentSize().height ) );
-
-	auto menu = Menu::create(closeItem, ggText, tryAgain, scoreTxt, scoreInt, NULL);
-	menu->setPosition(Vec2::ZERO);
-	menu->setName( "mainMenu" );
-	this->addChild(menu);
-}
-void HelloWorld::removeLostMenu()
-{
-	this->removeChildByName( "mainMenu" );
-}
-void HelloWorld::lostMenuTryAgain( cocos2d::Ref* pSender )
-{
-	HelloWorld::removeLostMenu();
-	HelloWorld::startGame( pSender );
-}
-
-
-void HelloWorld::initShooting()
-{
-
-	Size visibleSize = Director::getInstance()->getVisibleSize();
-    Vec2 origin = Director::getInstance()->getVisibleOrigin();
-
-	//keyboard listener
-	auto eventListener = EventListenerKeyboard::create();
-	eventListener->onKeyPressed = [ this, origin, visibleSize]( EventKeyboard::KeyCode keyCode, Event* event ){
-
-		PhysicsBody* body = event->getCurrentTarget()->getPhysicsBody();
-
-		switch(keyCode){
-			case EventKeyboard::KeyCode::KEY_SPACE:
-				//shoot a bullet straight forward
-				auto bulletSpeed = 300.0f;
-				auto distance = origin.x + visibleSize.width - pSprite->getPosition().x;
-				auto move_action = MoveTo::create( distance / bulletSpeed, Vec2( origin.x + visibleSize.width, pSprite->getPosition().y ) );
-
-				auto bullet = Sprite::create ( "arrow.png" );
-				bullet->setPosition( Vec2( pSprite->getPosition().x + bullet->getContentSize().width, pSprite->getPosition().y ) );
-				auto bulletBody = PhysicsBody::createBox( bullet->getContentSize(), PHYSICSBODY_MATERIAL_DEFAULT );
-
-				bulletBody->setCollisionBitmask( 3 );
-				bulletBody->setContactTestBitmask( true );
-
-				bullet->setPhysicsBody( bulletBody );
-				this->addChild( bullet );
-
-				auto callback = CallFunc::create( [this,bullet]() { this->actionFinished(bullet); } );
-				auto sequence = Sequence::create(move_action, callback, NULL);
-				bullet-> runAction(sequence);
-		
-					
-
-				break;
-
-		}
-
-	};
-    this->_eventDispatcher->addEventListenerWithSceneGraphPriority(eventListener, pSprite);
-}
-
-//old monsterSpawner function
-void HelloWorld::addMonster(float dt) 
-{
-	auto monster = Sprite::create( "cowboy21.png" );
-	auto monsterBody = PhysicsBody::createBox( monster->getContentSize(), PHYSICSBODY_MATERIAL_DEFAULT );
-	monsterBody->setContactTestBitmask( true );
-	monsterBody->setCollisionBitmask( 2 );
-
-	monster->setPhysicsBody( monsterBody );
-	monster->setScaleX ( -1 );
-	// 1
-	auto monsterContentSize = monster->getContentSize();
-	auto selfContentSize = this->getContentSize();
-	int minY = monsterContentSize.height/2;
-	int maxY = selfContentSize.height - monsterContentSize.height/2;
-	int rangeY = maxY - minY;
-	int randomY = ( rand() % rangeY ) + minY;
- 
-	monster->setPosition( Vec2( selfContentSize.width + monsterContentSize.width/2, randomY ) );
-	monster->setName( "monster" );
-	this->addChild(monster);
- 
-	// 2
-	int minDuration = 12.0;
-	int maxDuration = 14.0;
-	int rangeDuration = maxDuration - minDuration;
-	int randomDuration = ( rand() % rangeDuration ) + minDuration;
- 
-	// 3
-	auto actionMove = MoveTo::create( randomDuration, Vec2( -monsterContentSize.width/2, randomY ) );
-
-	//does actionMove, then calls monsterOutside when it's done. ( add parameters by: monsterOutside, this, param1, param2)
-	monster->runAction( Sequence::create( actionMove, CallFunc::create( std::bind( &HelloWorld::monsterOutside, this ) ), nullptr ) );
-}
-
-//called if a monster completes it's moveTo, loses game
-void HelloWorld::monsterOutside()
-{
-	auto monster = this->getChildByName( "monster" );
-	auto actionRemove = RemoveSelf::create();
-	monster->runAction( actionRemove );
-	HelloWorld::lostMenu();
-
-}
-
-//updates the score by parameter nr, shown in game.
-void HelloWorld::updateScore( int nr )
-{
-	Label* scoreLabel = (Label*) this->getChildByName( "scoreInt" );
-	if(scoreLabel)
+	if (nodeA->getPhysicsBody()->getCategoryBitmask() == 10 & nodeB->getPhysicsBody()->getCategoryBitmask() == 9 
+		|| nodeB->getPhysicsBody()->getCategoryBitmask() == 10 & nodeA->getPhysicsBody()->getCategoryBitmask() == 9 )
 	{
-		auto str = scoreLabel->getString();
-		int tempScore = std::stoi( str );
-		scoreLabel->setString( std::to_string( tempScore + nr ) );
+
 	}
+	return true;
 }

@@ -1,6 +1,7 @@
 #include "GameLayer.h"
 #include "GameController.h"
 #include "SimpleAudioEngine.h"
+#include "HelloWorldScene.h"
 
 USING_NS_CC;
 const char* HIGH_SCORE="key1";
@@ -15,7 +16,7 @@ cocos2d::Scene* GameLayer::createScene()
 {
 	_gameScene = Scene::createWithPhysics();
 	_gameScene -> getPhysicsWorld() -> setGravity( Vect( 0, 0 ) );
-    //_gameScene -> getPhysicsWorld() -> setDebugDrawMask( PhysicsWorld::DEBUGDRAW_ALL ); 
+   // _gameScene -> getPhysicsWorld() -> setDebugDrawMask( PhysicsWorld::DEBUGDRAW_ALL ); 
 
 	auto layer = GameLayer::create();
 	layer -> setPhyschisWorld( _gameScene -> getPhysicsWorld() );
@@ -32,8 +33,11 @@ bool GameLayer::init()
 
 	//init the music
 	 auto audio = CocosDenshion::SimpleAudioEngine::getInstance();
-	 //audio -> playBackgroundMusic( "backgroundMusic.mp3", true );
-	 //audio->playEffect( "shoot.mp3", false, 1.0f, 1.0f, 1.0f );
+	 if( !audio->isBackgroundMusicPlaying() )
+	 {
+		audio -> playBackgroundMusic( "background.wav", true );
+	 }
+	 //audio->playEffect( "gunshot.wav", false, 1.0f, 1.0f, 1.0f );
 
 	 GameLayer::initGame();
 
@@ -57,6 +61,10 @@ void GameLayer::update( float dt )
 
 	//Update bullets
 	 GameLayer::bulletControl();
+	
+	 //update arrow counter
+	 GameLayer::updateArrows();
+
 
 	//spawn enemies
 	 EnemyCB* cb;
@@ -116,6 +124,12 @@ void GameLayer::bulletControl()
 
 void GameLayer::removeBullet( Bullet *b ) 
 {
+	if ( b->getType() == 1 )
+	{
+		GameController::_player->nrOfArrows += 1;
+
+	}
+
 	GameController::bullets.eraseObject( b );
 	b->cleanup();
 	removeChild(b, true);
@@ -149,23 +163,36 @@ bool GameLayer::onContactBegin ( cocos2d::PhysicsContact &contact )
 		GameLayer::_dead = true;
 		GameController::eraseAll();
 		GameLayer::lostLayer();
+	}
+	////if arrow hits right wall
+	//else if( ( 6 == a->getCollisionBitmask() && 3 == b->getCollisionBitmask() ) 
+	//	|| ( 3 == a->getCollisionBitmask() && 6 == b->getCollisionBitmask() ) )
+	//{
+	//	if( a->getCollisionBitmask()==3 )
+	//	{
+	//		GameController::erase( a->getNode() );
+	//	}
+	//	else
+	//	{
+	//		GameController::erase( b->getNode() );
+	//	}
 
-	}
-	//if Worker, Cowboy collide with LeftWall
-	//remove later
-	else if( ( 2 == a->getCollisionBitmask() && 5 == b->getCollisionBitmask() ) 
-		|| ( 5 == a->getCollisionBitmask() && 2 == b->getCollisionBitmask() ) )
-	{
-		//remove Worker / Cowboy
-		if( 2 == a->getCollisionBitmask() )
-		{
-			a->getNode()->removeFromParent();
-		}else{
-			b->getNode()->removeFromParent();
-		}
-		//HelloWorld::lostMenu();
-	}
-	   
+	//}
+	////if bullets hits left wall
+	//else if( ( 4 == a->getCollisionBitmask() && 5 == b->getCollisionBitmask() ) 
+	//	|| ( 5 == a->getCollisionBitmask() && 4 == b->getCollisionBitmask() ) )
+	//{
+	//	if( a->getCollisionBitmask()==4 )
+	//	{
+	//		GameController::erase( a->getNode() );
+	//	}
+	//	else
+	//	{
+	//		GameController::erase( b->getNode() );
+	//	}
+	//}
+
+
     return true;
 }
 
@@ -180,6 +207,16 @@ void GameLayer::updateScore( int nr )
 	}
 }
 
+void GameLayer::updateArrows()
+{
+	int nr = GameController::_player->nrOfArrows + 1;
+	Label* arrowLabel = (Label*) _gameScene->getChildByName( "nrArrows" );
+	if(arrowLabel)
+	{
+		arrowLabel->setString( std::string( "Arrows: " ) + std::to_string( nr ) + std::string( " / 4" ));
+	}
+}
+
 void GameLayer::lostLayer()
 {
 	//Can make this so it isnt remade everytime, but instead retained?
@@ -190,13 +227,16 @@ void GameLayer::lostLayer()
 	layer->setName( "lostLayer" );
 
 	auto lostText = Label::create( "Game Over", "fonts/Marker Felt.ttf", 30);
-	lostText->setPosition( Vec2( origin.x + visibleSize.width / 2, origin.y + visibleSize.height / 2 ) );
+	lostText->setPosition( Vec2( origin.x + visibleSize.width / 2, origin.y + visibleSize.height / 2 + lostText->getContentSize().height) );
 	layer->addChild( lostText );
 
 	auto retryText = MenuItemFont::create( "Retry?", this, menu_selector( GameLayer::retryGame ) );
-	retryText->setPosition( Vec2( lostText->getPosition().x, lostText->getPosition().y - retryText->getContentSize().height ) );
+	retryText->setPosition( Vec2( lostText->getPosition().x, lostText->getPosition().y - 2 * retryText->getContentSize().height ) );
 
-	auto menu = Menu::create( retryText, NULL );
+	auto menuText = MenuItemFont::create( "Menu", this, menu_selector( GameLayer::backToMenu ) );
+	menuText->setPosition( Vec2( retryText->getPosition().x, retryText->getPosition().y - menuText->getContentSize().height ) );
+
+	auto menu = Menu::create( retryText, menuText, NULL );
 	menu->setPosition(Vec2::ZERO);
 	layer->addChild( menu );
 
@@ -241,7 +281,7 @@ void GameLayer::initGame()
 
 	//Create the player
 	GameController::spawnPlayer();
-	GameController::_player->setPosition( Point( origin.x + visibleSize.width / 10, origin.y + visibleSize.height / 2 ) );
+	GameController::_player->setPosition( Point( origin.x + visibleSize.width / 6, origin.y + visibleSize.height / 2 ) );
 	_gameScene->addChild( GameController::_player );
 
 	//draw the score
@@ -258,6 +298,14 @@ void GameLayer::initGame()
 	scoreInt->setName( "scoreInt" );
 
 	_gameScene->addChild( scoreInt );
+	
+	//draw amount of arrows
+	auto nrArrows = Label::create("Arrows: 4 / 4", "fonts/Marker Felt.ttf", 30 );
+	nrArrows->setPosition( Vec2( origin.x + visibleSize.width - nrArrows->getContentSize().width / 2,
+		origin.y + visibleSize.height - nrArrows->getContentSize().height / 2 ) );
+	nrArrows->setName( "nrArrows" );
+
+	_gameScene->addChild( nrArrows );
 }
 
 void GameLayer::retryGame( cocos2d::Ref* pSender )
@@ -265,7 +313,20 @@ void GameLayer::retryGame( cocos2d::Ref* pSender )
 	_gameScene->removeChildByName( "lostLayer" );
 	_gameScene->removeChildByName( "scoreText" );
 	_gameScene->removeChildByName( "scoreInt" );
+	_gameScene->removeChildByName( "nrArrows" );
 
 	GameLayer::_dead = false;
 	GameLayer::initGame();
+}
+
+void GameLayer::backToMenu( cocos2d::Ref* pSender )
+{
+	auto audio = CocosDenshion::SimpleAudioEngine::getInstance();
+	if( audio->isBackgroundMusicPlaying() )
+	{
+		audio->stopBackgroundMusic();
+	}
+
+	auto scene = HelloWorld::createScene();
+	Director::getInstance()->pushScene( scene );
 }

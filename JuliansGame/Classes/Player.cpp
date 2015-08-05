@@ -11,16 +11,21 @@ Player::~Player()
 //if retained, must release
 	CC_SAFE_RELEASE(idleAnimate);
 	CC_SAFE_RELEASE(moveAnimate);
+	//CC_SAFE_RELEASE(shootAnimate);
 }
 
 Player* Player::create()
 {
     Player* pSprite = new Player();
+	pSprite->nrOfArrows = 3;
 	pSprite->initWithFile( "C:/JuliansGame/JuliansGame/Resources/Indian_idle1.png" );
 
 	pBody = PhysicsBody::createBox( pSprite->getContentSize(), PHYSICSBODY_MATERIAL_DEFAULT);
+
+	//pBody->setCategoryBitmask( 1 );
 	pBody->setCollisionBitmask( 1 );
 	pBody->setContactTestBitmask( true );
+
 	pBody->setRotationEnable( false );
 	//pSprite->setPhysicsBody( pBody );
 
@@ -80,6 +85,8 @@ void Player::addEvents()
 			break;
 
 		case cocos2d::EventKeyboard::KeyCode::KEY_SPACE:
+			//this->stopAllActions();
+			//this->runAction( shootAnimate  );
 			this->Player::shoot();
 			break;
 		}
@@ -130,10 +137,7 @@ void Player::initAnimations()
 	moveAnimate = Animate::create(animation);
 	moveAnimate->retain();
 	
-
-	auto cacher2 = SpriteFrameCache::getInstance();
 	cacher->addSpriteFramesWithFile( "indian_idle.plist" );
-	#include <sstream>
 	// load all the animation frames into an array
 	const int kNumberOfFrames2 = 4;
 	Vector<SpriteFrame*> frames2;
@@ -142,7 +146,7 @@ void Player::initAnimations()
 		std::string s = std::to_string( i );
 
 		SpriteFrame* aFrame2 =
-		cacher2->getSpriteFrameByName( "indian_idle" + s + ".png" );
+		cacher->getSpriteFrameByName( "indian_idle" + s + ".png" );
 		frames2.pushBack(aFrame2);
 	}
 
@@ -150,7 +154,27 @@ void Player::initAnimations()
 	animation2->setRestoreOriginalFrame( true) ;
 	idleAnimate = Animate::create( animation2 );
 	idleAnimate->retain();
+
+	//cacher->addSpriteFramesWithFile( "indian_shoot.plist" );
+	//// load all the animation frames into an array
+	//const int kNumberOfFrames3 = 4;
+	//Vector<SpriteFrame*> frames3;
+	//for (int i = 1; i < kNumberOfFrames3; i++)
+	//{
+	//	std::string s = std::to_string( i );
+
+	//	SpriteFrame* aFrame3 =
+	//	cacher->getSpriteFrameByName( "indian_shoot" + s + ".png" );
+	//	frames3.pushBack( aFrame3 );
+	//}
+
+	//auto animation3 = Animation::createWithSpriteFrames( frames3, 0.40f );
+	//animation3->setRestoreOriginalFrame( true) ;
+	//shootAnimate = Animate::create( animation3 );
+	//shootAnimate->retain();
+
 	this->runAction( RepeatForever::create( idleAnimate ) );
+
 }
 
 void Player::move( cocos2d::Vec2 direction )
@@ -158,7 +182,9 @@ void Player::move( cocos2d::Vec2 direction )
 	moving = true;
 
 	this->stopAllActions();
-	this->runAction( RepeatForever::create( moveAnimate ) );
+	auto action = RepeatForever::create( moveAnimate ) ;
+	action->setTag( 1 );
+	this->runAction( action );
 	pBody->setVelocity( direction );
 
 	if( direction.x > 0 )
@@ -176,6 +202,7 @@ void Player::idle()
 
 	this->stopAllActions();
 	this->runAction(RepeatForever::create( idleAnimate ) );
+	
 	pBody->setVelocity( cocos2d::Vec2( 0, 0 ) );
 }
 
@@ -201,6 +228,6 @@ void Player::shoot()
     Vec2 origin = Director::getInstance()->getVisibleOrigin();
 
 	auto tar = Vec2( origin.x + visibleSize.width, this->getPosition().y );
-
+	
     GameController::spawnBullet( 1, Vec2( this->getPosition().x + this->getContentSize().width, this->getPosition().y) , tar );
 }

@@ -39,7 +39,10 @@ public:
 
 	void initGame();
 
+	void updateArrows();
+
 	void retryGame( cocos2d::Ref* pSender );
+	void backToMenu( cocos2d::Ref* pSender );
 };
 
 #endif // _GAMELAYER_HPP_
