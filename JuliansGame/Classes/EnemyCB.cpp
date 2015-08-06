@@ -1,5 +1,6 @@
 #include "EnemyCB.h"
 #include "GameController.h"
+#include "stdReplacer.h"
 
 using namespace cocos2d;
 
@@ -42,7 +43,7 @@ void EnemyCB::initAnimations()
 	Vector<SpriteFrame*> frames;
 	for (int i = 1; i < kNumberOfFrames; i++)
 	{
-		std::string s = std::to_string( i );
+		std::string s = stdReplacer::to_string( i );
 
 		SpriteFrame* aFrame =
 		cacher->getSpriteFrameByName( "cowboy2" + s + ".png" );
@@ -148,7 +149,7 @@ void Worker::initAnimations()
 	Vector<SpriteFrame*> frames;
 	for (int i = 1; i < kNumberOfFrames; i++)
 	{
-		std::string s = std::to_string( i );
+		std::string s = stdReplacer::to_string( i );
 
 		SpriteFrame* aFrame =
 		cacher->getSpriteFrameByName( "Constructor2" + s + ".png" );

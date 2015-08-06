@@ -2,6 +2,7 @@
 #include "GameController.h"
 #include "SimpleAudioEngine.h"
 #include "HelloWorldScene.h"
+#include "stdReplacer.h"
 
 USING_NS_CC;
 const char* HIGH_SCORE="key1";
@@ -202,8 +203,8 @@ void GameLayer::updateScore( int nr )
 	if(scoreLabel)
 	{
 		auto str = scoreLabel->getString();
-		int tempScore = std::stoi( str );
-		scoreLabel->setString( std::to_string( tempScore + nr ) );
+		int tempScore = stdReplacer::stoi( str );
+		scoreLabel->setString( stdReplacer::to_string( tempScore + nr ) );
 	}
 }
 
@@ -213,7 +214,7 @@ void GameLayer::updateArrows()
 	Label* arrowLabel = (Label*) _gameScene->getChildByName( "nrArrows" );
 	if(arrowLabel)
 	{
-		arrowLabel->setString( std::string( "Arrows: " ) + std::to_string( nr ) + std::string( " / 4" ));
+		arrowLabel->setString( std::string( "Arrows: " ) + stdReplacer::to_string( nr ) + std::string( " / 4" ));
 	}
 }
 
@@ -251,10 +252,10 @@ void GameLayer::lostLayer()
 	std::string tempString( "Highscore: ");
 	//checks if its a highscore
 	auto playerScore = (Label* )  _gameScene->getChildByName( "scoreInt" );
-	if( std::stoi(playerScore->getString() ) > highScoreKey )
+	if( stdReplacer::stoi(playerScore->getString() ) > highScoreKey )
 	{
 		tempString += playerScore->getString();
-		def->setIntegerForKey(HIGH_SCORE, std::stoi(playerScore->getString() ));
+		def->setIntegerForKey(HIGH_SCORE, stdReplacer::stoi(playerScore->getString() ));
 		def->flush();
 	} else {
 		tempString += score;

@@ -1,4 +1,10 @@
 To do:
+0. Make it work on android emulator - - -- - - 
+0.1 Change the menu from labels to MenuItemSprite
+	-see:  https://github.com/chukong/EarthWarrior3D/blob/master/Classes/MainMenuScene.cpp
+
+
+
 1. fix the changes or nrOfArrows			**Need wifi, to check the guide on how to do it
 	-Idéa: Make an invisible wall that the arrows hit but the cowboys can walk through,
 		remove arrows on collision instead of callback after MoveTo. Make Cowboy bullets
@@ -15,16 +21,12 @@ To do:
 
 9. HighScore -add name to the score
 
-Note:
-1. try Eclipse to run HelloWorld on android
-	- Compiling works through cmd, but not the emulator
-	- Check cocos2d-x emulator guide and try again
-2. Add all files to Appication.mk or Android.mk
-3. Move all the files to Classes
+10. Small animation at main menu, arrow that fly across the screen and is burning using cocos2d-x particle
 
-Ideas:
-1. Variable to keep track on which level we are
-2. Have a function which changes level
+Remember:
+1. Add all files to Appication.mk or Android.mk
+2. Move all the files to Classes
+
 
 CollisionBitmasks:
 1: Player
@@ -48,6 +50,17 @@ Type:
 int to char* for CCLOG reasons:
 std::string s2 = std::to_string( distance );
 char const *pchar2 = s2.c_str();
+
+
+
+
+Project in android:
+1. cd projectfolder
+2. cocos compile -p android (it's okay if it gives error as long as it's not from my code)
+3. open in eclipse
+4. start emulator
+4. run as android project
+
 
 
 07/23/2015:
@@ -86,3 +99,4 @@ to create a runable win32 file, use the cocos run command ( cocos run -s path -p
 
 6/21/2015:
 	Started making a sealHunter - clone
+

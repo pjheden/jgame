@@ -1,5 +1,6 @@
 #include "Player.h"
 #include "GameController.h"
+#include "stdReplacer.h"
 
 using namespace cocos2d;
 cocos2d::PhysicsBody* pBody;
@@ -124,7 +125,7 @@ void Player::initAnimations()
 	Vector<SpriteFrame*> frames;
 	for (int i = 1; i < kNumberOfFrames; i++)
 	{
-		std::string s = std::to_string( i );
+		std::string s = stdReplacer::to_string( i );
 
 		SpriteFrame* aFrame =
 		cacher->getSpriteFrameByName( "indian_walk" + s + ".png" );
@@ -143,7 +144,7 @@ void Player::initAnimations()
 	Vector<SpriteFrame*> frames2;
 	for (int i = 1; i < kNumberOfFrames2; i++)
 	{
-		std::string s = std::to_string( i );
+		std::string s = stdReplacer::to_string( i );
 
 		SpriteFrame* aFrame2 =
 		cacher->getSpriteFrameByName( "indian_idle" + s + ".png" );
@@ -161,7 +162,7 @@ void Player::initAnimations()
 	//Vector<SpriteFrame*> frames3;
 	//for (int i = 1; i < kNumberOfFrames3; i++)
 	//{
-	//	std::string s = std::to_string( i );
+	//	std::string s = stdReplacer::to_string( i );
 
 	//	SpriteFrame* aFrame3 =
 	//	cacher->getSpriteFrameByName( "indian_shoot" + s + ".png" );

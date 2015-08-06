@@ -1,10 +1,10 @@
 #ifndef _GAMECONTROLLER_HPP_
 #define _GAMECONTROLLER_HPP_
 
-#include "cocos2d.h";
-#include "Bullet.h";
-#include "EnemyCB.h";
-#include "Player.h";
+#include "cocos2d.h"
+#include "Bullet.h"
+#include "EnemyCB.h"
+#include "Player.h"
 
 
 USING_NS_CC;
