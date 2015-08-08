@@ -19,7 +19,7 @@ Player* Player::create()
 {
     Player* pSprite = new Player();
 	pSprite->nrOfArrows = 3;
-	pSprite->initWithFile( "C:/JuliansGame/JuliansGame/Resources/Indian_idle1.png" );
+	pSprite->initWithFile( "Indian_idle1.png" );
 
 	pBody = PhysicsBody::createBox( pSprite->getContentSize(), PHYSICSBODY_MATERIAL_DEFAULT);
 
@@ -64,48 +64,61 @@ void Player::addEvents()
 	///////
 	// Keyboard listener
 	///////
-	auto eventlistener = EventListenerKeyboard::create();
-	eventlistener->onKeyPressed = [ this ] ( cocos2d::EventKeyboard::KeyCode keyCode, cocos2d::Event* event )
-	{
-		switch (keyCode)
+	#if CC_TARGET_PLATFORM == CC_PLATFORM_WIN32 || CC_TARGET_PLATFORM == CC_PLATFORM_LINUX || CC_TARGET_PLATFORM == CC_PLATFORM_MAC	
+		auto eventlistener = EventListenerKeyboard::create();
+		eventlistener->onKeyPressed = [ this ] ( cocos2d::EventKeyboard::KeyCode keyCode, cocos2d::Event* event )
 		{
-		case cocos2d::EventKeyboard::KeyCode::KEY_A:
-			this->Player::move( Vec2( - pBody->getVelocityLimit(), 0 ) );
-			break;
+			switch (keyCode)
+			{
+			/*case cocos2d::EventKeyboard::KeyCode::KEY_A:
+				this->Player::move( Vec2( - pBody->getVelocityLimit(), 0 ) );
+				break;
 
-		case cocos2d::EventKeyboard::KeyCode::KEY_D:
-			this->Player::move( Vec2( pBody->getVelocityLimit(), 0 ) );
-			break;
+			case cocos2d::EventKeyboard::KeyCode::KEY_D:
+				this->Player::move( Vec2( pBody->getVelocityLimit(), 0 ) );
+				break;*/
 
-		case cocos2d::EventKeyboard::KeyCode::KEY_S:
-			this->Player::move( Vec2( 0, - pBody->getVelocityLimit()) );
-			break;
+			case cocos2d::EventKeyboard::KeyCode::KEY_S:
+			case cocos2d::EventKeyboard::KeyCode::KEY_DOWN_ARROW:
+				this->Player::move( Vec2( 0, - pBody->getVelocityLimit()) );
+				break;
 
-		case cocos2d::EventKeyboard::KeyCode::KEY_W:
-			this->Player::move( Vec2( 0, pBody->getVelocityLimit()) );
-			break;
+			case cocos2d::EventKeyboard::KeyCode::KEY_W:
+			case cocos2d::EventKeyboard::KeyCode::KEY_UP_ARROW:
+				this->Player::move( Vec2( 0, pBody->getVelocityLimit()) );
+				break;
 
-		case cocos2d::EventKeyboard::KeyCode::KEY_SPACE:
-			//this->stopAllActions();
-			//this->runAction( shootAnimate  );
-			this->Player::shoot();
-			break;
-		}
-	};
+			case cocos2d::EventKeyboard::KeyCode::KEY_SPACE:
+				//this->stopAllActions();
+				//this->runAction( shootAnimate  );
+				this->Player::shoot();
+				break;
+			}
+		};
 
-	eventlistener->onKeyReleased = [ this ] ( EventKeyboard::KeyCode keyCode, Event* event )
-	{
-		switch (keyCode)
+		eventlistener->onKeyReleased = [ this ] ( EventKeyboard::KeyCode keyCode, Event* event )
 		{
-		case cocos2d::EventKeyboard::KeyCode::KEY_A:
-		case cocos2d::EventKeyboard::KeyCode::KEY_D:
-		case cocos2d::EventKeyboard::KeyCode::KEY_S:
-		case cocos2d::EventKeyboard::KeyCode::KEY_W:
-			this->Player::idle();
-		}
-	};
+			switch (keyCode)
+			{
+			//case cocos2d::EventKeyboard::KeyCode::KEY_A:
+			//case cocos2d::EventKeyboard::KeyCode::KEY_D:
+			case cocos2d::EventKeyboard::KeyCode::KEY_S:
+			case cocos2d::EventKeyboard::KeyCode::KEY_W:
+			case cocos2d::EventKeyboard::KeyCode::KEY_UP_ARROW:
+			case cocos2d::EventKeyboard::KeyCode::KEY_DOWN_ARROW:
+				this->Player::idle();
+			}
+		};
 
-	this->_eventDispatcher->addEventListenerWithSceneGraphPriority(eventlistener, this);
+		this->_eventDispatcher->addEventListenerWithSceneGraphPriority(eventlistener, this);
+	#else
+		//mobile phone, set touch
+		auto eventListener = EventListenerTouchOneByOne::create();
+		eventListener->onTouchBegan = CC_CALLBACK_2(Player::onTouchBegan, this);
+		eventListener->onTouchEnded = CC_CALLBACK_2(Player::onTouchEnded, this);
+		this->getEventDispatcher()->addEventListenerWithSceneGraphPriority(eventListener, this);
+
+	#endif
 }
 
 
@@ -117,7 +130,7 @@ void Player::initAnimations()
 
 	// load and cache the texture and sprite frames
 	auto cacher = SpriteFrameCache::getInstance();
-	cacher->addSpriteFramesWithFile("C:/JuliansGame/JuliansGame/Resources/indian_walk.plist");
+	cacher->addSpriteFramesWithFile("indian_walk.plist");
 
 	#include <sstream>
 	// load all the animation frames into an array
@@ -231,4 +244,34 @@ void Player::shoot()
 	auto tar = Vec2( origin.x + visibleSize.width, this->getPosition().y );
 	
     GameController::spawnBullet( 1, Vec2( this->getPosition().x + this->getContentSize().width, this->getPosition().y) , tar );
+}
+
+bool Player::onTouchBegan( Touch *touch, Event *unused_event )
+{
+	Size visibleSize = Director::getInstance()->getVisibleSize();
+
+	auto touchLoc = touch->getLocation();
+	if(touchLoc.x >= visibleSize.width / 2)
+	{
+		//shoot
+		this->Player::shoot();
+	}else
+	{
+		if(touchLoc.y >= visibleSize.height / 2)
+		{
+			//walk up
+			this->Player::move( Vec2( 0, pBody->getVelocityLimit()) );
+		}else
+		{
+			// walk down
+			this->Player::move( Vec2( 0, - pBody->getVelocityLimit()) );
+		}
+		
+	}
+	return true;
+}
+
+void Player::onTouchEnded( Touch *touch, Event *unused_event )
+{
+	this->Player::idle();
 }

@@ -1,7 +1,7 @@
 #include "GameLayer.h"
 #include "GameController.h"
 #include "SimpleAudioEngine.h"
-#include "HelloWorldScene.h"
+#include "MainMenu.h"
 #include "stdReplacer.h"
 
 USING_NS_CC;
@@ -273,9 +273,12 @@ void GameLayer::initGame()
 {
 	Size visibleSize = Director::getInstance()->getVisibleSize();
     Vec2 origin = Director::getInstance()->getVisibleOrigin();
+	auto winSize = Director::getInstance()->getWinSize();
 
 	//draw background
 	cocos2d::Sprite* backgroundSprite = Sprite::create( "background.png" );
+	backgroundSprite->setScaleX((winSize.width / backgroundSprite->getContentSize().width));
+	backgroundSprite->setScaleY((winSize.height / backgroundSprite->getContentSize().height));
 	backgroundSprite->setPosition( Vec2( origin.x + visibleSize.width / 2, origin.y + visibleSize.height / 2 ) );
 	backgroundSprite->setLocalZOrder( -10 );
 	_gameScene->addChild( backgroundSprite );
@@ -328,6 +331,6 @@ void GameLayer::backToMenu( cocos2d::Ref* pSender )
 		audio->stopBackgroundMusic();
 	}
 
-	auto scene = HelloWorld::createScene();
+	auto scene = MainMenu::createScene();
 	Director::getInstance()->pushScene( scene );
 }

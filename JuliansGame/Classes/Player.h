@@ -36,6 +36,9 @@ class Player : public cocos2d::Sprite
 
 		void shoot();
 
+		bool onTouchBegan( Touch *touch, Event *unused_event );
+		void onTouchEnded( Touch *touch, Event *unused_event );
+
     private:
 
 };

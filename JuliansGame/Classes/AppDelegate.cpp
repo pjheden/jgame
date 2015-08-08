@@ -1,6 +1,6 @@
 #include "AppDelegate.h"
-#include "HelloWorldScene.h"
 #include "SimpleAudioEngine.h"
+#include "MainMenu.h"
 
 USING_NS_CC;
 
@@ -27,11 +27,16 @@ bool AppDelegate::applicationDidFinishLaunching() {
     // initialize director
     auto director = Director::getInstance();
     auto glview = director->getOpenGLView();
+	Size visibleSize = director->getVisibleSize();
+
     if(!glview) {
         glview = GLViewImpl::create("My Game");
+		#if CC_TARGET_PLATFORM == CC_PLATFORM_WIN32 || CC_TARGET_PLATFORM == CC_PLATFORM_LINUX || CC_TARGET_PLATFORM == CC_PLATFORM_MAC	
+			glview->setFrameSize( 1080, 960 ); //for scaling test purposes
+		#endif
         director->setOpenGLView(glview);
     }
-
+	glview->setDesignResolutionSize(visibleSize.width, visibleSize.height, ResolutionPolicy::NO_BORDER);
     // turn on display FPS
     director->setDisplayStats(true);
 
@@ -39,7 +44,8 @@ bool AppDelegate::applicationDidFinishLaunching() {
     director->setAnimationInterval(1.0 / 60);
 
     // create a scene. it's an autorelease object
-    auto scene = HelloWorld::createScene();
+    //auto scene = HelloWorld::createScene();
+	auto scene = MainMenu::createScene();
 
     // run
     director->runWithScene(scene);

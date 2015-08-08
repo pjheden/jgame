@@ -19,7 +19,7 @@ EnemyCB* EnemyCB::create()
 	
 	eSprite->setScaleX( -1 );
 
-    if (eSprite && eSprite->initWithFile( "C:/JuliansGame/JuliansGame/Resources/cowboy21.png" ) )
+    if (eSprite && eSprite->initWithFile( "cowboy21.png" ) )
     {
 		eSprite->initAnimations();
 		eSprite->move();
@@ -35,7 +35,7 @@ void EnemyCB::initAnimations()
 {
 	// load and cache the texture and sprite frames
 	auto cacher = SpriteFrameCache::getInstance();
-	cacher->addSpriteFramesWithFile("C:/JuliansGame/JuliansGame/Resources/cowboy.plist");
+	cacher->addSpriteFramesWithFile("cowboy.plist");
 
 	#include <sstream>
 	// load all the animation frames into an array
@@ -141,7 +141,7 @@ void Worker::initAnimations()
 {
 	// load and cache the texture and sprite frames
 	auto cacher = SpriteFrameCache::getInstance();
-	cacher->addSpriteFramesWithFile("C:/JuliansGame/JuliansGame/Resources/constructor.plist");
+	cacher->addSpriteFramesWithFile("constructor.plist");
 
 	#include <sstream>
 	// load all the animation frames into an array
