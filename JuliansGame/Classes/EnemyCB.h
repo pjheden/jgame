@@ -9,6 +9,7 @@ class EnemyCB : public cocos2d::Sprite
 {
 public:
 	Animate * moveAnimate;
+	Animate * idleAnimate;
 
 	EnemyCB();
 	~EnemyCB();
@@ -17,6 +18,8 @@ public:
 	void initAnimations();
 
 	void move();
+
+	void startIdleAnimation();
 
 	PhysicsBody* getBody();
 

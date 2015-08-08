@@ -1,29 +1,24 @@
 To do:
-0. Make it work on android emulator - - -- - - 
-0.1 Change the menu from labels to MenuItemSprite
-	-see:  https://github.com/chukong/EarthWarrior3D/blob/master/Classes/MainMenuScene.cpp
 
-
-
-1. fix the changes or nrOfArrows			**Need wifi, to check the guide on how to do it
+1. fix the changes or nrOfArrows
 	-Idéa: Make an invisible wall that the arrows hit but the cowboys can walk through,
 		remove arrows on collision instead of callback after MoveTo. Make Cowboy bullets
 		also go through cowboys. Same wall on the leftside for the cowboys bullets
 	-2idea: can you cancel the callback?
 	
 -	-3idea best idea: make a wall behind player and a wall behind where cowboys spawn that catch and deletes arrows/bullets, molto bene.
-	-When it's fixed, uncomment nrOfArrows -= 1 in Gamecontroller:erase()
 
-2. add cowboy walking animation  **need wifi, Henke skulle skicka cowboy.plisk
-3. add indian shooting animation?
 
-5. settings slider		**need wifi, check bookmark
 
-9. HighScore -add name to the score
-
+6. make settings button in gameLayer (ingame settings )
+7. make all picture resources in plist files to save memory
+8. HighScore -add name to the score
+9. Improve cowboy_idle animation in plisk
 10. Small animation at main menu, arrow that fly across the screen and is burning using cocos2d-x particle
+11. add tumbleweed rolling across the screen at random times
 
 Remember:
+HellWorldScene is unused for now, delete when you feel comfterable
 1. Add all files to Appication.mk or Android.mk
 2. Move all the files to Classes
 
