@@ -5,6 +5,7 @@
 #include "Player.h"
 #include "EnemyCB.h"
 #include "SimpleAudioEngine.h"
+#include "ui/CocosGUI.h"
 
 USING_NS_CC;
 class Bullet;
@@ -41,8 +42,19 @@ public:
 
 	void updateArrows();
 
+	void checkHighscore();
+
 	void retryGame( cocos2d::Ref* pSender );
 	void backToMenu( cocos2d::Ref* pSender );
+
+	void doneButton(Ref* sender);
+
+
+private:
+	MenuItemSprite* donebutton_item;
+	Layer* _lostLayer;
+	Layer* _highscoreLayer;
+	cocos2d::ui::TextField* nameField;
 };
 
 #endif // _GAMELAYER_HPP_

@@ -6,6 +6,7 @@
 
 USING_NS_CC;
 const char* HIGH_SCORE="key1";
+const char* NAME_SCORE="key2";
 
 bool GameLayer::_dead = false;
 Scene* GameLayer::_gameScene;
@@ -165,34 +166,6 @@ bool GameLayer::onContactBegin ( cocos2d::PhysicsContact &contact )
 		GameController::eraseAll();
 		GameLayer::lostLayer();
 	}
-	////if arrow hits right wall
-	//else if( ( 6 == a->getCollisionBitmask() && 3 == b->getCollisionBitmask() ) 
-	//	|| ( 3 == a->getCollisionBitmask() && 6 == b->getCollisionBitmask() ) )
-	//{
-	//	if( a->getCollisionBitmask()==3 )
-	//	{
-	//		GameController::erase( a->getNode() );
-	//	}
-	//	else
-	//	{
-	//		GameController::erase( b->getNode() );
-	//	}
-
-	//}
-	////if bullets hits left wall
-	//else if( ( 4 == a->getCollisionBitmask() && 5 == b->getCollisionBitmask() ) 
-	//	|| ( 5 == a->getCollisionBitmask() && 4 == b->getCollisionBitmask() ) )
-	//{
-	//	if( a->getCollisionBitmask()==4 )
-	//	{
-	//		GameController::erase( a->getNode() );
-	//	}
-	//	else
-	//	{
-	//		GameController::erase( b->getNode() );
-	//	}
-	//}
-
 
     return true;
 }
@@ -224,49 +197,136 @@ void GameLayer::lostLayer()
 	Size visibleSize = Director::getInstance()->getVisibleSize();
     Vec2 origin = Director::getInstance()->getVisibleOrigin();
 
-	auto layer = Layer::create();
-	layer->setName( "lostLayer" );
+	auto counterSize =  _gameScene->getChildByName( "nrArrows" )->getBoundingBox().size;
+	_gameScene->removeChildByName( "nrArrows" );
 
-	auto lostText = Label::create( "Game Over", "fonts/Marker Felt.ttf", 30);
-	lostText->setPosition( Vec2( origin.x + visibleSize.width / 2, origin.y + visibleSize.height / 2 + lostText->getContentSize().height) );
-	layer->addChild( lostText );
+	_lostLayer = Layer::create();
+	_lostLayer->setName( "lostLayer" );
+
+	auto lostText = Label::create( "Game Over!", "fonts/Marker Felt.ttf", 60);
+	lostText->setScaleX( (visibleSize.width / lostText->getBoundingBox().size.width) * 1/2 );
+	lostText->setScaleY( (visibleSize.height / lostText->getBoundingBox().size.height) * 1/8 );
+	lostText->setPosition( Vec2( origin.x + visibleSize.width / 2,
+		origin.y + visibleSize.height - counterSize.height - lostText->getBoundingBox().size.height ) );
+	_lostLayer->addChild( lostText );
 
 	auto retryText = MenuItemFont::create( "Retry?", this, menu_selector( GameLayer::retryGame ) );
-	retryText->setPosition( Vec2( lostText->getPosition().x, lostText->getPosition().y - 2 * retryText->getContentSize().height ) );
+	//retryText->setScaleX( ( visibleSize.width / retryText->getBoundingBox().size.width ) * 1/2 );
+	//retryText->setScaleY( ( visibleSize.height / retryText->getBoundingBox().size.height ) * 1/8 );
+	retryText->setPosition( Vec2( origin.x + visibleSize.width / 2,
+		origin.y + visibleSize.height / 2 - 2 * retryText->getBoundingBox().size.height ) );
 
 	auto menuText = MenuItemFont::create( "Menu", this, menu_selector( GameLayer::backToMenu ) );
-	menuText->setPosition( Vec2( retryText->getPosition().x, retryText->getPosition().y - menuText->getContentSize().height ) );
+	//menuText->setScaleX( ( visibleSize.width / menuText->getBoundingBox().size.width ) * 1/2 );
+	//menuText->setScaleY( ( visibleSize.height / menuText->getBoundingBox().size.height ) * 1/8 );
+	menuText->setPosition( Vec2( origin.x + visibleSize.width / 2, retryText->getPosition().y - menuText->getBoundingBox().size.height ) );
 
 	auto menu = Menu::create( retryText, menuText, NULL );
 	menu->setPosition(Vec2::ZERO);
-	layer->addChild( menu );
+	menu->setName( "menu" );
+	_lostLayer->addChild( menu );
 
-	
+	GameLayer::checkHighscore();
+	GameLayer::_gameScene->addChild( _lostLayer );
+}
 
-	//draws the Highscore 
+void GameLayer::checkHighscore()
+{
+	Size visibleSize = Director::getInstance()->getVisibleSize();
+	Vec2 origin = Director::getInstance()->getVisibleOrigin();
+	_lostLayer->getChildByName( "menu" )->setVisible( false );
 	auto def = CCUserDefault::sharedUserDefault();
-	auto highScoreKey = def->getIntegerForKey( HIGH_SCORE );
-	char score[10];
-	sprintf( score, "%d", highScoreKey );
+	auto playerScore = (Label* )  _gameScene->getChildByName( "scoreInt" ); //get the actual score
 
-	std::string tempString( "Highscore: ");
-	//checks if its a highscore
-	auto playerScore = (Label* )  _gameScene->getChildByName( "scoreInt" );
-	if( stdReplacer::stoi(playerScore->getString() ) > highScoreKey )
+	//draws the highscore
+	char score[20];
+	sprintf( score, "%d", def->getIntegerForKey( HIGH_SCORE ) );
+
+	std::string printString( "Highscore:   " );
+	printString += def->getStringForKey( NAME_SCORE );
+	printString += "-";
+	printString += score;
+
+	auto highScore = Label::create( printString , "fonts/Marker Felt.ttf", 30 );
+	highScore->setScaleX( ( visibleSize.width / highScore->getBoundingBox().size.width ) * 1/3 );
+	highScore->setScaleY( ( visibleSize.height / highScore->getBoundingBox().size.height ) * 1/8 );
+	highScore->setPosition( Vec2( origin.x + visibleSize.width / 2, origin.y + visibleSize.height - highScore->getBoundingBox().size.height / 2 ) );
+	_lostLayer->addChild( highScore );
+
+
+	//compare the scores
+	//if( stdReplacer::stoi(playerScore->getString() ) > def->getIntegerForKey( HIGH_SCORE ) )
+	if(true)
 	{
-		tempString += playerScore->getString();
-		def->setIntegerForKey(HIGH_SCORE, stdReplacer::stoi(playerScore->getString() ));
-		def->flush();
-	} else {
-		tempString += score;
+		//new highscore
+		_highscoreLayer = Layer::create();
+		_highscoreLayer->setName( "highscoreLayer" );
+
+		auto background = Sprite::create( "highscorebox.png" );
+		background->setScaleX( ( visibleSize.width / background->getBoundingBox().size.width ) * 1/2 );
+		background->setScaleY( ( visibleSize.height / background->getBoundingBox().size.height ) * 1/2 );
+		background->setPosition( Vec2( origin.x + visibleSize.width / 2, origin.y + visibleSize.height / 2 ) );
+
+		_highscoreLayer->addChild( background );
+
+		auto newScore = Label::create( "New Highscore!" , "fonts/Marker Felt.ttf", 30 );
+		newScore->setScaleX( ( visibleSize.width / newScore->getBoundingBox().size.width ) * 1/3 );
+		newScore->setScaleY( ( visibleSize.height / newScore->getBoundingBox().size.height ) * 1/8 );
+		newScore->setPosition( background->getPosition().x,
+			background->getPosition().y + background->getBoundingBox().size.height / 2 - newScore->getBoundingBox().size.height / 2 );
+
+		_highscoreLayer->addChild( newScore );
+
+		//edit highscore name box
+		nameField = ui::TextField::create( "ABC", "fonts/Marker Felt.ttf", 30 );
+		nameField->setScaleX( ( visibleSize.width / nameField->getBoundingBox().size.width ) * 1/6 );
+		nameField->setScaleY( ( visibleSize.height / nameField->getBoundingBox().size.height ) * 1/8 );
+		nameField->setName( "nameField" );
+		nameField->setPosition( Vec2( background->getPosition().x,
+			newScore->getPosition().y - newScore->getBoundingBox().size.height / 2 - nameField->getBoundingBox().size.height / 2 ) );
+		nameField->setMaxLength( 3 );
+		nameField->setTouchAreaEnabled( true );
+		nameField->setTouchEnabled( true );
+		nameField->setTouchSize( Size( 200, 200) );
+		nameField->addTouchEventListener([&](Ref* sender, ui::Widget::TouchEventType type){
+			if(nameField->getStringLength() == 0 )
+			{
+				nameField->setString( "ABC" );
+			}
+            def->setStringForKey( NAME_SCORE, nameField->getString() );
+
+		});
+
+		_highscoreLayer->addChild( nameField );
+
+		//adds done button
+		auto donebutton_item = ui::Button::create( "donebutton1.png", "donebutton2.png" );
+		donebutton_item->setScaleX( ( visibleSize.width / donebutton_item->getBoundingBox().size.width ) * 1/4 );
+		donebutton_item->setScaleY( ( visibleSize.height / donebutton_item->getBoundingBox().size.height ) * 1/8 );
+		donebutton_item->setPosition( Vec2( background->getPosition().x,
+			background->getPosition().y - background->getBoundingBox().size.height / 2 + donebutton_item->getBoundingBox().size.height / 2 + 10 )  );
+		donebutton_item->addTouchEventListener( CC_CALLBACK_1( GameLayer::doneButton, this ) );
+
+		_highscoreLayer->addChild( donebutton_item );
+
+		//cocos2d::Sprite* done_normal=Sprite::create( "donebutton1.png" );
+		//cocos2d::Sprite* done_pressed=Sprite::create( "donebutton2.png" );
+		//donebutton_item = MenuItemSprite::create( done_normal, done_pressed, done_normal, CC_CALLBACK_1( GameLayer::doneButton, this) );
+		//donebutton_item->setScaleX( ( visibleSize.width / donebutton_item->getContentSize().width ) * 3/8 );
+		//donebutton_item->setScaleY(  ( visibleSize.height / donebutton_item->getContentSize().height ) * 1/9 );
+		////donebutton_item->setAnchorPoint( Vec2( 0, 0 ) );
+		//donebutton_item->setPosition( background->getPosition().x,
+		//	background->getPosition().y - background->getContentSize().height / 2 + donebutton_item->getContentSize().height / 2  );
+
+		//************* Menu ******************
+		/*auto menu = Menu::create(donebutton_item, NULL);
+		menu->setPosition(origin);
+		menu->setName("menus");
+		_highscoreLayer->addChild( menu, 4 );*/
+
+		GameLayer::_gameScene->addChild( _highscoreLayer );
+
 	}
-
-	auto highScore = Label::create( tempString , "fonts/Marker Felt.ttf", 30 );
-	highScore->setPosition( Vec2( origin.x + visibleSize.width / 2, origin.y + visibleSize.height - highScore->getContentSize().height / 2 ) );
-	layer->addChild( highScore );
-
-	//GameLayer::_gameScene->unscheduleUpdate();
-	GameLayer::_gameScene->addChild( layer );
 }
 
 void GameLayer::initGame()
@@ -290,14 +350,18 @@ void GameLayer::initGame()
 
 	//draw the score
 	auto scoreText = Label::create( "Score:   ", "fonts/Marker Felt.ttf", 30);
-	scoreText->setPosition( Vec2( origin.x + scoreText->getContentSize().width / 2,
-		origin.y + visibleSize.height - scoreText->getContentSize().height / 2 ) );
+	//scoreText->setScaleX( ( visibleSize.width / scoreText->getBoundingBox().size.width ) * 1/3 );
+	//scoreText->setScaleY( ( visibleSize.height / scoreText->getBoundingBox().size.height ) * 1/8 );
+	scoreText->setPosition( Vec2( origin.x + scoreText->getBoundingBox().size.width / 2,
+		origin.y + visibleSize.height - scoreText->getBoundingBox().size.height / 2 ) );
 	scoreText->setName( "scoreText" );
 
 	_gameScene->addChild( scoreText );
 
 	auto scoreInt = Label::create( "000", "fonts/Marker Felt.ttf", 30);
-	scoreInt->setPosition( Vec2( scoreText->getPosition().x + scoreText->getContentSize().width / 2 + scoreInt->getContentSize().width / 2,
+	//scoreInt->setScaleX( ( visibleSize.width / scoreInt->getBoundingBox().size.width ) * 1/6 );
+	//scoreInt->setScaleY( ( visibleSize.height / scoreInt->getBoundingBox().size.height ) * 1/8 );
+	scoreInt->setPosition( Vec2( scoreText->getPosition().x + scoreText->getBoundingBox().size.width / 2 + scoreInt->getBoundingBox().size.width / 2,
 		scoreText->getPosition().y ) );
 	scoreInt->setName( "scoreInt" );
 
@@ -305,8 +369,10 @@ void GameLayer::initGame()
 	
 	//draw amount of arrows
 	auto nrArrows = Label::create("Arrows: 4 / 4", "fonts/Marker Felt.ttf", 30 );
-	nrArrows->setPosition( Vec2( origin.x + visibleSize.width - nrArrows->getContentSize().width / 2,
-		origin.y + visibleSize.height - nrArrows->getContentSize().height / 2 ) );
+	//nrArrows->setScaleX( ( visibleSize.width / nrArrows->getBoundingBox().size.width ) * 1/6 );
+	//nrArrows->setScaleY( ( visibleSize.height / nrArrows->getBoundingBox().size.height ) * 1/8 );
+	nrArrows->setPosition( Vec2( origin.x + visibleSize.width / 2 - nrArrows->getBoundingBox().size.width / 2,
+		origin.y + visibleSize.height - nrArrows->getBoundingBox().size.height / 2 ) );
 	nrArrows->setName( "nrArrows" );
 
 	_gameScene->addChild( nrArrows );
@@ -334,3 +400,25 @@ void GameLayer::backToMenu( cocos2d::Ref* pSender )
 	auto scene = MainMenu::createScene();
 	Director::getInstance()->pushScene( scene );
 }
+
+void GameLayer::doneButton(Ref* sender)
+{
+	GameLayer::_gameScene->removeChildByName( "highscoreLayer" );
+
+	//set the new highscore and name
+	Label* labelScore = (Label* )  _gameScene->getChildByName( "scoreInt" );
+	auto def = CCUserDefault::sharedUserDefault();
+
+	def->setIntegerForKey( HIGH_SCORE, stdReplacer::stoi( labelScore->getString() ) );
+
+	_lostLayer->getChildByName( "menu" )->setVisible( true );
+
+
+	/*if(GameLayer::nameField->getInsertText() == 0)
+	{
+		GameLayer::nameField->setString( "ABC" );
+	}
+	def->setStringForKey( NAME_SCORE, GameLayer::nameField->getString() );*/
+	//def->setStringForKey( NAME_SCORE, "Temporary" )
+}
+

@@ -33,6 +33,21 @@ bool MainMenu::init()
     auto origin = Director::getInstance()->getVisibleOrigin();
 	auto winSize = Director::getInstance()->getWinSize();
 
+	//particle test
+	auto m_emitter = CCParticleFire::createWithTotalParticles( 60 );
+	m_emitter->setPosition( origin.x + visibleSize.width  * 1/6,
+		origin.y + visibleSize.height * 5/8 );
+	m_emitter->setGravity( Vec2( 0, 90 ) );
+	
+	this->addChild( m_emitter, 10 );
+
+	auto m_emitter2 = CCParticleSmoke::createWithTotalParticles( 45 );
+	m_emitter2->setPosition( origin.x + visibleSize.width - (visibleSize.width * 1/6 ), 
+		origin.y + visibleSize.height * 5/8 );
+	m_emitter2->setGravity( Vec2( 0, 90 ) );
+	
+	this->addChild( m_emitter2, 10 );
+
 	//audio settings
 	auto audio = CocosDenshion::SimpleAudioEngine::getInstance();
 	if ( !audio->isBackgroundMusicPlaying() )
@@ -42,7 +57,7 @@ bool MainMenu::init()
 	}
 
 	//add background
-	cocos2d::Sprite* background = Sprite::create( "mainmenu.png" );
+	cocos2d::Sprite* background = Sprite::create( "mainmenu2.png" );
 	background->setScaleX((visibleSize.width / background->getContentSize().width));
 	background->setScaleY((winSize.height / background->getContentSize().height));
 	background->setAnchorPoint( Vec2( origin.x, origin.y ) );
