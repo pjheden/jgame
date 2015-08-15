@@ -69,7 +69,7 @@ public:
     Vector<T>()
     : _data()
     {
-        static_assert(std::is_convertible<T, Ref*>::value, "Invalid Type for cocos2d::Vector<T>!");
+         static_assert(std::is_convertible<T, Ref*>::value, "Invalid Type for cocos2d::Vector<T>!");
     }
     
     /** Constructor with a capacity */

@@ -6,9 +6,11 @@
 #include "EnemyCB.h"
 #include "SimpleAudioEngine.h"
 #include "ui/CocosGUI.h"
+#include "ryCast.h"
 
 USING_NS_CC;
 class Bullet;
+class ryCast;
 
 class GameLayer : public cocos2d::Layer {
 public:
@@ -44,6 +46,10 @@ public:
 
 	void checkHighscore();
 
+	void playerDead();
+
+	void spawnEnemies();
+
 	void retryGame( cocos2d::Ref* pSender );
 	void backToMenu( cocos2d::Ref* pSender );
 
@@ -55,6 +61,9 @@ private:
 	Layer* _lostLayer;
 	Layer* _highscoreLayer;
 	cocos2d::ui::TextField* nameField;
+
+	void removeCast ( DrawNode* node );
+	void rCast( Vec2 start, Vec2 end );
 };
 
 #endif // _GAMELAYER_HPP_

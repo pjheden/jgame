@@ -67,10 +67,49 @@ void GameLayer::update( float dt )
 	 //update arrow counter
 	 GameLayer::updateArrows();
 
-
 	//spawn enemies
+	 GameLayer::spawnEnemies();
+
+	//check raycasts
+	while( GameController::casts.size() > 0 )
+	{
+		ryCast* b = GameController::casts.at ( 0 );
+		Vec2 start = b->getStart();
+		Vec2 end = b->getEnd();
+		auto node = DrawNode::create();
+		node->drawSegment( start, end, 1, cocos2d::Color4F::RED );
+		GameLayer::_gameScene->addChild( node );
+		auto time = DelayTime::create( 3.0f );
+		auto ray = CallFunc::create( [this, start, end]() { this->rCast( start, end ); } );
+		auto callback = CallFunc::create( [this, node]() { this->removeCast( node ); } );
+		auto action = Sequence::create( time, callback, ray, nullptr );
+		node->runAction( action );
+		GameController::casts.erase( GameController::casts.begin() );
+	}
+
+	/*for(int i = GameController::casts.size() - 1; i >= 0; i-- )
+	{
+		ryCast* b = GameController::casts.at ( i );
+		auto parent = b->getNode()->getParent();
+		if(!parent)
+		{
+			_gameScene->addChild( b->getNode() );
+			auto time = DelayTime::create( 3.0f );
+			auto ray = CallFunc::create( [this, b]() { this->rCast( b ); } );
+			auto callback = CallFunc::create( [this, b]() { this->removeCast( b ); } );
+			auto action = Sequence::createWithTwoActions( time, callback );
+
+			b->getNode()->runAction( action );
+		}
+	}*/
+	
+
+}
+
+void GameLayer::spawnEnemies()
+{
 	 EnemyCB* cb;
-	 //EnemyCB* worker;
+	 EnemyCB* sniper;
 	 if(GameController::enemies.size() < 5)
 	 {
 		cb = GameController::spawnEnemy( 2 ); //int 2=cowboy, 3=worker
@@ -79,13 +118,19 @@ void GameLayer::update( float dt )
 			addChild( cb );
 		}
 
-		//worker = GameController::spawnEnemy( 3 ); //int 2=cowboy, 3=worker
-		//if( worker )
-		//{
-		//	addChild( worker );
-		//}
+		sniper = GameController::spawnEnemy( 4 ); //int 2=cowboy, 3=worker, 4 = sniper
+		if( sniper )
+		{
+			addChild( sniper );
+		}
 	 }
+}
 
+void GameLayer::removeCast( DrawNode* node )
+{
+	_gameScene->removeChild( node );
+	//GameController::casts.erase( GameController::casts.begin() );
+	//n->getNode()->removeFromParentAndCleanup( true );
 }
 
 void GameLayer::bulletControl()
@@ -162,12 +207,17 @@ bool GameLayer::onContactBegin ( cocos2d::PhysicsContact &contact )
 	else if( ( 1 == a->getCollisionBitmask() && 4 == b->getCollisionBitmask() ) 
 		|| ( 4 == a->getCollisionBitmask() && 1 == b->getCollisionBitmask() ) )
 	{
-		GameLayer::_dead = true;
-		GameController::eraseAll();
-		GameLayer::lostLayer();
+		GameLayer::playerDead();
 	}
 
     return true;
+}
+
+void GameLayer::playerDead()
+{
+	GameLayer::_dead = true;
+	GameController::eraseAll();
+	GameLayer::lostLayer();
 }
 
 void GameLayer::updateScore( int nr )
@@ -234,7 +284,6 @@ void GameLayer::checkHighscore()
 {
 	Size visibleSize = Director::getInstance()->getVisibleSize();
 	Vec2 origin = Director::getInstance()->getVisibleOrigin();
-	_lostLayer->getChildByName( "menu" )->setVisible( false );
 	auto def = CCUserDefault::sharedUserDefault();
 	auto playerScore = (Label* )  _gameScene->getChildByName( "scoreInt" ); //get the actual score
 
@@ -255,9 +304,10 @@ void GameLayer::checkHighscore()
 
 
 	//compare the scores
-	//if( stdReplacer::stoi(playerScore->getString() ) > def->getIntegerForKey( HIGH_SCORE ) )
-	if(true)
+	if( stdReplacer::stoi(playerScore->getString() ) > def->getIntegerForKey( HIGH_SCORE ) )
+	//if(true)
 	{
+		_lostLayer->getChildByName( "menu" )->setVisible( false );
 		//new highscore
 		_highscoreLayer = Layer::create();
 		_highscoreLayer->setName( "highscoreLayer" );
@@ -371,7 +421,7 @@ void GameLayer::initGame()
 	auto nrArrows = Label::create("Arrows: 4 / 4", "fonts/Marker Felt.ttf", 30 );
 	//nrArrows->setScaleX( ( visibleSize.width / nrArrows->getBoundingBox().size.width ) * 1/6 );
 	//nrArrows->setScaleY( ( visibleSize.height / nrArrows->getBoundingBox().size.height ) * 1/8 );
-	nrArrows->setPosition( Vec2( origin.x + visibleSize.width / 2 - nrArrows->getBoundingBox().size.width / 2,
+	nrArrows->setPosition( Vec2( scoreInt->getPosition().x + scoreInt->getBoundingBox().size.width / 2 + nrArrows->getBoundingBox().size.width / 2,
 		origin.y + visibleSize.height - nrArrows->getBoundingBox().size.height / 2 ) );
 	nrArrows->setName( "nrArrows" );
 
@@ -422,3 +472,28 @@ void GameLayer::doneButton(Ref* sender)
 	//def->setStringForKey( NAME_SCORE, "Temporary" )
 }
 
+void GameLayer::rCast( Vec2 start, Vec2 end )
+{
+	Vec2 points[5];
+    int num = 0;
+    auto func = [&points, &num](PhysicsWorld& world,
+        const PhysicsRayCastInfo& info, void* data)->bool
+    {
+        if (num < 5)
+        {
+            points[num++] = info.contact;
+        }
+        return true;
+    };
+
+	GameLayer::_gameScene->getPhysicsWorld()->rayCast( func, start, end, nullptr );
+
+	for (int i = 0; i < num; ++i)
+    {
+		if( abs( GameController::_player->getPosition().x - points[i].x ) < GameController::_player->getBoundingBox().size.width )
+		{
+			GameLayer::playerDead();
+		}
+    }
+
+}

@@ -45,7 +45,7 @@ void EnemyCB::initAnimations()
 	// load all the animation frames into an array
 	const int kNumberOfFrames = 4;
 	Vector<SpriteFrame*> frames;
-	for (int i = 1; i < kNumberOfFrames; i++)
+	for (int i = 1; i <= kNumberOfFrames; i++)
 	{
 		std::string s = stdReplacer::to_string( i );
 
@@ -66,7 +66,7 @@ void EnemyCB::initAnimations()
 	cacher->addSpriteFramesWithFile( "cowboy_idle.plist" );
 	const int kNumberOfFrames2 = 2;
 	Vector<SpriteFrame*> frames2;
-	for (int i = 1; i < kNumberOfFrames2; i++)
+	for (int i = 1; i <= kNumberOfFrames2; i++)
 	{
 		std::string s = stdReplacer::to_string( i );
 
@@ -233,4 +233,187 @@ PhysicsBody* Worker::getBody()
 	physicsBody->setRotationEnable( false );
 
 	return physicsBody;
+}
+
+
+//------------------------------Sniper ------------------
+
+Sniper::Sniper(){}
+
+
+Sniper::~Sniper()
+{
+	CC_SAFE_RELEASE( moveAnimate );
+	CC_SAFE_RELEASE( idleAnimate );
+}
+
+Sniper* Sniper::create()
+{
+	Sniper* eSprite = new Sniper();
+	eSprite->idle = false;
+	eSprite->setName( "Sniper" );
+
+	auto cacher = SpriteFrameCache::getInstance();
+	cacher->addSpriteFramesWithFile( "sniper_walk.plist" );
+
+	eSprite->setScaleX( -1 );
+
+	if (eSprite && eSprite->initWithSpriteFrame( cacher->getSpriteFrameByName( "sniper_walk1.png" ) )  )
+    {
+		eSprite->initAnimations();
+		eSprite->move();
+
+        return eSprite;
+    }
+
+    CC_SAFE_DELETE(eSprite);
+    return NULL;
+}
+
+void Sniper::initAnimations()
+{
+	auto cacher = SpriteFrameCache::getInstance();
+	cacher->addSpriteFramesWithFile( "sniper_walk.plist");
+
+	//------------------move animation -------------------
+	#include <sstream>
+	// load all the animation frames into an array
+	const int kNumberOfFrames = 3;
+	Vector<SpriteFrame*> frames;
+	for (int i = 1; i <= kNumberOfFrames; i++)
+	{
+		std::string s = stdReplacer::to_string( i );
+
+		SpriteFrame* aFrame =
+		cacher->getSpriteFrameByName( "sniper_walk" + s + ".png" );
+		frames.pushBack(aFrame);
+	}
+
+	// play the animation
+	auto animation = Animation::createWithSpriteFrames(frames, 0.25f);
+	animation->setRestoreOriginalFrame(true);
+	moveAnimate = Animate::create(animation);
+	moveAnimate->retain();
+
+
+	//-------------------------idle animation---------------------
+	// load all the animation frames into an array
+	cacher->addSpriteFramesWithFile( "sniper_idle.plist" );
+	const int kNumberOfFrames2 = 2;
+	Vector<SpriteFrame*> frames2;
+	for (int i = 1; i <= kNumberOfFrames2; i++)
+	{
+		std::string s = stdReplacer::to_string( i );
+
+		SpriteFrame* aFrame2 =
+		cacher->getSpriteFrameByName( "sniper_idle" + s + ".png" );
+		frames2.pushBack(aFrame2);
+	}
+
+	// play the animation
+	auto animation2 = Animation::createWithSpriteFrames(frames2, 0.40f);
+	animation2->setRestoreOriginalFrame(true);
+	idleAnimate = Animate::create(animation2);
+	idleAnimate->retain();
+
+	this->runAction( RepeatForever::create( moveAnimate ) );
+}
+
+PhysicsBody* Sniper::getBody()
+{
+	auto physicsBody = PhysicsBody::createBox( this->getBoundingBox().size, PHYSICSBODY_MATERIAL_DEFAULT );
+
+	//physicsBody->setCategoryBitmask( 2 );
+	physicsBody->setCollisionBitmask( 2 );
+	physicsBody->setContactTestBitmask( true );
+
+	physicsBody->setRotationEnable ( false );
+
+	return physicsBody;
+}
+
+
+void Sniper::move()
+{
+	// 1
+	auto monsterContentSize = this->getContentSize();
+	auto selfContentSize = Director::getInstance()->getWinSize();
+	int minY = monsterContentSize.height/2;
+	int maxY = selfContentSize.height - monsterContentSize.height;
+	int rangeY = maxY - minY;
+	int randomY = ( rand() % rangeY ) + minY;
+
+	this->setPosition( Vec2( selfContentSize.width + monsterContentSize.width/2, randomY ) );
+
+	// 2
+	int minDuration = 6.0;
+	int maxDuration = 14.0;
+	int rangeDuration = maxDuration - minDuration;
+	int randomDuration = ( rand() % rangeDuration ) + minDuration;
+ 
+	// 3
+	auto actionMove = MoveTo::create( randomDuration, Vec2( selfContentSize.width - selfContentSize.width / 4, randomY ) );
+	this->runAction( actionMove );
+
+	auto callback = CallFunc::create( [this]() { this->startIdleAnimation(); } );
+	auto seq = Sequence::create( actionMove, callback , NULL);
+	this->runAction( seq );
+}
+
+
+void Sniper::shoot( float dt )
+{
+	if( this->idle )
+	{
+		Vec2 origin = Director::getInstance()->getVisibleOrigin();
+
+		Vec2 start = this->getPosition();
+		Vec2 end = Vec2 ( origin.x, this->getPosition().y );
+
+		GameController::drawCast( start, end );
+	}
+}
+
+DrawNode* Sniper::drawCast( Vec2 start, Vec2 end )
+{
+	auto drawNode = DrawNode::create();
+	drawNode->drawSegment( start, end, 1, cocos2d::Color4F::RED );
+	return drawNode;
+}
+
+bool Sniper::rayCast( Vec2 start, Vec2 end )
+{
+	/*bool playerHit = false;
+	Vec2 points[5];
+    int num = 0;
+    auto func = [&points, &num](PhysicsWorld& world,
+        const PhysicsRayCastInfo& info, void* data)->bool
+    {
+        if (num < 5)
+        {
+            points[num++] = info.contact;
+        }
+        return true;
+    };
+
+	GameLayer::_gameScene->getPhysicsWorld()->rayCast( func, start, end, nullptr );
+
+	for (int i = 0; i < num; ++i)
+    {
+		if( abs( _player->getPosition().x - points[i].x ) < _player->getBoundingBox().size.width )
+		{
+			playerHit = true;
+		}
+    }
+
+	return playerHit;*/
+	return true; //temporary
+}
+
+
+void Sniper::startIdleAnimation()
+{
+	this->idle =  true;
+	this->stopAllActions();
+	this->runAction(RepeatForever::create( idleAnimate ) );
 }

@@ -32,7 +32,7 @@ bool AppDelegate::applicationDidFinishLaunching() {
     if(!glview) {
         glview = GLViewImpl::create("My Game");
 		#if CC_TARGET_PLATFORM == CC_PLATFORM_WIN32 || CC_TARGET_PLATFORM == CC_PLATFORM_LINUX || CC_TARGET_PLATFORM == CC_PLATFORM_MAC	
-			glview->setFrameSize( 1136, 640 ); //for scaling test purposes
+			glview->setFrameSize( 480, 320 ); //for scaling test purpose
 		#endif
         director->setOpenGLView(glview);
     }

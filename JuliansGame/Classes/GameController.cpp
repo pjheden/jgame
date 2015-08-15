@@ -6,6 +6,7 @@ USING_NS_CC;
 
 Vector<Bullet*> GameController::bullets;
 Vector<EnemyCB*> GameController::enemies;
+std::vector<ryCast*> GameController::casts;
 Player* GameController::_player;
 
 GameController::GameController(void)
@@ -66,16 +67,20 @@ EnemyCB* GameController::spawnEnemy( int type )
 	EnemyCB* cbSprite = nullptr;
 	switch( type )
 	{
+	case 2:
+		cbSprite= EnemyCB::create();
+		cbSprite->setPhysicsBody( cbSprite->getBody() );
+		cbSprite->schedule(schedule_selector( EnemyCB::shoot ), RandomHelper::random_int( 4.0f, 6.0f ) );
+		break;
 	case 3:
 		cbSprite= Worker::create();
 		cbSprite->setPhysicsBody( cbSprite->getBody() );
 		break;
-	case 2:
-		cbSprite= EnemyCB::create();
+
+	case 4:
+		cbSprite = Sniper::create();
 		cbSprite->setPhysicsBody( cbSprite->getBody() );
-
-		cbSprite->schedule(schedule_selector( EnemyCB::shoot ), RandomHelper::random_int( 4.0f, 6.0f ) );
-
+		cbSprite->schedule(schedule_selector( Sniper::shoot ), RandomHelper::random_int( 8.0f, 10.0f ) );
 		break;
 
 		
@@ -94,6 +99,20 @@ Player* GameController::spawnPlayer()
 	GameController::_player->setPhysicsBody ( GameController::_player->getBody() );
 
 	return _player;
+}
+
+void GameController::drawCast( Vec2 start, Vec2 end ) //remove end if it works, also from enemyCB
+{
+	auto drawNode = DrawNode::create();
+	//drawNode->drawSegment( start, _player->getPosition(), 1, cocos2d::Color4F::RED );
+	
+	auto rc = ryCast::create();
+	rc->setStart( start );
+	rc->setEnd( _player->getPosition() );
+	rc->setNode( drawNode );
+	//GameLayer::_gameScene->addChild( drawNode );
+	casts.push_back( rc );
+	//hur ska man ta bor den sen, 1. en timer som tar bort den. 2. lägga dom i en lista
 }
 
 void GameController::erase( Node* node )

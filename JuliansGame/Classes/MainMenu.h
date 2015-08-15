@@ -18,11 +18,13 @@ public:
 	void settings(Ref* sender);
 	void back(Ref* sender);
 	void settingsSliderCallFunc(Ref* pSender, ui::Slider::EventType type);
+	void testing(Ref* sender);
 	
 private:
 	MenuItemSprite* startgame_item;
 	MenuItemSprite* settings_item;
 	MenuItemSprite* back_item;
+	MenuItemSprite* test_item;
 	void setPhyschisWorld( cocos2d::PhysicsWorld *world ) { sceneWorld = world; }
 };
 

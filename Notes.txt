@@ -1,6 +1,8 @@
 To do:
 
-1. fix the changes or nrOfArrows
+0. programmet crashar med min egen datatyp. fråga edvard om hr man gör data typer
+
+1. fix the changes of nrOfArrows
 	-Idéa: Make an invisible wall that the arrows hit but the cowboys can walk through,
 		remove arrows on collision instead of callback after MoveTo. Make Cowboy bullets
 		also go through cowboys. Same wall on the leftside for the cowboys bullets
@@ -8,14 +10,11 @@ To do:
 	
 -	-3idea best idea: make a wall behind player and a wall behind where cowboys spawn that catch and deletes arrows/bullets, molto bene.
 
-
-
+4. fix main menu settings picture
+5. minimize particle size for the smoke and fire at main screen
 6. make settings button in gameLayer (ingame settings )
 7. make all picture resources in plist files to save memory
-8. HighScore -add name to the score
-9. Improve cowboy_idle animation in plisk
-10. Small animation at main menu, arrow that fly across the screen and is burning using cocos2d-x particle
-11. add tumbleweed rolling across the screen at random times
+8. HighScore -add name to the score, done?
 
 Remember:
 HellWorldScene is unused for now, delete when you feel comfterable

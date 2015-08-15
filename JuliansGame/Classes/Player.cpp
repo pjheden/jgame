@@ -136,7 +136,7 @@ void Player::initAnimations()
 	// load all the animation frames into an array
 	const int kNumberOfFrames = 4;
 	Vector<SpriteFrame*> frames;
-	for (int i = 1; i < kNumberOfFrames; i++)
+	for (int i = 1; i <= kNumberOfFrames; i++)
 	{
 		std::string s = stdReplacer::to_string( i );
 
@@ -155,7 +155,7 @@ void Player::initAnimations()
 	// load all the animation frames into an array
 	const int kNumberOfFrames2 = 4;
 	Vector<SpriteFrame*> frames2;
-	for (int i = 1; i < kNumberOfFrames2; i++)
+	for (int i = 1; i <= kNumberOfFrames2; i++)
 	{
 		std::string s = stdReplacer::to_string( i );
 

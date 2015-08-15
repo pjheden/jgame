@@ -7,7 +7,8 @@
 Scene* MainMenu::createScene()
 {
 	// 'scene' is an autorelease object
-    auto scene = Scene::create();
+    //auto scene = Scene::create();
+	auto scene = Scene::createWithPhysics();
 	//disable for release:
     //scene -> getPhysicsWorld() -> setDebugDrawMask( PhysicsWorld::DEBUGDRAW_ALL ); 
     // 'layer' is an autorelease object
@@ -69,16 +70,30 @@ bool MainMenu::init()
 	cocos2d::Sprite* start_normal=Sprite::create( "startgame1.png" );
     cocos2d::Sprite* start_pressed=Sprite::create( "startgame2.png" );
     startgame_item = MenuItemSprite::create(start_normal, start_pressed, CC_CALLBACK_1(MainMenu::startgame, this));
-    startgame_item->setPosition( visibleSize.width/2 ,200 );
+	startgame_item->setScaleX( (visibleSize.width / startgame_item->getBoundingBox().size.width) * 1/2 );
+	startgame_item->setScaleY( (visibleSize.height / startgame_item->getBoundingBox().size.height) * 1/8 );
+    startgame_item->setPosition( visibleSize.width/2 , visibleSize.height / 2 );
 	
 	//adds settings
 	cocos2d::Sprite* settings_normal=Sprite::create( "settings1.png" );
     cocos2d::Sprite* settings_pressed=Sprite::create( "settings2.png" );
     settings_item = MenuItemSprite::create(settings_normal, settings_pressed, CC_CALLBACK_1(MainMenu::settings, this));
-    settings_item->setPosition( visibleSize.width/2 , 100 );
+	settings_item->setScaleX( (visibleSize.width / settings_item->getBoundingBox().size.width) * 1/2 );
+	settings_item->setScaleY( (visibleSize.height / settings_item->getBoundingBox().size.height) * 1/8 );
+    settings_item->setPosition( visibleSize.width/2 ,
+		startgame_item->getPosition().y - startgame_item->getBoundingBox().size.height / 2 - settings_item->getBoundingBox().size.height / 2 );
+
+	//adds testing
+	cocos2d::Sprite* testing_normal=Sprite::create( "testing1.png" );
+	cocos2d::Sprite* testing_pressed=Sprite::create( "testing1.png" );
+    test_item = MenuItemSprite::create(testing_normal, testing_pressed, CC_CALLBACK_1(MainMenu::testing, this));
+	test_item->setScaleX( (visibleSize.width / test_item->getBoundingBox().size.width) * 1/2 );
+	test_item->setScaleY( (visibleSize.height / test_item->getBoundingBox().size.height) * 1/8 );
+    test_item->setPosition( visibleSize.width/2 ,
+		settings_item->getPosition().y - settings_item->getBoundingBox().size.height / 2 - test_item->getBoundingBox().size.height / 2 );
 
 	//************* Menu ******************
-    auto menu = Menu::create(startgame_item, settings_item, NULL);
+    auto menu = Menu::create(startgame_item, settings_item, test_item, NULL);
     menu->setPosition(origin);
 	menu->setName("menu");
     this->addChild(menu,3);
@@ -134,7 +149,6 @@ void MainMenu::back(Ref* sender)
 	MainMenu::init();
 }
 
-
 void MainMenu::settingsSliderCallFunc(Ref* pSender, ui::Slider::EventType type)
 {
 	if (type == ui::Slider::EventType::ON_PERCENTAGE_CHANGED)
@@ -147,4 +161,34 @@ void MainMenu::settingsSliderCallFunc(Ref* pSender, ui::Slider::EventType type)
 		audio->setEffectsVolume( (float) percent / 100 );
 	}
 
+}
+
+void MainMenu::testing(Ref* sender)
+{
+	Size visibleSize = Director::getInstance()->getVisibleSize();
+    auto origin = Director::getInstance()->getVisibleOrigin();
+
+	//PhysicsQueryRectCallbackFunc func = [](PhysicsWorld& world, PhysicsShape& shape,
+	//void* userData)->bool
+	//{
+	//	//Return true from the callback to continue rect queries
+	//	return true;
+	//};
+
+	//sceneWorld->queryRect(func, Rect(0, 0, 200, 200), nullptr );
+
+	auto drawNode = DrawNode::create();
+	drawNode->drawSegment( Vec2( origin.x, origin.y),
+		Vec2( origin.x + visibleSize.width / 2, origin.y + visibleSize.height / 2), 1, cocos2d::Color4F::RED );
+	addChild( drawNode );
+	
+	PhysicsRayCastCallbackFunc func = [](PhysicsWorld& world,
+        const PhysicsRayCastInfo& info, void* data)->bool
+    {
+       
+        return true;
+    };
+
+	sceneWorld->rayCast( func, Vec2( origin.x, origin.y),
+		Vec2( origin.x + visibleSize.width / 2, origin.y + visibleSize.height / 2), nullptr );
 }
