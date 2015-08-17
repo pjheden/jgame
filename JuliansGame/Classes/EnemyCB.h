@@ -62,8 +62,6 @@ public:
 
 	void move();
 	void shoot(float dt);
-	DrawNode* drawCast( Vec2 start, Vec2 end );
-	bool rayCast( Vec2 start, Vec2 end );
 	void startIdleAnimation();
 
 	PhysicsBody* getBody();

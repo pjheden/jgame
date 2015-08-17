@@ -71,11 +71,10 @@ void GameLayer::update( float dt )
 	 GameLayer::spawnEnemies();
 
 	//check raycasts
-	while( GameController::casts.size() > 0 )
+	while( GameController::rayStart.size() > 0 )
 	{
-		ryCast* b = GameController::casts.at ( 0 );
-		Vec2 start = b->getStart();
-		Vec2 end = b->getEnd();
+		Vec2 start = GameController::rayStart.at( 0 );
+		Vec2 end = GameController::rayEnd.at( 0 );
 		auto node = DrawNode::create();
 		node->drawSegment( start, end, 1, cocos2d::Color4F::RED );
 		GameLayer::_gameScene->addChild( node );
@@ -84,25 +83,10 @@ void GameLayer::update( float dt )
 		auto callback = CallFunc::create( [this, node]() { this->removeCast( node ); } );
 		auto action = Sequence::create( time, callback, ray, nullptr );
 		node->runAction( action );
-		GameController::casts.erase( GameController::casts.begin() );
+		GameController::rayStart.erase( GameController::rayStart.begin() );
+		GameController::rayEnd.erase( GameController::rayEnd.begin() );
+
 	}
-
-	/*for(int i = GameController::casts.size() - 1; i >= 0; i-- )
-	{
-		ryCast* b = GameController::casts.at ( i );
-		auto parent = b->getNode()->getParent();
-		if(!parent)
-		{
-			_gameScene->addChild( b->getNode() );
-			auto time = DelayTime::create( 3.0f );
-			auto ray = CallFunc::create( [this, b]() { this->rCast( b ); } );
-			auto callback = CallFunc::create( [this, b]() { this->removeCast( b ); } );
-			auto action = Sequence::createWithTwoActions( time, callback );
-
-			b->getNode()->runAction( action );
-		}
-	}*/
-	
 
 }
 

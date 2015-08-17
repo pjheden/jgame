@@ -5,7 +5,6 @@
 #include "Bullet.h"
 #include "EnemyCB.h"
 #include "Player.h"
-#include "ryCast.h"
 
 USING_NS_CC;
 
@@ -18,7 +17,8 @@ public:
 
 	static Vector<Bullet*> bullets;
 	static Vector<EnemyCB*> enemies;
-	static std::vector<ryCast*> GameController::casts;
+	static std::vector<Vec2> rayStart;
+	static std::vector<Vec2> rayEnd;
 	static Player* _player;
 
 
@@ -30,7 +30,7 @@ public:
 
 	static Player* spawnPlayer();
 	
-	static void drawCast( Vec2 start, Vec2 end );
+	static void drawCast( Vec2 start );
 
 	static void erase( Node* node );
 

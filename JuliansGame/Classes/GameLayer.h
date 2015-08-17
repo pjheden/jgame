@@ -6,7 +6,6 @@
 #include "EnemyCB.h"
 #include "SimpleAudioEngine.h"
 #include "ui/CocosGUI.h"
-#include "ryCast.h"
 
 USING_NS_CC;
 class Bullet;

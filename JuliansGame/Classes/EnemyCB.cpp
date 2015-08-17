@@ -370,46 +370,9 @@ void Sniper::shoot( float dt )
 		Vec2 start = this->getPosition();
 		Vec2 end = Vec2 ( origin.x, this->getPosition().y );
 
-		GameController::drawCast( start, end );
+		GameController::drawCast( start );
 	}
 }
-
-DrawNode* Sniper::drawCast( Vec2 start, Vec2 end )
-{
-	auto drawNode = DrawNode::create();
-	drawNode->drawSegment( start, end, 1, cocos2d::Color4F::RED );
-	return drawNode;
-}
-
-bool Sniper::rayCast( Vec2 start, Vec2 end )
-{
-	/*bool playerHit = false;
-	Vec2 points[5];
-    int num = 0;
-    auto func = [&points, &num](PhysicsWorld& world,
-        const PhysicsRayCastInfo& info, void* data)->bool
-    {
-        if (num < 5)
-        {
-            points[num++] = info.contact;
-        }
-        return true;
-    };
-
-	GameLayer::_gameScene->getPhysicsWorld()->rayCast( func, start, end, nullptr );
-
-	for (int i = 0; i < num; ++i)
-    {
-		if( abs( _player->getPosition().x - points[i].x ) < _player->getBoundingBox().size.width )
-		{
-			playerHit = true;
-		}
-    }
-
-	return playerHit;*/
-	return true; //temporary
-}
-
 
 void Sniper::startIdleAnimation()
 {

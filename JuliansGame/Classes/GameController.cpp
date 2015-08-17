@@ -6,7 +6,8 @@ USING_NS_CC;
 
 Vector<Bullet*> GameController::bullets;
 Vector<EnemyCB*> GameController::enemies;
-std::vector<ryCast*> GameController::casts;
+std::vector<Vec2> GameController::rayStart;
+std::vector<Vec2> GameController::rayEnd;
 Player* GameController::_player;
 
 GameController::GameController(void)
@@ -101,18 +102,10 @@ Player* GameController::spawnPlayer()
 	return _player;
 }
 
-void GameController::drawCast( Vec2 start, Vec2 end ) //remove end if it works, also from enemyCB
+void GameController::drawCast( Vec2 start )
 {
-	auto drawNode = DrawNode::create();
-	//drawNode->drawSegment( start, _player->getPosition(), 1, cocos2d::Color4F::RED );
-	
-	auto rc = ryCast::create();
-	rc->setStart( start );
-	rc->setEnd( _player->getPosition() );
-	rc->setNode( drawNode );
-	//GameLayer::_gameScene->addChild( drawNode );
-	casts.push_back( rc );
-	//hur ska man ta bor den sen, 1. en timer som tar bort den. 2. lägga dom i en lista
+	rayStart.push_back(  start );
+	rayEnd.push_back( _player->getPosition() );
 }
 
 void GameController::erase( Node* node )
