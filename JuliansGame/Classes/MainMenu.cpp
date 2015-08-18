@@ -84,16 +84,16 @@ bool MainMenu::init()
 		startgame_item->getPosition().y - startgame_item->getBoundingBox().size.height / 2 - settings_item->getBoundingBox().size.height / 2 );
 
 	//adds testing
-	cocos2d::Sprite* testing_normal=Sprite::create( "testing1.png" );
+	/*cocos2d::Sprite* testing_normal=Sprite::create( "testing1.png" );
 	cocos2d::Sprite* testing_pressed=Sprite::create( "testing1.png" );
     test_item = MenuItemSprite::create(testing_normal, testing_pressed, CC_CALLBACK_1(MainMenu::testing, this));
 	test_item->setScaleX( (visibleSize.width / test_item->getBoundingBox().size.width) * 1/2 );
 	test_item->setScaleY( (visibleSize.height / test_item->getBoundingBox().size.height) * 1/8 );
     test_item->setPosition( visibleSize.width/2 ,
-		settings_item->getPosition().y - settings_item->getBoundingBox().size.height / 2 - test_item->getBoundingBox().size.height / 2 );
+		settings_item->getPosition().y - settings_item->getBoundingBox().size.height / 2 - test_item->getBoundingBox().size.height / 2 );*/
 
 	//************* Menu ******************
-    auto menu = Menu::create(startgame_item, settings_item, test_item, NULL);
+    auto menu = Menu::create(startgame_item, settings_item, NULL);
     menu->setPosition(origin);
 	menu->setName("menu");
     this->addChild(menu,3);
@@ -133,7 +133,8 @@ void MainMenu::settings(Ref* sender)
 	cocos2d::Sprite* back_normal=Sprite::create( "back1.png" );
     cocos2d::Sprite* back_pressed=Sprite::create( "back2.png" );
     back_item = MenuItemSprite::create(back_normal, back_pressed, CC_CALLBACK_1(MainMenu::back, this));
-    back_item->setPosition( visibleSize.width/2 ,200 );
+    back_item->setPosition( visibleSize.width/2 ,
+		slider->getPosition().y - slider->getBoundingBox().size.height / 2 - back_item->getBoundingBox().size.height / 2);
 
 	auto menu = Menu::create(back_item, NULL);
     menu->setPosition(origin);

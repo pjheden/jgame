@@ -42,7 +42,7 @@ Bullet* GameController::spawnBullet( int type, Vec2 pos, Vec2 tar)
 		} 
 	case 2 : //cowboy
 		{
-		audio->playEffect( "gunshot.wav", false, 1.0f, 1.0f, 1.0f );
+		audio->playEffect( "gun.mp3", false, 1.0f, 1.0f, 1.0f );
 		bullet = Bullet::create();
 		bullet->setPosition( pos );
 		bullet->setTarget( tar );
@@ -65,11 +65,15 @@ Bullet* GameController::spawnBullet( int type, Vec2 pos, Vec2 tar)
 
 EnemyCB* GameController::spawnEnemy( int type )
 {
+	Size visibleSize = Director::getInstance()->getVisibleSize();
+
 	EnemyCB* cbSprite = nullptr;
 	switch( type )
 	{
 	case 2:
 		cbSprite= EnemyCB::create();
+		cbSprite->setScaleX( ( visibleSize.width / cbSprite->getBoundingBox().size.width) * -1/12 );
+		cbSprite->setScaleY( ( visibleSize.height / cbSprite->getBoundingBox().size.height ) * 1/11 );
 		cbSprite->setPhysicsBody( cbSprite->getBody() );
 		cbSprite->schedule(schedule_selector( EnemyCB::shoot ), RandomHelper::random_int( 4.0f, 6.0f ) );
 		break;
@@ -80,6 +84,8 @@ EnemyCB* GameController::spawnEnemy( int type )
 
 	case 4:
 		cbSprite = Sniper::create();
+		cbSprite->setScaleX( ( visibleSize.width / cbSprite->getBoundingBox().size.width) * -1/12 );
+		cbSprite->setScaleY( ( visibleSize.height / cbSprite->getBoundingBox().size.height ) * 1/11 );
 		cbSprite->setPhysicsBody( cbSprite->getBody() );
 		cbSprite->schedule(schedule_selector( Sniper::shoot ), RandomHelper::random_int( 8.0f, 10.0f ) );
 		break;
@@ -96,9 +102,11 @@ EnemyCB* GameController::spawnEnemy( int type )
 
 Player* GameController::spawnPlayer()
 {
+	Size visibleSize = Director::getInstance()->getVisibleSize();
+
 	GameController::_player = Player::create();
 	GameController::_player->setPhysicsBody ( GameController::_player->getBody() );
-
+	
 	return _player;
 }
 

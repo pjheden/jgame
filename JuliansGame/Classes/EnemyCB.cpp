@@ -86,7 +86,7 @@ void EnemyCB::initAnimations()
 
 PhysicsBody* EnemyCB::getBody()
 {
-	auto physicsBody = PhysicsBody::createBox( this->getContentSize(), PHYSICSBODY_MATERIAL_DEFAULT );
+	auto physicsBody = PhysicsBody::createBox( this->getBoundingBox().size, PHYSICSBODY_MATERIAL_DEFAULT );
 
 	//physicsBody->setCategoryBitmask( 2 );
 	physicsBody->setCollisionBitmask( 2 );
@@ -365,11 +365,7 @@ void Sniper::shoot( float dt )
 {
 	if( this->idle )
 	{
-		Vec2 origin = Director::getInstance()->getVisibleOrigin();
-
-		Vec2 start = this->getPosition();
-		Vec2 end = Vec2 ( origin.x, this->getPosition().y );
-
+		Vec2 start = Vec2( this->getPosition().x - this->getBoundingBox().size.width / 2, this->getPosition().y );
 		GameController::drawCast( start );
 	}
 }

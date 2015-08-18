@@ -1,20 +1,15 @@
 To do:
 
-0. programmet crashar med min egen datatyp. fråga edvard om hr man gör data typer
+6. scaling för texten i starten och gubbarna
+10. remove sniper laser if they are killed
 
-1. fix the changes of nrOfArrows
-	-Idéa: Make an invisible wall that the arrows hit but the cowboys can walk through,
-		remove arrows on collision instead of callback after MoveTo. Make Cowboy bullets
-		also go through cowboys. Same wall on the leftside for the cowboys bullets
-	-2idea: can you cancel the callback?
-	
--	-3idea best idea: make a wall behind player and a wall behind where cowboys spawn that catch and deletes arrows/bullets, molto bene.
-
-4. fix main menu settings picture
-5. minimize particle size for the smoke and fire at main screen
+4. change the movement to walk where you are pushing instead of up or down
+5. make nicer menu buttons
 6. make settings button in gameLayer (ingame settings )
 7. make all picture resources in plist files to save memory
-8. HighScore -add name to the score, done?
+9. change the way resupplying of arrows work
+10. mer passande musik
+11. slider for effects seperately
 
 Remember:
 HellWorldScene is unused for now, delete when you feel comfterable
@@ -46,8 +41,6 @@ std::string s2 = std::to_string( distance );
 char const *pchar2 = s2.c_str();
 
 
-
-
 Project in android:
 1. cd projectfolder
 2. cocos compile -p android (it's okay if it gives error as long as it's not from my code)
@@ -55,42 +48,5 @@ Project in android:
 4. start emulator
 4. run as android project
 
-
-
-07/23/2015:
-DONE 1.Fix cowboys shooting
-*Had negative velocity
-DONE 2. Arrow shooting bugged
-*When arrows are declared as bullets and its functions are called they use the
-super classes function, thus it the type and speed values was unset
-
-
-07/08/2015:
-DONE 1. Flytta physicsbody (PLayer, Cowboy, Worker) till HelloWorld.cpp
-
-DONE 3. add cowboy and worker animations
-
-DONE 6. cowboys and workers should be removed if they leave the screen (left side)
-	- Can be done by putting a wall with a collisionbitmask ?
-
-DONE 7. Turn off sprite rotation
-
-
-6/25/2015:
-Note to self:
-to create a runable win32 file, use the cocos run command ( cocos run -s path -p win32)
-
-6/24/2015:
-	Collisions fixed
-	Started setting up a general skeleton of a game, i.e. making Player & enemy classes,
-	setting up for animations.
-	Player class finished
-	Main menu finished
-
-6/22/2015:
-	Fixed movement, and bullet spawn position
-	To do: Fix collisions ( player with seals and bullets with seals, bullets with player? )
-
-6/21/2015:
-	Started making a sealHunter - clone
+6/21/2015: started
 

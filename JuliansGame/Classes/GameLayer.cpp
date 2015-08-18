@@ -18,7 +18,7 @@ cocos2d::Scene* GameLayer::createScene()
 {
 	_gameScene = Scene::createWithPhysics();
 	_gameScene -> getPhysicsWorld() -> setGravity( Vect( 0, 0 ) );
-   // _gameScene -> getPhysicsWorld() -> setDebugDrawMask( PhysicsWorld::DEBUGDRAW_ALL ); 
+    //_gameScene -> getPhysicsWorld() -> setDebugDrawMask( PhysicsWorld::DEBUGDRAW_ALL ); 
 
 	auto layer = GameLayer::create();
 	layer -> setPhyschisWorld( _gameScene -> getPhysicsWorld() );
@@ -92,22 +92,26 @@ void GameLayer::update( float dt )
 
 void GameLayer::spawnEnemies()
 {
-	 EnemyCB* cb;
-	 EnemyCB* sniper;
-	 if(GameController::enemies.size() < 5)
-	 {
+	Size visibleSize = Director::getInstance()->getVisibleSize();
+    Vec2 origin = Director::getInstance()->getVisibleOrigin();
+
+	EnemyCB* cb;
+	EnemyCB* sniper;
+	if(GameController::enemies.size() < 5)
+	{
 		cb = GameController::spawnEnemy( 2 ); //int 2=cowboy, 3=worker
+
 		if( cb )
 		{
-			addChild( cb );
+			addChild( cb, 2);
 		}
 
 		sniper = GameController::spawnEnemy( 4 ); //int 2=cowboy, 3=worker, 4 = sniper
 		if( sniper )
 		{
-			addChild( sniper );
+			addChild( sniper, 2 );
 		}
-	 }
+	}
 }
 
 void GameLayer::removeCast( DrawNode* node )
@@ -238,6 +242,7 @@ void GameLayer::lostLayer()
 	_lostLayer->setName( "lostLayer" );
 
 	auto lostText = Label::create( "Game Over!", "fonts/Marker Felt.ttf", 60);
+	lostText->setName("lostText");
 	lostText->setScaleX( (visibleSize.width / lostText->getBoundingBox().size.width) * 1/2 );
 	lostText->setScaleY( (visibleSize.height / lostText->getBoundingBox().size.height) * 1/8 );
 	lostText->setPosition( Vec2( origin.x + visibleSize.width / 2,
@@ -299,7 +304,9 @@ void GameLayer::checkHighscore()
 		auto background = Sprite::create( "highscorebox.png" );
 		background->setScaleX( ( visibleSize.width / background->getBoundingBox().size.width ) * 1/2 );
 		background->setScaleY( ( visibleSize.height / background->getBoundingBox().size.height ) * 1/2 );
-		background->setPosition( Vec2( origin.x + visibleSize.width / 2, origin.y + visibleSize.height / 2 ) );
+		background->setPosition( Vec2( origin.x + visibleSize.width / 2,
+			_lostLayer->getChildByName( "lostText" )->getPosition().y - _lostLayer->getChildByName( "lostText" )->getBoundingBox().size.height / 2
+			 - background->getBoundingBox().size.height / 2 - 10 ) );
 
 		_highscoreLayer->addChild( background );
 
@@ -374,20 +381,19 @@ void GameLayer::initGame()
 	backgroundSprite->setScaleX((winSize.width / backgroundSprite->getContentSize().width));
 	backgroundSprite->setScaleY((winSize.height / backgroundSprite->getContentSize().height));
 	backgroundSprite->setPosition( Vec2( origin.x + visibleSize.width / 2, origin.y + visibleSize.height / 2 ) );
-	backgroundSprite->setLocalZOrder( -10 );
-	_gameScene->addChild( backgroundSprite );
+	_gameScene->addChild( backgroundSprite, -10 );
 
 	//Create the player
 	GameController::spawnPlayer();
 	GameController::_player->setPosition( Point( origin.x + visibleSize.width / 6, origin.y + visibleSize.height / 2 ) );
-	_gameScene->addChild( GameController::_player );
+	_gameScene->addChild( GameController::_player, 1 );
 
 	//draw the score
 	auto scoreText = Label::create( "Score:   ", "fonts/Marker Felt.ttf", 30);
 	//scoreText->setScaleX( ( visibleSize.width / scoreText->getBoundingBox().size.width ) * 1/3 );
 	//scoreText->setScaleY( ( visibleSize.height / scoreText->getBoundingBox().size.height ) * 1/8 );
-	scoreText->setPosition( Vec2( origin.x + scoreText->getBoundingBox().size.width / 2,
-		origin.y + visibleSize.height - scoreText->getBoundingBox().size.height / 2 ) );
+	scoreText->setPosition( Vec2( origin.x + scoreText->getBoundingBox().size.width / 2 + 5,
+		origin.y + visibleSize.height - scoreText->getBoundingBox().size.height / 2 - 5) );
 	scoreText->setName( "scoreText" );
 
 	_gameScene->addChild( scoreText );
@@ -395,7 +401,7 @@ void GameLayer::initGame()
 	auto scoreInt = Label::create( "000", "fonts/Marker Felt.ttf", 30);
 	//scoreInt->setScaleX( ( visibleSize.width / scoreInt->getBoundingBox().size.width ) * 1/6 );
 	//scoreInt->setScaleY( ( visibleSize.height / scoreInt->getBoundingBox().size.height ) * 1/8 );
-	scoreInt->setPosition( Vec2( scoreText->getPosition().x + scoreText->getBoundingBox().size.width / 2 + scoreInt->getBoundingBox().size.width / 2,
+	scoreInt->setPosition( Vec2( scoreText->getPosition().x + scoreText->getBoundingBox().size.width / 2 + scoreInt->getBoundingBox().size.width / 2 ,
 		scoreText->getPosition().y ) );
 	scoreInt->setName( "scoreInt" );
 
@@ -405,8 +411,8 @@ void GameLayer::initGame()
 	auto nrArrows = Label::create("Arrows: 4 / 4", "fonts/Marker Felt.ttf", 30 );
 	//nrArrows->setScaleX( ( visibleSize.width / nrArrows->getBoundingBox().size.width ) * 1/6 );
 	//nrArrows->setScaleY( ( visibleSize.height / nrArrows->getBoundingBox().size.height ) * 1/8 );
-	nrArrows->setPosition( Vec2( scoreInt->getPosition().x + scoreInt->getBoundingBox().size.width / 2 + nrArrows->getBoundingBox().size.width / 2,
-		origin.y + visibleSize.height - nrArrows->getBoundingBox().size.height / 2 ) );
+	nrArrows->setPosition( Vec2( scoreInt->getPosition().x + scoreInt->getBoundingBox().size.width / 2 + nrArrows->getBoundingBox().size.width / 2 + 20,
+		origin.y + visibleSize.height - nrArrows->getBoundingBox().size.height / 2 - 5 ) );
 	nrArrows->setName( "nrArrows" );
 
 	_gameScene->addChild( nrArrows );
@@ -458,6 +464,9 @@ void GameLayer::doneButton(Ref* sender)
 
 void GameLayer::rCast( Vec2 start, Vec2 end )
 {
+	auto audio = CocosDenshion::SimpleAudioEngine::getInstance();
+	audio->playEffect( "sniper.wav", false, 1.0f, 1.0f, 1.0f );
+
 	Vec2 points[5];
     int num = 0;
     auto func = [&points, &num](PhysicsWorld& world,

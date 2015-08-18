@@ -17,11 +17,15 @@ Player::~Player()
 
 Player* Player::create()
 {
+	Size visibleSize = Director::getInstance()->getVisibleSize();
+
     Player* pSprite = new Player();
 	pSprite->nrOfArrows = 3;
 	pSprite->initWithFile( "Indian_idle1.png" );
+	pSprite->setScaleX( ( visibleSize.width / pSprite->getBoundingBox().size.width) * 1/12 );
+	pSprite->setScaleY( ( visibleSize.height / pSprite->getBoundingBox().size.height ) * 1/11 );
 
-	pBody = PhysicsBody::createBox( pSprite->getContentSize(), PHYSICSBODY_MATERIAL_DEFAULT);
+	pBody = PhysicsBody::createBox( pSprite->getBoundingBox().size, PHYSICSBODY_MATERIAL_DEFAULT);
 
 	//pBody->setCategoryBitmask( 1 );
 	pBody->setCollisionBitmask( 1 );
@@ -243,7 +247,7 @@ void Player::shoot()
 
 	auto tar = Vec2( origin.x + visibleSize.width, this->getPosition().y );
 	
-    GameController::spawnBullet( 1, Vec2( this->getPosition().x + this->getContentSize().width, this->getPosition().y) , tar );
+    GameController::spawnBullet( 1, Vec2( this->getPosition().x + this->getBoundingBox().size.width / 2, this->getPosition().y ) , tar );
 }
 
 bool Player::onTouchBegan( Touch *touch, Event *unused_event )
