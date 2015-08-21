@@ -23,7 +23,7 @@ Player* Player::create()
 	pSprite->nrOfArrows = 3;
 	pSprite->initWithFile( "Indian_idle1.png" );
 	pSprite->setScaleX( ( visibleSize.width / pSprite->getBoundingBox().size.width) * 1/12 );
-	pSprite->setScaleY( ( visibleSize.height / pSprite->getBoundingBox().size.height ) * 1/11 );
+	pSprite->setScaleY( ( visibleSize.height / pSprite->getBoundingBox().size.height ) * 1/10 );
 
 	pBody = PhysicsBody::createBox( pSprite->getBoundingBox().size, PHYSICSBODY_MATERIAL_DEFAULT);
 
@@ -74,13 +74,6 @@ void Player::addEvents()
 		{
 			switch (keyCode)
 			{
-			/*case cocos2d::EventKeyboard::KeyCode::KEY_A:
-				this->Player::move( Vec2( - pBody->getVelocityLimit(), 0 ) );
-				break;
-
-			case cocos2d::EventKeyboard::KeyCode::KEY_D:
-				this->Player::move( Vec2( pBody->getVelocityLimit(), 0 ) );
-				break;*/
 
 			case cocos2d::EventKeyboard::KeyCode::KEY_S:
 			case cocos2d::EventKeyboard::KeyCode::KEY_DOWN_ARROW:
@@ -255,6 +248,7 @@ bool Player::onTouchBegan( Touch *touch, Event *unused_event )
 	Size visibleSize = Director::getInstance()->getVisibleSize();
 
 	auto touchLoc = touch->getLocation();
+	auto position = this->getPosition();
 	if(touchLoc.x >= visibleSize.width / 2)
 	{
 		//shoot
@@ -274,6 +268,15 @@ bool Player::onTouchBegan( Touch *touch, Event *unused_event )
 	}
 	return true;
 }
+
+void Player::onTouchesMoved( Touch *touch, Event *unused_event)
+{
+	Size visibleSize = Director::getInstance()->getVisibleSize();
+
+	auto touchLoc = touch->getLocation();
+	auto position = this->getPosition();
+}
+
 
 void Player::onTouchEnded( Touch *touch, Event *unused_event )
 {

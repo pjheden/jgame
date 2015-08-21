@@ -282,12 +282,13 @@ void GameLayer::checkHighscore()
 
 	std::string printString( "Highscore:   " );
 	printString += def->getStringForKey( NAME_SCORE );
-	printString += "-";
+	printString += " ";
 	printString += score;
 
 	auto highScore = Label::create( printString , "fonts/Marker Felt.ttf", 30 );
 	highScore->setScaleX( ( visibleSize.width / highScore->getBoundingBox().size.width ) * 1/3 );
 	highScore->setScaleY( ( visibleSize.height / highScore->getBoundingBox().size.height ) * 1/8 );
+	highScore->setTextColor( cocos2d::Color4B::BLACK );
 	highScore->setPosition( Vec2( origin.x + visibleSize.width / 2, origin.y + visibleSize.height - highScore->getBoundingBox().size.height / 2 ) );
 	_lostLayer->addChild( highScore );
 
@@ -313,6 +314,7 @@ void GameLayer::checkHighscore()
 		auto newScore = Label::create( "New Highscore!" , "fonts/Marker Felt.ttf", 30 );
 		newScore->setScaleX( ( visibleSize.width / newScore->getBoundingBox().size.width ) * 1/3 );
 		newScore->setScaleY( ( visibleSize.height / newScore->getBoundingBox().size.height ) * 1/8 );
+		newScore->setTextColor( cocos2d::Color4B::BLACK );
 		newScore->setPosition( background->getPosition().x,
 			background->getPosition().y + background->getBoundingBox().size.height / 2 - newScore->getBoundingBox().size.height / 2 );
 
@@ -392,6 +394,7 @@ void GameLayer::initGame()
 	auto scoreText = Label::create( "Score:   ", "fonts/Marker Felt.ttf", 30);
 	//scoreText->setScaleX( ( visibleSize.width / scoreText->getBoundingBox().size.width ) * 1/3 );
 	//scoreText->setScaleY( ( visibleSize.height / scoreText->getBoundingBox().size.height ) * 1/8 );
+	scoreText->setTextColor( cocos2d::Color4B::BLACK );
 	scoreText->setPosition( Vec2( origin.x + scoreText->getBoundingBox().size.width / 2 + 5,
 		origin.y + visibleSize.height - scoreText->getBoundingBox().size.height / 2 - 5) );
 	scoreText->setName( "scoreText" );
@@ -401,6 +404,7 @@ void GameLayer::initGame()
 	auto scoreInt = Label::create( "000", "fonts/Marker Felt.ttf", 30);
 	//scoreInt->setScaleX( ( visibleSize.width / scoreInt->getBoundingBox().size.width ) * 1/6 );
 	//scoreInt->setScaleY( ( visibleSize.height / scoreInt->getBoundingBox().size.height ) * 1/8 );
+	scoreInt->setTextColor( cocos2d::Color4B::BLACK );
 	scoreInt->setPosition( Vec2( scoreText->getPosition().x + scoreText->getBoundingBox().size.width / 2 + scoreInt->getBoundingBox().size.width / 2 ,
 		scoreText->getPosition().y ) );
 	scoreInt->setName( "scoreInt" );
@@ -411,6 +415,7 @@ void GameLayer::initGame()
 	auto nrArrows = Label::create("Arrows: 4 / 4", "fonts/Marker Felt.ttf", 30 );
 	//nrArrows->setScaleX( ( visibleSize.width / nrArrows->getBoundingBox().size.width ) * 1/6 );
 	//nrArrows->setScaleY( ( visibleSize.height / nrArrows->getBoundingBox().size.height ) * 1/8 );
+	nrArrows->setTextColor( cocos2d::Color4B::BLACK );
 	nrArrows->setPosition( Vec2( scoreInt->getPosition().x + scoreInt->getBoundingBox().size.width / 2 + nrArrows->getBoundingBox().size.width / 2 + 20,
 		origin.y + visibleSize.height - nrArrows->getBoundingBox().size.height / 2 - 5 ) );
 	nrArrows->setName( "nrArrows" );
@@ -437,6 +442,13 @@ void GameLayer::backToMenu( cocos2d::Ref* pSender )
 		audio->stopBackgroundMusic();
 	}
 
+	_gameScene->removeChildByName( "lostLayer" );
+	_gameScene->removeChildByName( "scoreText" );
+	_gameScene->removeChildByName( "scoreInt" );
+	_gameScene->removeChildByName( "nrArrows" );
+
+	GameLayer::_dead = false;
+
 	auto scene = MainMenu::createScene();
 	Director::getInstance()->pushScene( scene );
 }
@@ -448,18 +460,9 @@ void GameLayer::doneButton(Ref* sender)
 	//set the new highscore and name
 	Label* labelScore = (Label* )  _gameScene->getChildByName( "scoreInt" );
 	auto def = CCUserDefault::sharedUserDefault();
-
 	def->setIntegerForKey( HIGH_SCORE, stdReplacer::stoi( labelScore->getString() ) );
 
 	_lostLayer->getChildByName( "menu" )->setVisible( true );
-
-
-	/*if(GameLayer::nameField->getInsertText() == 0)
-	{
-		GameLayer::nameField->setString( "ABC" );
-	}
-	def->setStringForKey( NAME_SCORE, GameLayer::nameField->getString() );*/
-	//def->setStringForKey( NAME_SCORE, "Temporary" )
 }
 
 void GameLayer::rCast( Vec2 start, Vec2 end )

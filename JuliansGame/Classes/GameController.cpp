@@ -46,9 +46,6 @@ Bullet* GameController::spawnBullet( int type, Vec2 pos, Vec2 tar)
 		bullet = Bullet::create();
 		bullet->setPosition( pos );
 		bullet->setTarget( tar );
-		/*auto bulletSpeed = 300.0f;
-		auto distance = pos.x - origin.x;
-		auto move_action = MoveTo::create( distance / bulletSpeed, Vec2( origin.x, pos.y ) );*/
 		break;
 		}
 	}

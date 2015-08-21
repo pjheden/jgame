@@ -134,7 +134,7 @@ void MainMenu::settings(Ref* sender)
     cocos2d::Sprite* back_pressed=Sprite::create( "back2.png" );
     back_item = MenuItemSprite::create(back_normal, back_pressed, CC_CALLBACK_1(MainMenu::back, this));
     back_item->setPosition( visibleSize.width/2 ,
-		slider->getPosition().y - slider->getBoundingBox().size.height / 2 - back_item->getBoundingBox().size.height / 2);
+		slider->getPosition().y - slider->getBoundingBox().size.height / 2 - back_item->getBoundingBox().size.height / 2 - 20 );
 
 	auto menu = Menu::create(back_item, NULL);
     menu->setPosition(origin);
