@@ -275,28 +275,15 @@ void GameLayer::lostLayer()
 	retry_item->setScaleY( (visibleSize.height / retry_item->getBoundingBox().size.height) * 1/8 );
     retry_item->setPosition( Vec2( origin.x + visibleSize.width / 2,
 		origin.y + visibleSize.height / 2 - 2 * retry_item->getBoundingBox().size.height ) );
-	//_lostLayer->addChild( retry_item );
 
 	//adds menu button
 	cocos2d::Sprite* menu_normal=Sprite::create( "menubutton1.png" );
-    cocos2d::Sprite* menu_pressed=Sprite::create( "menubotton2.png" );
+    cocos2d::Sprite* menu_pressed=Sprite::create( "menubutton2.png" );
     menu_item = MenuItemSprite::create( menu_normal, menu_pressed, CC_CALLBACK_1( GameLayer::backToMenu, this ) );
 	menu_item->setScaleX( (visibleSize.width / menu_item->getBoundingBox().size.width) * 1/2 );
 	menu_item->setScaleY( (visibleSize.height / menu_item->getBoundingBox().size.height) * 1/8 );
     menu_item->setPosition( Vec2( origin.x + visibleSize.width / 2,
 		retry_item->getPosition().y - menu_item->getBoundingBox().size.height ) );
-	//_lostLayer->addChild( menu_item );
-
-	//auto retryText = MenuItemFont::create( "Retry?", this, menu_selector( GameLayer::retryGame ) );
-	////retryText->setScaleX( ( visibleSize.width / retryText->getBoundingBox().size.width ) * 1/2 );
-	////retryText->setScaleY( ( visibleSize.height / retryText->getBoundingBox().size.height ) * 1/8 );
-	//retryText->setPosition( Vec2( origin.x + visibleSize.width / 2,
-	//	origin.y + visibleSize.height / 2 - 2 * retryText->getBoundingBox().size.height ) );
-
-	/*auto menuText = MenuItemFont::create( "Menu", this, menu_selector( GameLayer::backToMenu ) );
-	menuText->setScaleX( ( visibleSize.width / menuText->getBoundingBox().size.width ) * 1/2 );
-	menuText->setScaleY( ( visibleSize.height / menuText->getBoundingBox().size.height ) * 1/8 );
-	menuText->setPosition( Vec2( origin.x + visibleSize.width / 2, retryText->getPosition().y - menuText->getBoundingBox().size.height ) );*/
 
 	auto menu = Menu::create( retry_item, menu_item, NULL );
 	menu->setPosition(Vec2::ZERO);
@@ -390,21 +377,6 @@ void GameLayer::checkHighscore()
 
 		_highscoreLayer->addChild( donebutton_item );
 
-		//cocos2d::Sprite* done_normal=Sprite::create( "donebutton1.png" );
-		//cocos2d::Sprite* done_pressed=Sprite::create( "donebutton2.png" );
-		//donebutton_item = MenuItemSprite::create( done_normal, done_pressed, done_normal, CC_CALLBACK_1( GameLayer::doneButton, this) );
-		//donebutton_item->setScaleX( ( visibleSize.width / donebutton_item->getContentSize().width ) * 3/8 );
-		//donebutton_item->setScaleY(  ( visibleSize.height / donebutton_item->getContentSize().height ) * 1/9 );
-		////donebutton_item->setAnchorPoint( Vec2( 0, 0 ) );
-		//donebutton_item->setPosition( background->getPosition().x,
-		//	background->getPosition().y - background->getContentSize().height / 2 + donebutton_item->getContentSize().height / 2  );
-
-		//************* Menu ******************
-		/*auto menu = Menu::create(donebutton_item, NULL);
-		menu->setPosition(origin);
-		menu->setName("menus");
-		_highscoreLayer->addChild( menu, 4 );*/
-
 		GameLayer::_gameScene->addChild( _highscoreLayer );
 
 	}
@@ -466,7 +438,7 @@ void GameLayer::retryGame( cocos2d::Ref* pSender )
 	_gameScene->removeChildByName( "lostLayer" );
 	_gameScene->removeChildByName( "scoreText" );
 	_gameScene->removeChildByName( "scoreInt" );
-	_gameScene->removeChildByName( "nrArrows" );
+	//_gameScene->removeChildByName( "nrArrows" );
 
 	GameLayer::_dead = false;
 	GameLayer::initGame();
@@ -480,13 +452,13 @@ void GameLayer::backToMenu( cocos2d::Ref* pSender )
 		audio->stopBackgroundMusic();
 	}
 
-	_gameScene->removeChildByName( "lostLayer" );
-	_gameScene->removeChildByName( "scoreText" );
-	_gameScene->removeChildByName( "scoreInt" );
-	_gameScene->removeChildByName( "nrArrows" );
+	_gameScene->removeAllChildrenWithCleanup( true );
+	//_gameScene->removeChildByName( "lostLayer" );
+	//_gameScene->removeChildByName( "scoreText" );
+	//_gameScene->removeChildByName( "scoreInt" );
+	//_gameScene->removeChildByName( "nrArrows" );
 
 	GameLayer::_dead = false;
-
 	auto scene = MainMenu::createScene();
 	Director::getInstance()->pushScene( scene );
 }
