@@ -112,6 +112,7 @@ void Player::addEvents()
 		//mobile phone, set touch
 		auto eventListener = EventListenerTouchOneByOne::create();
 		eventListener->onTouchBegan = CC_CALLBACK_2(Player::onTouchBegan, this);
+		//eventListener->onTouchMoved = CC_CALLBACK_2(Player::onTouchMoved, this);
 		eventListener->onTouchEnded = CC_CALLBACK_2(Player::onTouchEnded, this);
 		this->getEventDispatcher()->addEventListenerWithSceneGraphPriority(eventListener, this);
 
@@ -221,6 +222,8 @@ void Player::update()
 {
 	//if player is moving
 	//cocos2d::Vec2 movement = this->getPhysicsBody()->getVelocity();
+
+
 	if( moving )
 	{
 		if( dir == 1 ){ //right
@@ -269,12 +272,42 @@ bool Player::onTouchBegan( Touch *touch, Event *unused_event )
 	return true;
 }
 
-void Player::onTouchesMoved( Touch *touch, Event *unused_event)
+void Player::onTouchMoved( Touch *touch, Event *unused_event)
 {
 	Size visibleSize = Director::getInstance()->getVisibleSize();
+	//auto touchLoc = touch->getLocation();
+	//auto position = this->getPosition();
 
-	auto touchLoc = touch->getLocation();
-	auto position = this->getPosition();
+	if(touch->getLocation().x >= visibleSize.width / 2)
+	{
+		//shoot
+		this->Player::shoot();
+	}else
+	{
+		if( touch->getLocation().y - this->getPosition().y > 20) //
+		{
+			//gå uppåt
+			this->Player::move( Vec2( 0, pBody->getVelocityLimit()) );
+		}else if( touch->getLocation().y - this->getPosition().y < -20)
+		{
+			//gå neråt
+			this->Player::move( Vec2( 0, - pBody->getVelocityLimit()) );
+		}else{
+			this->Player::idle();
+		}
+	}
+
+	if( this->getPosition().y + this->getBoundingBox().size.height / 2 > visibleSize.height )
+	{
+		this->Player::idle();
+		this->setPosition( Vec2( this->getPosition().x, visibleSize.height - this->getBoundingBox().size.height / 2  ) );
+	}
+	else if( this->getPosition().y - this->getBoundingBox().size.height / 2 < 0 )
+	{
+		this->Player::idle();
+		this->setPosition( Vec2( this->getPosition().x, this->getBoundingBox().size.height / 2  ) );
+	}
+
 }
 
 

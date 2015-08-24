@@ -61,6 +61,23 @@ void GameLayer::update( float dt )
 		return;
 	}
 
+	Size visibleSize = Director::getInstance()->getVisibleSize();
+
+
+	if( GameController::_player->getPosition().y + GameController::_player->getBoundingBox().size.height / 2 > visibleSize.height )
+	{
+		GameController::_player->Player::idle();
+		GameController::_player->setPosition( Vec2( GameController::_player->getPosition().x,
+			visibleSize.height - GameController::_player->getBoundingBox().size.height / 2  ) );
+	}
+	else if( GameController::_player->getPosition().y - GameController::_player->getBoundingBox().size.height / 2 < 0 )
+	{
+		GameController::_player->Player::idle();
+		GameController::_player->setPosition( Vec2( GameController::_player->getPosition().x,
+			GameController::_player->getBoundingBox().size.height / 2  ) );
+	}
+
+
 	//Update bullets
 	 GameLayer::bulletControl();
 	
@@ -243,24 +260,45 @@ void GameLayer::lostLayer()
 
 	auto lostText = Label::create( "Game Over!", "fonts/Marker Felt.ttf", 60);
 	lostText->setName("lostText");
+	lostText->setTextColor( cocos2d::Color4B::BLACK );
 	lostText->setScaleX( (visibleSize.width / lostText->getBoundingBox().size.width) * 1/2 );
 	lostText->setScaleY( (visibleSize.height / lostText->getBoundingBox().size.height) * 1/8 );
 	lostText->setPosition( Vec2( origin.x + visibleSize.width / 2,
 		origin.y + visibleSize.height - counterSize.height - lostText->getBoundingBox().size.height ) );
 	_lostLayer->addChild( lostText );
 
-	auto retryText = MenuItemFont::create( "Retry?", this, menu_selector( GameLayer::retryGame ) );
-	//retryText->setScaleX( ( visibleSize.width / retryText->getBoundingBox().size.width ) * 1/2 );
-	//retryText->setScaleY( ( visibleSize.height / retryText->getBoundingBox().size.height ) * 1/8 );
-	retryText->setPosition( Vec2( origin.x + visibleSize.width / 2,
-		origin.y + visibleSize.height / 2 - 2 * retryText->getBoundingBox().size.height ) );
+	//adds retry button
+	cocos2d::Sprite* retry_normal=Sprite::create( "retrybutton1.png" );
+    cocos2d::Sprite* retry_pressed=Sprite::create( "retrybutton2.png" );
+    retry_item = MenuItemSprite::create( retry_normal, retry_pressed, CC_CALLBACK_1( GameLayer::retryGame, this ) );
+	retry_item->setScaleX( (visibleSize.width / retry_item->getBoundingBox().size.width) * 1/2 );
+	retry_item->setScaleY( (visibleSize.height / retry_item->getBoundingBox().size.height) * 1/8 );
+    retry_item->setPosition( Vec2( origin.x + visibleSize.width / 2,
+		origin.y + visibleSize.height / 2 - 2 * retry_item->getBoundingBox().size.height ) );
+	//_lostLayer->addChild( retry_item );
 
-	auto menuText = MenuItemFont::create( "Menu", this, menu_selector( GameLayer::backToMenu ) );
-	//menuText->setScaleX( ( visibleSize.width / menuText->getBoundingBox().size.width ) * 1/2 );
-	//menuText->setScaleY( ( visibleSize.height / menuText->getBoundingBox().size.height ) * 1/8 );
-	menuText->setPosition( Vec2( origin.x + visibleSize.width / 2, retryText->getPosition().y - menuText->getBoundingBox().size.height ) );
+	//adds menu button
+	cocos2d::Sprite* menu_normal=Sprite::create( "menubutton1.png" );
+    cocos2d::Sprite* menu_pressed=Sprite::create( "menubotton2.png" );
+    menu_item = MenuItemSprite::create( menu_normal, menu_pressed, CC_CALLBACK_1( GameLayer::backToMenu, this ) );
+	menu_item->setScaleX( (visibleSize.width / menu_item->getBoundingBox().size.width) * 1/2 );
+	menu_item->setScaleY( (visibleSize.height / menu_item->getBoundingBox().size.height) * 1/8 );
+    menu_item->setPosition( Vec2( origin.x + visibleSize.width / 2,
+		retry_item->getPosition().y - menu_item->getBoundingBox().size.height ) );
+	//_lostLayer->addChild( menu_item );
 
-	auto menu = Menu::create( retryText, menuText, NULL );
+	//auto retryText = MenuItemFont::create( "Retry?", this, menu_selector( GameLayer::retryGame ) );
+	////retryText->setScaleX( ( visibleSize.width / retryText->getBoundingBox().size.width ) * 1/2 );
+	////retryText->setScaleY( ( visibleSize.height / retryText->getBoundingBox().size.height ) * 1/8 );
+	//retryText->setPosition( Vec2( origin.x + visibleSize.width / 2,
+	//	origin.y + visibleSize.height / 2 - 2 * retryText->getBoundingBox().size.height ) );
+
+	/*auto menuText = MenuItemFont::create( "Menu", this, menu_selector( GameLayer::backToMenu ) );
+	menuText->setScaleX( ( visibleSize.width / menuText->getBoundingBox().size.width ) * 1/2 );
+	menuText->setScaleY( ( visibleSize.height / menuText->getBoundingBox().size.height ) * 1/8 );
+	menuText->setPosition( Vec2( origin.x + visibleSize.width / 2, retryText->getPosition().y - menuText->getBoundingBox().size.height ) );*/
+
+	auto menu = Menu::create( retry_item, menu_item, NULL );
 	menu->setPosition(Vec2::ZERO);
 	menu->setName( "menu" );
 	_lostLayer->addChild( menu );

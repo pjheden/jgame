@@ -32,7 +32,11 @@ bool AppDelegate::applicationDidFinishLaunching() {
     if(!glview) {
         glview = GLViewImpl::create("My Game");
 		#if CC_TARGET_PLATFORM == CC_PLATFORM_WIN32 || CC_TARGET_PLATFORM == CC_PLATFORM_LINUX || CC_TARGET_PLATFORM == CC_PLATFORM_MAC	
-			glview->setFrameSize( 480, 320 ); //for scaling test purpose
+			glview->setFrameSize( 1136, 640 ); //for scaling test purpose
+			//iphone6 plus, h=1920
+			//iphone6, h=1334 w=750
+			//iphone5, h=1136 w=640
+			//ipad,  h=2048 w=1536
 		#endif
         director->setOpenGLView(glview);
     }

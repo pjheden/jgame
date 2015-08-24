@@ -57,6 +57,10 @@ public:
 
 private:
 	MenuItemSprite* donebutton_item;
+	MenuItemSprite* retry_item;
+	MenuItemSprite* menu_item;
+
+
 	Layer* _lostLayer;
 	Layer* _highscoreLayer;
 	cocos2d::ui::TextField* nameField;
