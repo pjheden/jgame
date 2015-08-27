@@ -19,7 +19,8 @@ LOCAL_SRC_FILES := hellocpp/main.cpp \
 				   ../../Classes/GameController.cpp \
 				   ../../Classes/GameLayer.cpp \
 				   ../../Classes/Player.cpp \
-				   ../../Classes/stdReplacer.cpp 
+				   ../../Classes/stdReplacer.cpp \
+				   ../../Classes/MyBodyParser.cpp
 
 LOCAL_C_INCLUDES := $(LOCAL_PATH)/../../Classes
 

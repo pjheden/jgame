@@ -1,6 +1,7 @@
 #include "Player.h"
 #include "GameController.h"
 #include "stdReplacer.h"
+#include "MyBodyParser.h"
 
 using namespace cocos2d;
 cocos2d::PhysicsBody* pBody;
@@ -21,21 +22,24 @@ Player* Player::create()
 
     Player* pSprite = new Player();
 	pSprite->nrOfArrows = 3;
-	pSprite->initWithFile( "Indian_idle1.png" );
-	pSprite->setScaleX( ( visibleSize.width / pSprite->getBoundingBox().size.width) * 1/12 );
-	pSprite->setScaleY( ( visibleSize.height / pSprite->getBoundingBox().size.height ) * 1/10 );
-
-	pBody = PhysicsBody::createBox( pSprite->getBoundingBox().size, PHYSICSBODY_MATERIAL_DEFAULT);
+	pSprite->initWithFile( "indian_idle1.png" );
+	//pSprite->setScaleX( ( visibleSize.width / pSprite->getBoundingBox().size.width) * 1/12 );
+	//pSprite->setScaleY( ( visibleSize.height / pSprite->getBoundingBox().size.height ) * 1/10 );
+	MyBodyParser::getInstance()->parseJsonFile( "bodies.json" );
+	pBody = MyBodyParser::getInstance()->bodyFormJson( pSprite, "indian", PHYSICSBODY_MATERIAL_DEFAULT );
+	/*pBody = PhysicsBody::createBox( Size( pSprite->getBoundingBox().size.width / 4, pSprite->getBoundingBox().size.height) 
+		, PHYSICSBODY_MATERIAL_DEFAULT);*/
 
 	//pBody->setCategoryBitmask( 1 );
 	pBody->setCollisionBitmask( 1 );
 	pBody->setContactTestBitmask( true );
 
 	pBody->setRotationEnable( false );
-	//pSprite->setPhysicsBody( pBody );
 
     if ( pSprite )
     {
+		pSprite->setPhysicsBody( pBody );
+
         pSprite->autorelease();
 
         pSprite->initOptions();
@@ -216,24 +220,6 @@ void Player::idle()
 	this->runAction(RepeatForever::create( idleAnimate ) );
 	
 	pBody->setVelocity( cocos2d::Vec2( 0, 0 ) );
-}
-
-void Player::update()
-{
-	//if player is moving
-	//cocos2d::Vec2 movement = this->getPhysicsBody()->getVelocity();
-
-
-	if( moving )
-	{
-		if( dir == 1 ){ //right
-			this->setScaleX( 1 ); //flip
-		}else if( dir == 0 ){ //left
-			this->setScaleX( -1 ); //flip
-		}
-
-	}
-
 }
 
 void Player::shoot()

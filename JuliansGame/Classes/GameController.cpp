@@ -69,8 +69,8 @@ EnemyCB* GameController::spawnEnemy( int type )
 	{
 	case 2:
 		cbSprite= EnemyCB::create();
-		cbSprite->setScaleX( ( visibleSize.width / cbSprite->getBoundingBox().size.width) * -1/12 );
-		cbSprite->setScaleY( ( visibleSize.height / cbSprite->getBoundingBox().size.height ) * 1/11 );
+		//cbSprite->setScaleX( ( visibleSize.width / cbSprite->getBoundingBox().size.width) * -1/12 );
+		//cbSprite->setScaleY( ( visibleSize.height / cbSprite->getBoundingBox().size.height ) * 1/11 );
 		cbSprite->setPhysicsBody( cbSprite->getBody() );
 		cbSprite->schedule(schedule_selector( EnemyCB::shoot ), RandomHelper::random_int( 4.0f, 6.0f ) );
 		break;
@@ -81,8 +81,8 @@ EnemyCB* GameController::spawnEnemy( int type )
 
 	case 4:
 		cbSprite = Sniper::create();
-		cbSprite->setScaleX( ( visibleSize.width / cbSprite->getBoundingBox().size.width) * -1/12 );
-		cbSprite->setScaleY( ( visibleSize.height / cbSprite->getBoundingBox().size.height ) * 1/11 );
+		//cbSprite->setScaleX( ( visibleSize.width / cbSprite->getBoundingBox().size.width) * -1/12 );
+		//cbSprite->setScaleY( ( visibleSize.height / cbSprite->getBoundingBox().size.height ) * 1/11 );
 		cbSprite->setPhysicsBody( cbSprite->getBody() );
 		cbSprite->schedule(schedule_selector( Sniper::shoot ), RandomHelper::random_int( 8.0f, 10.0f ) );
 		break;
@@ -99,10 +99,8 @@ EnemyCB* GameController::spawnEnemy( int type )
 
 Player* GameController::spawnPlayer()
 {
-	Size visibleSize = Director::getInstance()->getVisibleSize();
-
 	GameController::_player = Player::create();
-	GameController::_player->setPhysicsBody ( GameController::_player->getBody() );
+	//GameController::_player->setPhysicsBody ( GameController::_player->getBody() );
 	
 	return _player;
 }

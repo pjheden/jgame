@@ -28,24 +28,69 @@ bool AppDelegate::applicationDidFinishLaunching() {
     auto director = Director::getInstance();
     auto glview = director->getOpenGLView();
 	Size visibleSize = director->getVisibleSize();
-
-    if(!glview) {
-        glview = GLViewImpl::create("My Game");
-		#if CC_TARGET_PLATFORM == CC_PLATFORM_WIN32 || CC_TARGET_PLATFORM == CC_PLATFORM_LINUX || CC_TARGET_PLATFORM == CC_PLATFORM_MAC	
-			glview->setFrameSize( 1136, 640 ); //for scaling test purpose
-			//iphone6 plus, h=1920
-			//iphone6, h=1334 w=750
-			//iphone5, h=1136 w=640
-			//ipad,  h=2048 w=1536
-		#endif
-        director->setOpenGLView(glview);
-    }
-	glview->setDesignResolutionSize(visibleSize.width, visibleSize.height, ResolutionPolicy::NO_BORDER);
-    // turn on display FPS
+    glview = GLViewImpl::create("My Game");
+    director->setOpenGLView(glview);
+   
+	// turn on display FPS
     director->setDisplayStats(false);
 
     // set FPS. the default value is 1.0/60 if you don't call this
     director->setAnimationInterval(1.0 / 60);
+
+	auto fileUtils = FileUtils::getInstance( );
+    auto screenSize = glview->getFrameSize( );
+    std::vector<std::string> resDirOrders;
+    
+#if (CC_TARGET_PLATFORM == CC_PLATFORM_IOS) || (CC_TARGET_PLATFORM == CC_PLATFORM_ANDROID)
+    // check which assets the devices requires
+    if ( 2048 <= screenSize.width || 2048 <= screenSize.height ) // retina iPad
+    {
+        resDirOrders.push_back( "ipadhd" );
+        resDirOrders.push_back( "ipad" );
+        resDirOrders.push_back( "iphonehd5" );
+        resDirOrders.push_back( "iphonehd" );
+        resDirOrders.push_back( "iphone" );
+        
+        glview->setDesignResolutionSize( 2048, 1536, ResolutionPolicy::NO_BORDER );
+
+    }
+    else if ( 1024 <= screenSize.width || 1024 <= screenSize.height ) // non retina iPad
+    {
+        resDirOrders.push_back( "ipad" );
+        resDirOrders.push_back( "iphonehd5" );
+        resDirOrders.push_back( "iphonehd" );
+        resDirOrders.push_back( "iphone" );
+        
+        glview->setDesignResolutionSize( 1024, 768, ResolutionPolicy::NO_BORDER );
+    }
+    else if ( 1136 <= screenSize.width || 1136 <= screenSize.height ) // retina iPhone (5 and 5S)
+    {
+        resDirOrders.push_back("iphonehd5");
+        resDirOrders.push_back("iphonehd");
+        resDirOrders.push_back("iphone");
+        
+        glview->setDesignResolutionSize( 1136, 640, ResolutionPolicy::NO_BORDER );
+    }
+    else if ( 960 <= screenSize.width || 960 <= screenSize.height ) // retina iPhone (4 and 4S)
+    {
+        resDirOrders.push_back( "iphonehd" );
+        resDirOrders.push_back( "iphone" );
+        
+        glview->setDesignResolutionSize( 960, 640, ResolutionPolicy::NO_BORDER );
+    }
+
+#elif (CC_TARGET_PLATFORM == CC_PLATFORM_MAC) || (CC_TARGET_PLATFORM == CC_PLATFORM_WIN32)
+    resDirOrders.push_back( "ipad" );
+    resDirOrders.push_back( "iphonehd5" );
+    resDirOrders.push_back( "iphonehd" );
+    resDirOrders.push_back( "iphone" );
+    
+    glview->setFrameSize( 1024, 768 );
+    glview->setDesignResolutionSize( 1024, 768, ResolutionPolicy::NO_BORDER );
+
+#endif
+    
+    fileUtils->setSearchPaths(resDirOrders);
 
     // create a scene. it's an autorelease object
     //auto scene = HelloWorld::createScene();

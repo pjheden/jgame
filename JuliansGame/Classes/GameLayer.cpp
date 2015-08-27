@@ -18,7 +18,7 @@ cocos2d::Scene* GameLayer::createScene()
 {
 	_gameScene = Scene::createWithPhysics();
 	_gameScene -> getPhysicsWorld() -> setGravity( Vect( 0, 0 ) );
-    //_gameScene -> getPhysicsWorld() -> setDebugDrawMask( PhysicsWorld::DEBUGDRAW_ALL ); 
+   // _gameScene -> getPhysicsWorld() -> setDebugDrawMask( PhysicsWorld::DEBUGDRAW_ALL ); 
 
 	auto layer = GameLayer::create();
 	layer -> setPhyschisWorld( _gameScene -> getPhysicsWorld() );

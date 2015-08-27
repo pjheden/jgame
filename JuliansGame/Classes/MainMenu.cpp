@@ -64,7 +64,6 @@ bool MainMenu::init()
 	background->setAnchorPoint( Vec2( origin.x, origin.y ) );
     //background->setPosition( origin.x + visibleSize.width / 2, origin.y + visibleSize.height );
     this->addChild( background, -1, -1 );
-    background->setGlobalZOrder( -1 );
 
 	//adds start game
 	cocos2d::Sprite* start_normal=Sprite::create( "startgame1.png" );

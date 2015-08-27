@@ -32,8 +32,6 @@ class Player : public cocos2d::Sprite
 
 		void idle();
 
-		void update();
-
 		void shoot();
 
 		bool onTouchBegan( Touch *touch, Event *unused_event );

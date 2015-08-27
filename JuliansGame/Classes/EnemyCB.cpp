@@ -1,6 +1,7 @@
 #include "EnemyCB.h"
 #include "GameController.h"
 #include "stdReplacer.h"
+#include "MyBodyParser.h"
 
 using namespace cocos2d;
 
@@ -23,7 +24,7 @@ EnemyCB* EnemyCB::create()
 
 	eSprite->setScaleX( -1 );
 
-	if (eSprite && eSprite->initWithSpriteFrame( cacher->getSpriteFrameByName( "cowbay_walk1.png" ) )  )
+	if (eSprite && eSprite->initWithSpriteFrame( cacher->getSpriteFrameByName( "cowboy_walk1.png" ) )  )
     {
 		eSprite->initAnimations();
 		eSprite->move();
@@ -43,14 +44,14 @@ void EnemyCB::initAnimations()
 	//------------------move animation -------------------
 	#include <sstream>
 	// load all the animation frames into an array
-	const int kNumberOfFrames = 4;
+	const int kNumberOfFrames = 3;
 	Vector<SpriteFrame*> frames;
 	for (int i = 1; i <= kNumberOfFrames; i++)
 	{
 		std::string s = stdReplacer::to_string( i );
 
 		SpriteFrame* aFrame =
-		cacher->getSpriteFrameByName( "cowbay_walk" + s + ".png" );
+		cacher->getSpriteFrameByName( "cowboy_walk" + s + ".png" );
 		frames.pushBack(aFrame);
 	}
 
@@ -86,7 +87,10 @@ void EnemyCB::initAnimations()
 
 PhysicsBody* EnemyCB::getBody()
 {
-	auto physicsBody = PhysicsBody::createBox( this->getBoundingBox().size, PHYSICSBODY_MATERIAL_DEFAULT );
+	MyBodyParser::getInstance()->parseJsonFile( "bodies.json" );
+	auto physicsBody = MyBodyParser::getInstance()->bodyFormJson( this, "cowboy", PHYSICSBODY_MATERIAL_DEFAULT );
+	//auto physicsBody = PhysicsBody::createBox( Size(this->getBoundingBox().size.width / 2, this->getBoundingBox().size.height) 
+	//	, PHYSICSBODY_MATERIAL_DEFAULT );
 
 	//physicsBody->setCategoryBitmask( 2 );
 	physicsBody->setCollisionBitmask( 2 );
@@ -321,7 +325,8 @@ void Sniper::initAnimations()
 
 PhysicsBody* Sniper::getBody()
 {
-	auto physicsBody = PhysicsBody::createBox( this->getBoundingBox().size, PHYSICSBODY_MATERIAL_DEFAULT );
+	auto physicsBody = PhysicsBody::createBox( Size(this->getBoundingBox().size.width / 2, this->getBoundingBox().size.height) 
+		, PHYSICSBODY_MATERIAL_DEFAULT );
 
 	//physicsBody->setCategoryBitmask( 2 );
 	physicsBody->setCollisionBitmask( 2 );
