@@ -113,26 +113,34 @@ void GameController::drawCast( Vec2 start )
 
 void GameController::erase( Node* node )
 {
-	auto type = node->getPhysicsBody()->getCollisionBitmask();
-	switch ( type )
+	if(node)
 	{
-	case 1://player
-		break;
-	case 2: //enemy
-		enemies.eraseObject( (EnemyCB*) node );
-		break;
-	case 3: //projectile
-		//GameController::_player->nrOfArrows -= 1;
-		bullets.eraseObject( (Bullet*) node );
-		break;
+		auto body = node->getPhysicsBody();
+		auto type = body->getCollisionBitmask();
+		switch ( type )
+		{
+		case 1://player
+			break;
+		case 2: //enemy
+			enemies.eraseObject( (EnemyCB*) node );
+			break;
+		case 3: //arrow
+			//GameController::_player->nrOfArrows -= 1;
+			bullets.eraseObject( (Bullet*) node );
+			break;
+		case 4: // bullet
+			//bullets.eraseObject( (Bullet*) node );
+			break;
+		}
+		node->removeFromParentAndCleanup( true );
 	}
-	node->removeFromParentAndCleanup( true );
 }
 
 void GameController::eraseAll()
 {
 	//remove player & touch events
-	GameController::_player->removeFromParentAndCleanup( true );
+	//GameController::_player->removeFromParentAndCleanup( true );
+	GameController::_player->removeFromParent();
 //	GameController::_player->getEventDispatcher()->removeAllEventListeners();
 
 	//remove all bullets

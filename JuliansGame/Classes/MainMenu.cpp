@@ -24,7 +24,6 @@ Scene* MainMenu::createScene()
 
 bool MainMenu::init()
 {
-	
     if ( !Layer::init() )
     {
         return false;
@@ -48,7 +47,6 @@ bool MainMenu::init()
 	m_emitter2->setGravity( Vec2( 0, 90 ) );
 	
 	this->addChild( m_emitter2, 10 );
-
 	//audio settings
 	auto audio = CocosDenshion::SimpleAudioEngine::getInstance();
 	if ( !audio->isBackgroundMusicPlaying() )
@@ -61,9 +59,9 @@ bool MainMenu::init()
 	cocos2d::Sprite* background = Sprite::create( "mainmenu2.png" );
 	background->setScaleX((visibleSize.width / background->getContentSize().width));
 	background->setScaleY((winSize.height / background->getContentSize().height));
-	background->setAnchorPoint( Vec2( origin.x, origin.y ) );
-    //background->setPosition( origin.x + visibleSize.width / 2, origin.y + visibleSize.height );
-    this->addChild( background, -1, -1 );
+    background->setPosition( origin.x + visibleSize.width / 2, origin.y + visibleSize.height / 2 );
+    this->addChild( background, -1 );
+	//this->setZOrder( -10 );
 
 	//adds start game
 	cocos2d::Sprite* start_normal=Sprite::create( "startgame1.png" );
@@ -97,7 +95,6 @@ bool MainMenu::init()
 	menu->setName("menu");
     this->addChild(menu,3);
 
-	
 	return true;
 }
 

@@ -220,9 +220,12 @@ bool GameLayer::onContactBegin ( cocos2d::PhysicsContact &contact )
 
 void GameLayer::playerDead()
 {
-	GameLayer::_dead = true;
-	GameController::eraseAll();
-	GameLayer::lostLayer();
+	if(!GameLayer::_dead)
+	{
+		GameLayer::_dead = true;
+		GameController::eraseAll();
+		GameLayer::lostLayer();
+	}
 }
 
 void GameLayer::updateScore( int nr )
@@ -243,6 +246,7 @@ void GameLayer::updateArrows()
 	if(arrowLabel)
 	{
 		arrowLabel->setString( std::string( "Arrows: " ) + stdReplacer::to_string( nr ) + std::string( " / 4" ));
+		arrowLabel->setName( "nrArrows" );
 	}
 }
 
@@ -252,7 +256,8 @@ void GameLayer::lostLayer()
 	Size visibleSize = Director::getInstance()->getVisibleSize();
     Vec2 origin = Director::getInstance()->getVisibleOrigin();
 
-	auto counterSize =  _gameScene->getChildByName( "nrArrows" )->getBoundingBox().size;
+	auto arrow = _gameScene->getChildByName( "nrArrows");
+	auto counterSize =  arrow->getBoundingBox().size;
 	_gameScene->removeChildByName( "nrArrows" );
 
 	_lostLayer = Layer::create();
@@ -477,6 +482,7 @@ void GameLayer::doneButton(Ref* sender)
 
 void GameLayer::rCast( Vec2 start, Vec2 end )
 {
+	Size visibleSize = Director::getInstance()->getVisibleSize();
 	auto audio = CocosDenshion::SimpleAudioEngine::getInstance();
 	audio->playEffect( "sniper.wav", false, 1.0f, 1.0f, 1.0f );
 
@@ -496,10 +502,14 @@ void GameLayer::rCast( Vec2 start, Vec2 end )
 
 	for (int i = 0; i < num; ++i)
     {
-		if( abs( GameController::_player->getPosition().x - points[i].x ) < GameController::_player->getBoundingBox().size.width )
+		if (points[i].x < visibleSize.width / 2 && points[i].y != 0.0f)
 		{
 			GameLayer::playerDead();
 		}
+		/*if( abs( GameController::_player->getPosition().x - points[i].x ) < GameController::_player->getBoundingBox().size.width )
+		{
+			GameLayer::playerDead();
+		}*/
     }
 
 }
